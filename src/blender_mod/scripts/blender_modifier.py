@@ -6,6 +6,7 @@ import os
 import math
 import colorsys
 from pathlib import Path
+import random
 
 file_dir = os.path.join(bpy.path.abspath("//"), "scripts")
 
@@ -149,6 +150,7 @@ def apply_texture(document: str, paper: str):
     paper (str): The file path of the paper texture image.
     """
 
+    # TODO Include normals map
     # Get the active object
     obj = bpy.context.active_object
 
@@ -208,11 +210,95 @@ def apply_texture(document: str, paper: str):
         obj.data.materials.append(mat)
 
 
-def create_background(texture: str, normals: str):
-    pass
+def create_background(texture_path: str, normals_path: str, back_data: dict):
+    """
+    Creates a background plane in the Blender scene and applies a texture and normal map
+    to it.
+
+    This function creates a plane named "Background" in the Blender scene if it doesn't
+    exist already. It then creates a new material named "Background_Material" and sets
+    up nodes to use the specified texture and normal map files to create a textured sur-
+    face on the plane.
+
+    Args:
+        texture_path (str): The file path to the texture image.
+        normals_path (str): The file path to the normal map image.
+        data (dict): A dictionary containing info about the position or scale of the
+        plane background.
+    """
+
+    # Create plane
+    if not bpy.data.objects.get("Plane"):
+        bpy.ops.mesh.primitive_plane_add()
+    plane = bpy.data.objects["Plane"]
+    plane.scale = (back_data["scale_x"], back_data["scale_y"], 1)
+    plane.location = (back_data["pos_x"], back_data["pos_y"], back_data["pos_z"])
+
+    # New background material
+    mat = bpy.data.materials.new(name="Background_Material")
+    mat.use_nodes = True
+    nodes = mat.node_tree.nodes
+    links = mat.node_tree.links
+
+    # Clear default nodes
+    for node in nodes:
+        nodes.remove(node)
+
+    # Create necessary nodes
+    principled_node = nodes.new(type="ShaderNodeBsdfPrincipled")
+    texture_node = nodes.new(type="ShaderNodeTexImage")
+    normals_node = nodes.new(type="ShaderNodeNormalMap")
+    normals_node.inputs["Strength"].default_value = 0.5
+    normals_image_node = nodes.new(type="ShaderNodeTexImage")
+    output_node = nodes.new(type="ShaderNodeOutputMaterial")
+
+    # Set node locations to prevent overlapping
+    principled_node.location = (200, 300)
+    texture_node.location = (-300, 300)
+    normals_node.location = (0, -50)
+    normals_image_node.location = (-300, -50)
+    output_node.location = (500, 300)
+
+    texture_node.image = bpy.data.images.load(texture_path)
+    normals_image_node.image = bpy.data.images.load(normals_path)
+
+    # Link nodes
+    links.new(texture_node.outputs["Color"], principled_node.inputs["Base Color"])
+    links.new(normals_image_node.outputs["Color"], normals_node.inputs["Color"])
+    links.new(normals_node.outputs["Normal"], principled_node.inputs["Normal"])
+    links.new(principled_node.outputs["BSDF"], output_node.inputs["Surface"])
+
+    # Asign material
+    if plane.data.materials:
+        plane.data.materials[0] = mat
+    else:
+        plane.data.materials.append(mat)
 
 
 def compute_pos(pos_data: dict, distribution: str = "normal"):
+    """
+    Computes position coordinates based on specified distribution parameters.
+
+    This function generates a position vector based on the provided data for each di-
+    mension (x, y, z). Currently, it only supports a normal distribution for generating
+    these values, utilizing a helper function `ghelp.get_value_from_normal` to obtain a
+    value from a normal distribution based on the average and max_delta values for each
+    dimension.
+
+    Args:
+        pos_data (dict): A dictionary containing the average position ('x', 'y', 'z')
+            and the maximum deviation ('dx', 'dy', 'dz') for each dimension.
+        distribution (str): The type of distribution to use for generating position
+            values. Defaults to "normal".
+
+    Returns:
+        list: A list containing the position values for each dimension [x, y, z].
+
+    Note:
+        - Only the "normal" distribution is currently implemented. Any other distribu-
+          tion type will result in a printed message and no change to the position value
+          for that dimension.
+    """
     dims = ["x", "y", "z"]
     pos = []
 
@@ -236,14 +322,14 @@ def config_camera(camera_data: dict):
     the camera's location and rotation based on the input style. The camera_data
     dict should contain nested dictionaries describing the position and rotation
     parameters for the camera, including average values and maximum deviations
-    for each parameter. The function uses a helper function `ghelp.get_value_from_normal`
+    for each parameter. The function uses a helper method `ghelp.get_value_from_normal`
     to generate a value from a normal distribution defined by the average value and
     the max, min values.
 
     Args:
         camera_data (dict): A dictionary containing the following nested structure:
 
-            "camera": {
+            {
                 "pos_meters": {
                     "x": float, "dx": float,
                     "y": float, "dy": float,
@@ -318,6 +404,71 @@ def config_lights(lights_data: dict):
         )
         light.color = rgb_color
 
+        # Contact shadows
+        light.use_contact_shadow = True
+        light.shadow_buffer_bias = 0.001
+
+
+def render_scene(dst_folder: str, name: str, img_dims: dict):
+    """
+    Render the current scene in Blender using the EEVEE render engine,
+    and save the rendered image to the specified destination folder with the given name.
+
+    Args:
+        dst_folder (str): The directory path where the rendered image will be saved.
+        name (str): The name of the rendered image file (including file extension).
+    """
+    camera = bpy.data.objects.get("Camera")
+    if camera:
+        bpy.context.scene.camera = camera
+    else:
+        raise RuntimeError("No camera found in the scene")
+
+    bpy.context.scene.render.resolution_x = img_dims["width"]
+    bpy.context.scene.render.resolution_y = img_dims["height"]
+
+    bpy.context.scene.render.filepath = os.path.join(dst_folder, name)
+    bpy.ops.render.render(write_still=True)
+
+
+def modify_mesh(mesh_data: dict):
+    """
+    Modify a mesh object in Blender by subdividing it and smoothing the vertices.
+
+    This function takes a dictionary containing subdivision and vertex smoothing
+    information, selects the mesh object named "Document" in the current Blender scene,
+    and applies the specified modifications.
+
+    Args:
+        mesh_data (dict): A dictionary containing the following keys:
+
+            {
+                'subdivision': {
+                    'cuts': float
+                    'fractal': float
+                },
+                'vert_smooth': {
+                    'repeat': float
+                    'factor': float
+                }
+            }
+
+    """
+    bpy.data.objects["Document"].select_set(True)
+    bpy.ops.object.mode_set(mode="EDIT")
+
+    subdiv = mesh_data["subdivision"]
+    smooth = mesh_data["vert_smooth"]
+
+    # Mesh modifications
+    bpy.ops.mesh.subdivide(
+        number_cuts=subdiv["cuts"],
+        fractal=subdiv["fractal"],
+        seed=random.randint(1, 1000),
+    )
+    bpy.ops.mesh.vertices_smooth(repeat=smooth["repeat"], factor=smooth["factor"])
+    bpy.ops.object.mode_set(mode="OBJECT")
+
 
 if __name__ == "__main__":
     # Config
@@ -340,8 +491,22 @@ if __name__ == "__main__":
     paper_texture = os.path.join(
         bpy.path.abspath("//"), "assets", "textures", "papers", "paper.png"
     )
-    background_texture = ""
-    background_normal = ""
+    background_texture = os.path.join(
+        bpy.path.abspath("//"),
+        "assets",
+        "textures",
+        "backgrounds",
+        "white_oak",
+        "texture.png",
+    )
+    background_normal = os.path.join(
+        bpy.path.abspath("//"),
+        "assets",
+        "textures",
+        "backgrounds",
+        "white_oak",
+        "normals.png",
+    )
 
     # Mesh and object
     vertices, delaunay_mesh = compute_mesh(
@@ -353,9 +518,16 @@ if __name__ == "__main__":
     apply_texture(document=document_texture, paper=paper_texture)
 
     # Modify mesh
+    mesh_data = properties["blender"]["document_mesh_mod"]
+    modify_mesh(mesh_data=mesh_data)
 
     # Set background
-    # create_background()
+    background_data = properties["blender"]["common"]["background"]
+    create_background(
+        texture_path=background_texture,
+        normals_path=background_normal,
+        back_data=background_data,
+    )
 
     # Set light
     lights_data = properties["blender"][requirements["styles"][0]]["lights"]
@@ -366,3 +538,9 @@ if __name__ == "__main__":
     config_camera(camera_data=camera_data)
 
     # Render scene
+    dst_folder = os.path.join(
+        Path(bpy.path.abspath("//")).parent.parent, "data", "modified"
+    )
+    render_scene(
+        dst_folder=dst_folder, name="test.png", img_dims=requirements["img_output"]
+    )

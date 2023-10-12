@@ -110,6 +110,25 @@
                     "max": 1
                 }
             }
+        },
+        "common": {
+            "background": {
+                "pos_x": 0.105,
+                "pos_y": 0.1485,
+                "pos_z": -0.005,
+                "scale_x": 0.5,
+                "scale_y": 0.5
+            }
+        },
+        "document_mesh_mod": {
+            "subdivision": {
+                "cuts": 4,
+                "fractal": 3.5
+            },
+            "vert_smooth": {
+                "repeat": 3,
+                "factor": 1
+            }
         }
     }
 }

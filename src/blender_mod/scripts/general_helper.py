@@ -51,7 +51,6 @@ def get_value_from_normal(avg: float, max_delta: float, z_score: int = 3):
 
     max_val = avg + max_delta
     min_val = avg - max_delta
-    print(f"min:{min_val}, avg:{avg}, max:{max_val}")
     sigma = (max_val - min_val) / (2 * z_score)
 
     sample = np.random.normal(loc=avg, scale=sigma)

@@ -1,5 +1,9 @@
 {
     "styles": [
         "scanner_style"
-    ]
+    ],
+    "img_output": {
+        "width": 1920,
+        "height": 1080
+    }
 }
