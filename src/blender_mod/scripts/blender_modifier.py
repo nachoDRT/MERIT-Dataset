@@ -3,6 +3,8 @@ import numpy as np
 from scipy.spatial import Delaunay
 import sys
 import os
+import math
+import colorsys
 from pathlib import Path
 
 file_dir = os.path.join(bpy.path.abspath("//"), "scripts")
@@ -11,6 +13,7 @@ if file_dir not in sys.path:
     sys.path.append(file_dir)
 
 import delaunay_helper as dhelp
+import general_helper as ghelp
 
 SHOW_PLOT = True
 
@@ -25,10 +28,10 @@ def define_units(scale_length: float = 1.0, lenght_unit: str = "METERS"):
     The scale length is a multiplier that adjusts the size of the 3D space in Blender,
     and the unit of length specifies the name of the units being used (e.g., meters).
 
-    Parameters:
+    Args:
         scale_length (float): The scale length to set in Blender. Defaults to 1.0.
         length_unit (str): The unit of length to use (e.g., "METERS", "MILLIMETERS").
-        Defaults to "METERS".
+            Defaults to "METERS".
     """
 
     bpy.context.scene.unit_settings.system = "METRIC"
@@ -36,7 +39,7 @@ def define_units(scale_length: float = 1.0, lenght_unit: str = "METERS"):
     bpy.context.scene.unit_settings.length_unit = lenght_unit
 
 
-def compute_mesh(sample_path: str):
+def compute_mesh(sample_path: str, properties: dict):
     """
     Compute a Delaunay mesh based on the data from a labeled document JSON file.
 
@@ -45,8 +48,10 @@ def compute_mesh(sample_path: str):
     both the document points and the grid. If the global variable `SHOW_PLOT` is set to
     True, it also plots the resulting Delaunay mesh.
 
-    Parameters:
-        sample_path (str): The name of the sample JSON file containing the data.
+    Args:
+        sample_path (str): The name of the sample JSON file containing the (clean)
+            template data.
+        properties (dict): The JSON dict with configuration values.
 
     Returns:
         tuple: A tuple containing:
@@ -57,7 +62,7 @@ def compute_mesh(sample_path: str):
 
     json_info = dhelp.read_json(name=sample_path)
     document_points = dhelp.get_bboxes_as_points(form=json_info["form"])
-    grid = dhelp.compute_grid()
+    grid = dhelp.compute_grid(properties=properties)
     vertices = np.concatenate((document_points, grid), axis=0)
     delaunay_mesh = Delaunay(vertices)
     if SHOW_PLOT:
@@ -71,7 +76,7 @@ def compute_mesh(sample_path: str):
     return vertices, delaunay_mesh
 
 
-def create_mesh_object(vertices: np.array, mesh: Delaunay):
+def create_mesh_object(vertices: np.array, mesh: Delaunay, properties: dict):
     """
     Create a new Blender mesh using a Delaunay mesh object and its vertices.
 
@@ -84,6 +89,7 @@ def create_mesh_object(vertices: np.array, mesh: Delaunay):
     Args:
         vertices (np.array): The array of 2D vertices used to create the mesh.
         mesh (Delaunay): The Delaunay mesh computed from the vertices.
+        properties (dict): The JSON dict with configuration values.
 
     Note:
         - The vertices should be 2D, and they will be converted to 3D by adding a
@@ -103,7 +109,7 @@ def create_mesh_object(vertices: np.array, mesh: Delaunay):
 
     # Add the z dimension to the 2D vertices and format them
     three_d_vertices = [tuple(np.append(vertice, 0)) for vertice in vertices]
-    three_d_vertices = dhelp.pixel_to_m(three_d_vertices)
+    three_d_vertices = dhelp.pixel_to_m(vector=three_d_vertices, properties=properties)
     three_d_vertices = dhelp.list_to_tuple_items(three_d_vertices)
 
     # Define faces (clockwise lists of vertex indices delimiting them) and format them
@@ -138,7 +144,7 @@ def apply_texture(document: str, paper: str):
     Applies a texture to the active object by creating a new material and
     setting up a node tree to handle the texture mapping, mixing, and shading.
 
-    Parameters:
+    Args:
     document (str): The file path of the document texture image.
     paper (str): The file path of the paper texture image.
     """
@@ -206,9 +212,122 @@ def create_background(texture: str, normals: str):
     pass
 
 
+def compute_pos(pos_data: dict, distribution: str = "normal"):
+    dims = ["x", "y", "z"]
+    pos = []
+
+    for dim in dims:
+        pos_i = pos_data[dim]
+        pos_di = pos_data["".join(["d", dim])]
+        if distribution == "normal":
+            pos_i = ghelp.get_value_from_normal(avg=pos_i, max_delta=pos_di)
+        else:
+            print(f"{distribution} distribution is not implemented")
+        pos.append(pos_i)
+
+    return pos
+
+
+def config_camera(camera_data: dict):
+    """
+    Positions and orients a camera in the Blender scene based on specified style.
+
+    This function ensures a camera object exists in the Blender scene, then computes
+    the camera's location and rotation based on the input style. The camera_data
+    dict should contain nested dictionaries describing the position and rotation
+    parameters for the camera, including average values and maximum deviations
+    for each parameter. The function uses a helper function `ghelp.get_value_from_normal`
+    to generate a value from a normal distribution defined by the average value and
+    the max, min values.
+
+    Args:
+        camera_data (dict): A dictionary containing the following nested structure:
+
+            "camera": {
+                "pos_meters": {
+                    "x": float, "dx": float,
+                    "y": float, "dy": float,
+                    "z": float, "dz": float
+                },
+                "rot_degrees": {
+                    "x": float, "dx": float,
+                    "y": float, "dy": float,
+                    "z": float, "dz": float
+                }
+            }
+    """
+
+    # Make sure a camera object exists
+    if not bpy.data.objects.get("Camera"):
+        bpy.ops.object.camera_add()
+    camera = bpy.data.objects["Camera"]
+
+    # Compute camera location
+    pos = compute_pos(pos_data=camera_data["pos_meters"])
+
+    # Compute camera rotation
+    rot_x = camera_data["rot_degrees"]["x"]
+    rot_dx = camera_data["rot_degrees"]["dx"]
+    rot_x = math.radians(ghelp.get_value_from_normal(avg=rot_x, max_delta=rot_dx))
+
+    rot_y = camera_data["rot_degrees"]["y"]
+    rot_dy = camera_data["rot_degrees"]["dy"]
+    rot_y = math.radians(ghelp.get_value_from_normal(avg=rot_y, max_delta=rot_dy))
+
+    rot_z = camera_data["rot_degrees"]["z"]
+    rot_dz = camera_data["rot_degrees"]["dz"]
+    rot_z = math.radians(ghelp.get_value_from_normal(avg=rot_z, max_delta=rot_dz))
+
+    # Set location and rotation
+    camera.location = (pos[0], pos[1], pos[2])
+    camera.rotation_euler = (rot_x, rot_y, rot_z)
+
+
+def config_lights(lights_data: dict):
+    """
+    Create and configure a number of light objects in the Blender scene based on the
+    provided data.
+
+    Args:
+        lights_data (dict): A dictionary containing the data to configure lights.
+    """
+
+    # TODO Random light style
+    n_lights = lights_data["number"]
+
+    for light_i in range(n_lights):
+        # Create a new light datablock
+        light = bpy.data.lights.new(name=f"Light_{light_i}", type="POINT")
+        light.energy = lights_data["power"]
+        light.diffuse_factor = lights_data["diffuse"]
+        light.specular_factor = lights_data["specular"]
+        light.shadow_soft_size = lights_data["radius"]
+
+        # Create a new light object and link it to the collection
+        light_object = bpy.data.objects.new(f"Light_{light_i}", object_data=light)
+        bpy.context.collection.objects.link(light_object)
+
+        # Set light location
+        light_pos = compute_pos(lights_data["pos_meters"])
+        light_object.location = (light_pos[0], light_pos[1], light_pos[2])
+
+        # Light color
+        color_info = lights_data["color"]
+        rgb_color = colorsys.hsv_to_rgb(
+            color_info["hue"], color_info["saturation"], color_info["value"]
+        )
+        light.color = rgb_color
+
+
 if __name__ == "__main__":
     # Config
     define_units()
+
+    # Load requirements
+    requirements = ghelp.load_requirements(root=bpy.path.abspath("//"))
+
+    # Load properties
+    properties = dhelp.load_properties(root=bpy.path.abspath("//"))
 
     # Load assets
     sample_name = os.path.join(
@@ -225,8 +344,10 @@ if __name__ == "__main__":
     background_normal = ""
 
     # Mesh and object
-    vertices, delaunay_mesh = compute_mesh(sample_path=sample_name)
-    create_mesh_object(vertices=vertices, mesh=delaunay_mesh)
+    vertices, delaunay_mesh = compute_mesh(
+        sample_path=sample_name, properties=properties
+    )
+    create_mesh_object(vertices=vertices, mesh=delaunay_mesh, properties=properties)
 
     # Textures
     apply_texture(document=document_texture, paper=paper_texture)
@@ -237,7 +358,11 @@ if __name__ == "__main__":
     # create_background()
 
     # Set light
+    lights_data = properties["blender"][requirements["styles"][0]]["lights"]
+    config_lights(lights_data=lights_data)
 
     # Set camera
+    camera_data = properties["blender"][requirements["styles"][0]]["camera"]
+    config_camera(camera_data=camera_data)
 
     # Render scene

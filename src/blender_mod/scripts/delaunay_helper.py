@@ -16,13 +16,13 @@ def get_bboxes_as_points(form: List[Dict[str, Any]]) -> np.array:
 
     Args:
         form (list): A list containing all the segments of a form. Each segment should
-        be a dictionary containing (among others) a 'words' key with bounding box(es)
-        data.
+            be a dictionary containing (among others) a 'words' key with bounding
+            box(es) data.
 
     Returns:
         np.array: An array containing all the key points as pixel coordinates, where
-        each row represents a point and has two columns for the x and y coordinates res-
-        pectively.
+            each row represents a point and has two columns for the x and y coordinates
+            respectively.
 
     Example:
         >>> form = {
@@ -73,7 +73,7 @@ def extract_boxes(form_entry: dict) -> List[Tuple[int, int]]:
 
     Returns:
         list[tuple[int, int]]: A list with the points of the each bounding box. Each
-        point is represented as a tuple of two integers (x, y).
+            point is represented as a tuple of two integers (x, y).
     """
 
     points = []
@@ -84,27 +84,28 @@ def extract_boxes(form_entry: dict) -> List[Tuple[int, int]]:
     return points
 
 
-def compute_grid(sampling_x: int = 50, sampling_y: int = 50):
+def compute_grid(properties: dict, sampling_x: int = 50, sampling_y: int = 50):
     """
-    Generate a grid of points within a specified bounding box.
+    Generate a grid of points within the bounding box defined by the dimensions of
+    an A4 page.
 
-    The function creates a grid of points by sampling the A4 page space. The sampling
-    intervals along the x and y axes are defined by `sampling_x` and `sampling_y` res-
-    pectively.
+    The function creates a grid of points by sampling the space within the bounds of
+    an A4 page. The interval between adjacent grid points along the x and y axes are
+    defined by `sampling_x` and `sampling_y` respectively. These intervals determine
+    the density of the grid points.
 
     Args:
-        sampling_x (int): The sampling interval along the x-axis.
-        Default is 100.
-        sampling_y (int): The sampling interval along the y-axis.
-        Default is 100.
+        properties (dict): A dictionary containing the properties of the A4 page
+            including its dimensions in pixels.
+        sampling_x (int): The sampling interval along the x-axis. Default is 50.
+        sampling_y (int): The sampling interval along the y-axis.Default is 50.
 
     Returns:
         np.array: An array of tuples where each tuple contains the x and y coordinates
-        of a point on the grid. The grid points are ordered first along the x-axis, then
-        along the y-axis.
+            of a point on the grid. The grid points are ordered first along the x-axis,
+            then along the y-axis.
     """
 
-    properties = load_properties()
     a4_pixel_width = properties["delaunay"]["a4_pixel_dims"]["width"]
     a4_pixel_height = properties["delaunay"]["a4_pixel_dims"]["height"]
 
@@ -149,9 +150,9 @@ def show_plot(
 
     Args:
         vertices (np.array): A 2D numpy array of shape (n, 2) representing the vertices
-        coordinates (it includes default_grid + words' bounding boxes vertices).
-        default_grid (np.array): A 2D numpy array of shape (m, 2) representing the grid
-        points coordinates.
+            coordinates (it includes default_grid + words' bounding boxes vertices).
+            default_grid (np.array): A 2D numpy array of shape (m, 2) representing the
+            grid points coordinates.
         mesh (Type[Delaunay]): A Delaunay object representing the triangulation mesh.
         name (str): The title to be displayed at the top of the plot.
     """
@@ -180,8 +181,27 @@ def list_to_tuple_items(vector: list):
     return [tuple(item) for item in vector]
 
 
-def pixel_to_m(vector: list):
-    properties = load_properties()
+def pixel_to_m(vector: list, properties: dict):
+    """
+    Converts a list of coordinates from pixels to meters.
+
+    This function iterates through a list of tuples, each containing coordinates in
+    pixels, and converts these coordinates to meters based on the conversion factor
+    provided in the 'properties' dictionary. The conversion involves two steps:
+
+    1. Converting pixels to millimeters using the '1 / mm_2_pixel' conversion factor.
+    2. Converting millimeters to meters by dividing by 1000.
+
+    Args:
+        vector (list): A list of tuples where each tuple contains coordinates in pixels.
+        properties (dict): A dictionary containing the conversion factor under the keys
+            'delaunay' and 'mm_2_pixel'.
+
+    Returns:
+        np.array: A NumPy array of tuples where each tuple contains the converted
+            coordinates in meters.
+    """
+
     mm_2_pixel = properties["delaunay"]["mm_2_pixel"]
     pixel_to_mm = 1 / mm_2_pixel
     pixel_to_m = pixel_to_mm / 1000
@@ -193,23 +213,20 @@ def pixel_to_m(vector: list):
     return np.array(transformed)
 
 
-def load_properties():
-    proprerties_path = os.path.join(os.getcwd(), "assets", "properties.json")
+def load_properties(root: str):
+    """
+    Load the properties from a JSON file located in the "assets" directory.
+
+    This function reads a JSON file named "properties.json" located in the "assets"
+    directory under the specified root directory. It utilizes the `read_json` function
+    to read the file and return the properties as a dictionary.
+
+    Args:
+        root (str): The root directory where the "assets" directory is located.
+
+    Returns:
+        dict: A dictionary containing the properties loaded from the JSON file.
+    """
+
+    proprerties_path = os.path.join(root, "assets", "properties.json")
     return read_json(proprerties_path)
-
-
-if __name__ == "__main__":
-    sample = "sample_0000_0.json"
-    json_info = read_json(name=sample)
-    document_points = get_bboxes_as_points(form=json_info["form"])
-    grid = compute_grid()
-
-    vertices = np.concatenate((document_points, grid), axis=0)
-    vertices = pixel_to_m(vertices)
-    grid = pixel_to_m(grid)
-    delaunay_mesh = Delaunay(vertices)
-
-    if SHOW_PLOT:
-        show_plot(
-            vertices=vertices, default_grid=grid, mesh=delaunay_mesh, name=sample[:-5]
-        )
