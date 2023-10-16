@@ -2,6 +2,7 @@ terminal_commands.txt
 data/original/sample.json
 data/original/sample.png
 data/modified/test.png
+data/modified/bboxes.png
 src/blender_mod/mod.blend
 src/blender_mod/mod.blend1
 src/blender_mod/scripts/__pycache__

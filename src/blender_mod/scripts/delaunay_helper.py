@@ -207,9 +207,9 @@ def pixel_to_m(vector: list, properties: dict):
     pixel_to_m = pixel_to_mm / 1000
 
     transformed = []
-    for vertice in vector:
-        vertice = tuple(np.array(vertice) * pixel_to_m)
-        transformed.append(vertice)
+    for vertex in vector:
+        vertex = tuple(np.array(vertex) * pixel_to_m)
+        transformed.append(vertex)
     return np.array(transformed)
 
 

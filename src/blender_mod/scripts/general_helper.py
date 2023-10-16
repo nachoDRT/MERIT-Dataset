@@ -1,6 +1,7 @@
 import numpy as np
 import os
 import json
+import cv2
 
 
 def read_json(name: str):
@@ -74,3 +75,24 @@ def load_requirements(root: str):
     """
     requiremetns_path = os.path.join(root, "assets", "requirements.json")
     return read_json(requiremetns_path)
+
+
+def draw_point(img: np.array, point: tuple):
+    """
+    Draw a point on a given image using OpenCV.
+
+    This method takes a numpy array representing an image and a tuple representing
+    the coordinates of a point. It uses the OpenCV function `cv2.circle` to draw
+    a green point of radius 3 pixels at the specified coordinates on the image.
+
+    Args:
+        img (np.array): A np array (image) on which the point will be drawn.
+        point (tuple): A tuple with (x, y) coordinates of the point to be drawn.
+
+    Returns:
+        np.array: The input image with the point drawn on it.
+    """
+    x, y = point
+    img_with_point = cv2.circle(img, (x, y), 3, (0, 255, 0), -1)
+
+    return img_with_point

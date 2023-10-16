@@ -7,6 +7,8 @@ import math
 import colorsys
 from pathlib import Path
 import random
+import bpy_extras
+import cv2
 
 file_dir = os.path.join(bpy.path.abspath("//"), "scripts")
 
@@ -56,6 +58,8 @@ def compute_mesh(sample_path: str, properties: dict):
 
     Returns:
         tuple: A tuple containing:
+            - n_document_points (int): Number of document vertices (word's bboxes)
+                used in the computation.
             - vertices (np.array): The array of vertices used to compute the Delaunay
             mesh (it contains the document vertices + the grid vertices).
             - delaunay_mesh (Delaunay): The computed Delaunay mesh.
@@ -63,6 +67,7 @@ def compute_mesh(sample_path: str, properties: dict):
 
     json_info = dhelp.read_json(name=sample_path)
     document_points = dhelp.get_bboxes_as_points(form=json_info["form"])
+    n_document_points = len(document_points)
     grid = dhelp.compute_grid(properties=properties)
     vertices = np.concatenate((document_points, grid), axis=0)
     delaunay_mesh = Delaunay(vertices)
@@ -74,10 +79,12 @@ def compute_mesh(sample_path: str, properties: dict):
             name=sample_path[:-5],
         )
 
-    return vertices, delaunay_mesh
+    return n_document_points, vertices, delaunay_mesh
 
 
-def create_mesh_object(vertices: np.array, mesh: Delaunay, properties: dict):
+def create_mesh_object(
+    n_bboxes_vertices: int, vertices: np.array, mesh: Delaunay, properties: dict
+):
     """
     Create a new Blender mesh using a Delaunay mesh object and its vertices.
 
@@ -88,6 +95,7 @@ def create_mesh_object(vertices: np.array, mesh: Delaunay, properties: dict):
     these changes. The function finally unwraps the UV map of the object.
 
     Args:
+        n_bboxes_vertices (int): Number of (exclusively) words' bboxes vertices.
         vertices (np.array): The array of 2D vertices used to create the mesh.
         mesh (Delaunay): The Delaunay mesh computed from the vertices.
         properties (dict): The JSON dict with configuration values.
@@ -109,7 +117,7 @@ def create_mesh_object(vertices: np.array, mesh: Delaunay, properties: dict):
     bpy.context.view_layer.objects.active = mesh_obj
 
     # Add the z dimension to the 2D vertices and format them
-    three_d_vertices = [tuple(np.append(vertice, 0)) for vertice in vertices]
+    three_d_vertices = [tuple(np.append(vertex, 0)) for vertex in vertices]
     three_d_vertices = dhelp.pixel_to_m(vector=three_d_vertices, properties=properties)
     three_d_vertices = dhelp.list_to_tuple_items(three_d_vertices)
 
@@ -120,6 +128,13 @@ def create_mesh_object(vertices: np.array, mesh: Delaunay, properties: dict):
     # Fill the mesh data block with the vertices and faces
     mesh_data.from_pydata(three_d_vertices, [], faces)
     mesh_data.update()
+
+    # Create a group so we can easily track vertices later
+    bboxes_vertices_group = mesh_obj.vertex_groups.new(name="bboxes_v_group")
+    # We take advantage of the order of indices in "vertices": first those related to
+    # word bounding boxes, followed by the rest (grid)
+    indices_selection = [index for index in range(n_bboxes_vertices)]
+    bboxes_vertices_group.add(indices_selection, 1.0, "ADD")
 
     # Update the scene
     bpy.context.view_layer.update()
@@ -411,24 +426,34 @@ def config_lights(lights_data: dict):
 
 def render_scene(dst_folder: str, name: str, img_dims: dict):
     """
-    Render the current scene in Blender using the EEVEE render engine,
-    and save the rendered image to the specified destination folder with the given name.
+    Render the current scene in Blender using the EEVEE render engine, save the rendered
+    image to the specified destination folder with the given name, and return the rende-
+    red image as a NumPy array
 
     Args:
         dst_folder (str): The directory path where the rendered image will be saved.
         name (str): The name of the rendered image file (including file extension).
+    Returns:
+        np.array: The rendered image as an cv2 image.
     """
+
     camera = bpy.data.objects.get("Camera")
     if camera:
         bpy.context.scene.camera = camera
     else:
         raise RuntimeError("No camera found in the scene")
 
-    bpy.context.scene.render.resolution_x = img_dims["width"]
-    bpy.context.scene.render.resolution_y = img_dims["height"]
+    # Dimensions swapped to get a vertical orientation for the output (image and labels)
+    bpy.context.scene.render.resolution_x = img_dims["height"]
+    bpy.context.scene.render.resolution_y = img_dims["width"]
 
-    bpy.context.scene.render.filepath = os.path.join(dst_folder, name)
+    rendered_img_path = os.path.join(dst_folder, name)
+    bpy.context.scene.render.filepath = rendered_img_path
     bpy.ops.render.render(write_still=True)
+
+    rendered_img = cv2.imread(rendered_img_path)
+
+    return rendered_img
 
 
 def modify_mesh(mesh_data: dict):
@@ -470,6 +495,97 @@ def modify_mesh(mesh_data: dict):
     bpy.ops.object.mode_set(mode="OBJECT")
 
 
+def get_vertices_id_from_group(object_name: str, group_name: str):
+    """
+    Retrieve the indices of the vertices belonging to an specific vertex group of a
+    given object.
+
+    This function activates the object, switches to edit mode, and selects the vertices
+    belonging to an specific vertex group. It then retrieves the indices of these verti-
+    ces and returns them in a list.
+
+    Args:
+        object_name (str): The name of the object whose vertex group is being queried.
+        group_name (str): The name of the vertex group within the object.
+
+    Returns:
+        list: A list of integers representing the indices of the vertices belonging to
+        the specified vertex group.
+    """
+
+    doc_object = bpy.data.objects[object_name]
+    if group_name not in doc_object.vertex_groups:
+        raise ValueError(f"Vertex group {group_name} not found in object {object_name}")
+
+    vertex_group = doc_object.vertex_groups[group_name]
+    vertices_in_group = []
+
+    for v in doc_object.data.vertices:
+        try:
+            if vertex_group.weight(v.index) > 0:
+                vertices_in_group.append(v.index)
+
+        # Vertex not in group, skip to next vertex
+        except RuntimeError:
+            pass
+
+    return vertices_in_group
+
+
+def retrieve_bboxes_pixel_points(img: np.array):
+    """
+    Retrieve the pixel coordinates of vertices belonging to a vertex group (words
+    bboxes) and draw these points on the rendered image.
+
+    This method identifies the pixel coordinates of vertices from a specified vertex
+    group in a Blender object. It uses the Blender camera settings to convert the 3D
+    world coordinates of these vertices to 2D pixel coordinates. It then draws these
+    points on the input image and returns both the list of pixel coordinates and the
+    modified image.
+
+    Args:
+        img (np.array): A numpy array representing the (original) rendered image.
+
+    Returns:
+        tuple: A tuple containing:
+            - bboxes_vertices_px (list): A list of tuples representing the pixel coordi-
+              nates of the vertices belonging to the vertex group.
+            - img (np.array): The input image with the vertices drawn on it as points.
+    """
+
+    camera_name = "Camera"
+    obj_name = "Document"
+    mesh_name = "Document Mesh"
+
+    camera = bpy.data.objects[camera_name]
+    doc_object = bpy.data.objects[obj_name]
+    world_location = doc_object.location
+
+    bbox_vertices_indices = get_vertices_id_from_group(
+        object_name="Document", group_name="bboxes_v_group"
+    )
+
+    mesh = bpy.data.meshes[mesh_name]
+    bboxes_vertices_px = []
+
+    for index in bbox_vertices_indices:
+        world_location = mesh.vertices[index].co
+
+        render_coordinates = bpy_extras.object_utils.world_to_camera_view(
+            bpy.context.scene, camera, world_location
+        )
+
+        point_x = int(render_coordinates.x * bpy.context.scene.render.resolution_x)
+        point_y = int(
+            (1 - render_coordinates.y) * bpy.context.scene.render.resolution_y
+        )
+        point = (point_x, point_y)
+        bboxes_vertices_px.append(point)
+        img = ghelp.draw_point(img, point)
+
+    return bboxes_vertices_px, img
+
+
 if __name__ == "__main__":
     # Config
     define_units()
@@ -484,7 +600,6 @@ if __name__ == "__main__":
     sample_name = os.path.join(
         Path(bpy.path.abspath("//")).parent.parent, "data", "original", "sample.json"
     )
-    print(sample_name)
     document_texture = os.path.join(
         Path(bpy.path.abspath("//")).parent.parent, "data", "original", "sample.png"
     )
@@ -509,17 +624,22 @@ if __name__ == "__main__":
     )
 
     # Mesh and object
-    vertices, delaunay_mesh = compute_mesh(
+    n_bboxes_vertices, all_vertices, delaunay_mesh = compute_mesh(
         sample_path=sample_name, properties=properties
     )
-    create_mesh_object(vertices=vertices, mesh=delaunay_mesh, properties=properties)
+    create_mesh_object(
+        n_bboxes_vertices=n_bboxes_vertices,
+        vertices=all_vertices,
+        mesh=delaunay_mesh,
+        properties=properties,
+    )
 
     # Textures
     apply_texture(document=document_texture, paper=paper_texture)
 
     # Modify mesh
     mesh_data = properties["blender"]["document_mesh_mod"]
-    modify_mesh(mesh_data=mesh_data)
+    # modify_mesh(mesh_data=mesh_data)
 
     # Set background
     background_data = properties["blender"]["common"]["background"]
@@ -541,6 +661,8 @@ if __name__ == "__main__":
     dst_folder = os.path.join(
         Path(bpy.path.abspath("//")).parent.parent, "data", "modified"
     )
-    render_scene(
+    rendered_img = render_scene(
         dst_folder=dst_folder, name="test.png", img_dims=requirements["img_output"]
     )
+    _, img = retrieve_bboxes_pixel_points(img=rendered_img)
+    cv2.imwrite(os.path.join(dst_folder, "bboxes.png"), img)
