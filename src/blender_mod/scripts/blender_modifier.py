@@ -66,7 +66,9 @@ def compute_mesh(sample_path: str, properties: dict):
     """
 
     json_info = dhelp.read_json(name=sample_path)
-    document_points = dhelp.get_bboxes_as_points(form=json_info["form"])
+    document_points = dhelp.get_bboxes_as_points(
+        form=json_info["form"], properties=properties
+    )
     n_document_points = len(document_points)
     grid = dhelp.compute_grid(properties=properties)
     vertices = np.concatenate((document_points, grid), axis=0)
@@ -186,7 +188,9 @@ def apply_texture(document: str, paper: str):
     mix_rgb_node = nodes.new(type="ShaderNodeMixRGB")
     mix_rgb_node.inputs[0].default_value = 1.0
     mapping_node = nodes.new(type="ShaderNodeMapping")
-    mapping_node.inputs["Scale"].default_value[0] = 1.4
+    mapping_node.inputs["Scale"].default_value[0] = 1.39
+    mapping_node.inputs["Scale"].default_value[1] = 0.98
+    mapping_node.inputs["Rotation"].default_value[2] = math.radians(180)
     coord_node = nodes.new(type="ShaderNodeTexCoord")
     principled_node = nodes.new(type="ShaderNodeBsdfPrincipled")
     output_node = nodes.new(type="ShaderNodeOutputMaterial")
@@ -444,8 +448,8 @@ def render_scene(dst_folder: str, name: str, img_dims: dict):
         raise RuntimeError("No camera found in the scene")
 
     # Dimensions swapped to get a vertical orientation for the output (image and labels)
-    bpy.context.scene.render.resolution_x = img_dims["height"]
-    bpy.context.scene.render.resolution_y = img_dims["width"]
+    # bpy.context.scene.render.resolution_x = img_dims["height"]
+    # bpy.context.scene.render.resolution_y = img_dims["width"]
 
     rendered_img_path = os.path.join(dst_folder, name)
     bpy.context.scene.render.filepath = rendered_img_path
@@ -568,6 +572,7 @@ def retrieve_bboxes_pixel_points(img: np.array):
     mesh = bpy.data.meshes[mesh_name]
     bboxes_vertices_px = []
 
+    # Bboxes vertices: transform 3D world coordinates to 2D pixel coordinates
     for index in bbox_vertices_indices:
         world_location = mesh.vertices[index].co
 
@@ -579,9 +584,29 @@ def retrieve_bboxes_pixel_points(img: np.array):
         point_y = int(
             (1 - render_coordinates.y) * bpy.context.scene.render.resolution_y
         )
+        # point_y = int((render_coordinates.y) * bpy.context.scene.render.resolution_y)
         point = (point_x, point_y)
         bboxes_vertices_px.append(point)
-        img = ghelp.draw_point(img, point)
+
+    # Draw the bboxes over the rendered img for visual check
+    rectangles = []
+    rect_points = []
+    counter = 0
+
+    for bbox_vertext_px in bboxes_vertices_px:
+        # One bbox is defined by 4 points
+        if counter < 4:
+            rect_points.append(bbox_vertext_px)
+        else:
+            rect_points = np.array(rect_points, dtype=np.int32)
+            rectangles.append(rect_points)
+            counter = 0
+            rect_points = []
+            rect_points.append(bbox_vertext_px)
+
+        counter += 1
+
+    img = ghelp.draw_bboxes(img=img, rectangles=rectangles)
 
     return bboxes_vertices_px, img
 

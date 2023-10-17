@@ -9,7 +9,7 @@ import os
 SHOW_PLOT = True
 
 
-def get_bboxes_as_points(form: List[Dict[str, Any]]) -> np.array:
+def get_bboxes_as_points(form: List[Dict[str, Any]], properties: dict) -> np.array:
     """
     Get a list containing all the points of the word's bounding boxes as pixel coordina-
     tes (x, y).
@@ -18,6 +18,8 @@ def get_bboxes_as_points(form: List[Dict[str, Any]]) -> np.array:
         form (list): A list containing all the segments of a form. Each segment should
             be a dictionary containing (among others) a 'words' key with bounding
             box(es) data.
+        properties (dict): A dictionary containing the properties of the A4 page
+            including its dimensions in pixels.
 
     Returns:
         np.array: An array containing all the key points as pixel coordinates, where
@@ -55,12 +57,42 @@ def get_bboxes_as_points(form: List[Dict[str, Any]]) -> np.array:
 
     bboxes_points = []
     for form_entry in form:
-        bboxes_points.extend(extract_boxes(form_entry))
+        bboxes_points.extend(extract_boxes(form_entry, properties))
 
     return np.array(bboxes_points)
 
 
-def extract_boxes(form_entry: dict) -> List[Tuple[int, int]]:
+def reference_system_correction(point: list, adjust: str, properties: dict) -> list:
+    """
+    Adjust a point's coordinate based on the reference system of the document.
+
+    This method modifies a single coordinate (x or y) of a given point according to the
+    dimensions specified in the properties dictionary. The purpose is to ensure that the
+    point's coordinates are consistent with the reference system used in Blender.
+
+    Args:
+        point (list): A list containing the coordinates of the point to be adjusted.
+        adjust (str): A string indicating which coordinate ('x' or 'y') to adjust.
+        properties (dict): A dictionary containing the configuration values, including
+                           the dimensions of the document.
+
+    Returns:
+        list: A list containing the updated coordinates of the point.
+    """
+
+    if adjust == "x":
+        index_correction = 0
+        a4_pixel_dim = properties["delaunay"]["a4_pixel_dims"]["width"]
+    elif adjust == "y":
+        index_correction = 1
+        a4_pixel_dim = properties["delaunay"]["a4_pixel_dims"]["width"]
+
+    point[index_correction] = a4_pixel_dim - point[index_correction]
+
+    return point
+
+
+def extract_boxes(form_entry: dict, properties: dict) -> List[Tuple[int, int]]:
     """
     Extract the pixel coordinates of the bounding boxes from the words in the JSON dict.
 
@@ -70,6 +102,8 @@ def extract_boxes(form_entry: dict) -> List[Tuple[int, int]]:
 
     Args:
         form_entry (dict): A dataset segment containing words and their bounding boxes.
+        properties (dict): A dictionary containing the properties of the A4 page
+            including its dimensions in pixels.
 
     Returns:
         list[tuple[int, int]]: A list with the points of the each bounding box. Each
@@ -78,8 +112,14 @@ def extract_boxes(form_entry: dict) -> List[Tuple[int, int]]:
 
     points = []
     for word in form_entry["words"]:
-        points.append(word["box"][0:2])
-        points.append(word["box"][2:4])
+        second_point = [word["box"][0], word["box"][3]]
+        fourth_point = [word["box"][2], word["box"][1]]
+
+        # Append points in a counter-clockwise order
+        points.append(reference_system_correction(word["box"][0:2], "x", properties))
+        points.append(reference_system_correction(second_point, "x", properties))
+        points.append(reference_system_correction(word["box"][2:4], "x", properties))
+        points.append(reference_system_correction(fourth_point, "x", properties))
 
     return points
 
