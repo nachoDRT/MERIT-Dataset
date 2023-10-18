@@ -2,7 +2,8 @@ import numpy as np
 import os
 import json
 import cv2
-from typing import List
+import copy
+from typing import List, Tuple
 
 SHOW_RESULTS = True
 
@@ -80,7 +81,7 @@ def load_requirements(root: str):
     return read_json(requiremetns_path)
 
 
-def draw_point(img: np.array, point: tuple):
+def draw_point(img: np.array, point: tuple, color: tuple):
     """
     Draw a point on a given image using OpenCV.
 
@@ -91,17 +92,20 @@ def draw_point(img: np.array, point: tuple):
     Args:
         img (np.array): A np array (image) on which the point will be drawn.
         point (tuple): A tuple with (x, y) coordinates of the point to be drawn.
+        color (tuple): A BGR color.
 
     Returns:
         np.array: The input image with the point drawn on it.
     """
     x, y = point
-    img_with_point = cv2.circle(img, (x, y), 2, (0, 255, 0), -1)
+    img_with_point = cv2.circle(img, (x, y), 2, color, -1)
 
     return img_with_point
 
 
-def draw_bboxes(img: np.array, rectangles: List[np.ndarray[np.int32]]) -> np.array:
+def draw_bboxes(
+    img: np.array, rectangles: List[np.ndarray[np.int32]], color: tuple
+) -> np.array:
     """
     Draw the bboxes on a given image using the vertices in the 'rectangles' list.
 
@@ -115,6 +119,7 @@ def draw_bboxes(img: np.array, rectangles: List[np.ndarray[np.int32]]) -> np.arr
         rectangles (List[np.ndarray[np.int32]]): A list of np.ndarray objects where each
                                                  ndarray contains the vertices of a
                                                  transformed bbox.
+        color (tuple): A BGR color.
 
     Returns:
         np.array: The image with the bboxes drawn on it.
@@ -127,11 +132,11 @@ def draw_bboxes(img: np.array, rectangles: List[np.ndarray[np.int32]]) -> np.arr
     overlay = np.zeros_like(img)
     for rect_points in rectangles:
         # Draw a solid color rectangle on the empty image
-        cv2.fillPoly(overlay, [rect_points], color=(0, 255, 0))
+        cv2.fillPoly(overlay, [rect_points], color=color)
 
         # Draw the rectangle corners
         for point in rect_points:
-            img = draw_point(img, point)
+            img = draw_point(img, point, color)
 
     # Blend images
     alpha = 0.5
@@ -139,7 +144,7 @@ def draw_bboxes(img: np.array, rectangles: List[np.ndarray[np.int32]]) -> np.arr
     output_img = cv2.addWeighted(overlay, alpha, img, beta, 0)
 
     if SHOW_RESULTS:
-        show_img(title="Trnasformed bboxes", img=output_img)
+        show_img(title="Transformed bboxes", img=output_img)
 
     return output_img
 
@@ -156,3 +161,100 @@ def show_img(title: str, img: np.array) -> None:
     cv2.imshow(title, img)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
+
+
+def write_json(data: dict, file_path: str) -> None:
+    """
+    Write a dictionary to a JSON file.
+
+    Args:
+        data (dict): The data to be written to the file.
+        file_path (str): The path of the file to write to.
+    """
+
+    with open(file_path, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=4)
+
+
+def collect_bbox_pts_in_list(word_index: int, points: List) -> List:
+    """
+    Flatten a list of lists into a single list.
+
+    Parameters:
+        word_index (int): Index of the item in the `points` list.
+        points (List): List containing points or coordinates.
+
+    Returns:
+        List: Flattened list of coordinates.
+    """
+    try:
+        points_list = [
+            coordinate for point in points[word_index].tolist() for coordinate in point
+        ]
+    except AttributeError:
+        points_list = [
+            coordinate for point in points[word_index] for coordinate in point
+        ]
+
+    return points_list
+
+
+def collect_transformed_segment_bbox(bboxes: List) -> List:
+    """
+    Create a new bounding box encompassing a text segment.
+
+    Parameters:
+        bboxes (List): List containing bounding boxes.
+
+    Returns:
+        List: List of lists containing the coordinates of the four corners of
+        the new segment bounding box.
+    """
+    pt0 = [bboxes[0][0], bboxes[0][1]]
+    pt1 = [bboxes[0][2], bboxes[0][3]]
+    pt2 = [bboxes[-1][-4], bboxes[-1][-3]]
+    pt3 = [bboxes[-1][-2], bboxes[-1][-1]]
+    segment_bbox = [pt0, pt1, pt2, pt3]
+
+    return segment_bbox
+
+
+def edit_json_labels(json_path: str, points: List) -> Tuple[dict, List]:
+    """
+    Read the JSON file with the original labels and replace the original bounding boxes
+    with the new ones (after Blender modifications: camera rotatation, traslation, etc.)
+
+    Parameters:
+        json_path (str): Path to the original JSON file containing the labels.
+        points (List): A list of lists (bbounding boxes with four points delimiting
+                       every word bbox)
+
+    Returns:
+        Tuple[dict, List]: Tuple containing the edited JSON object and a list of the new
+                           segments bounding boxes.
+    """
+
+    labels = read_json(name=json_path)
+    labels_edited = copy.deepcopy(labels)
+
+    word_index = 0
+    segments_bboxes = []
+    for segment_index, segment in enumerate(labels["form"]):
+        segment_bboxes = []
+        for word_index_in_segment, _ in enumerate(segment["words"]):
+            edited_bbox = collect_bbox_pts_in_list(word_index, points)
+            labels_edited["form"][segment_index]["words"][word_index_in_segment][
+                "box"
+            ] = edited_bbox
+            segment_bboxes.append(edited_bbox)
+            word_index += 1
+
+        # Obtain the transformed segment bbounding box
+        segment_bboxes = collect_transformed_segment_bbox(bboxes=segment_bboxes)
+        edited_segment_bbox = collect_bbox_pts_in_list(
+            word_index=0, points=[segment_bboxes]
+        )
+        labels_edited["form"][segment_index]["box"] = edited_segment_bbox
+        segments_bboxes.append(np.array(segment_bboxes))
+
+    return labels_edited, segments_bboxes

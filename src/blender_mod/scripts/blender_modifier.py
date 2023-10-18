@@ -9,6 +9,7 @@ from pathlib import Path
 import random
 import bpy_extras
 import cv2
+import copy
 
 file_dir = os.path.join(bpy.path.abspath("//"), "scripts")
 
@@ -552,8 +553,8 @@ def retrieve_bboxes_pixel_points(img: np.array):
 
     Returns:
         tuple: A tuple containing:
-            - bboxes_vertices_px (list): A list of tuples representing the pixel coordi-
-              nates of the vertices belonging to the vertex group.
+            - rectangles (list): A list of lists (bbounding boxes with four points deli-
+                                 miting every word bbox).
             - img (np.array): The input image with the vertices drawn on it as points.
     """
 
@@ -584,31 +585,21 @@ def retrieve_bboxes_pixel_points(img: np.array):
         point_y = int(
             (1 - render_coordinates.y) * bpy.context.scene.render.resolution_y
         )
-        # point_y = int((render_coordinates.y) * bpy.context.scene.render.resolution_y)
+
         point = (point_x, point_y)
         bboxes_vertices_px.append(point)
 
     # Draw the bboxes over the rendered img for visual check
     rectangles = []
-    rect_points = []
-    counter = 0
 
-    for bbox_vertext_px in bboxes_vertices_px:
-        # One bbox is defined by 4 points
-        if counter < 4:
-            rect_points.append(bbox_vertext_px)
-        else:
-            rect_points = np.array(rect_points, dtype=np.int32)
-            rectangles.append(rect_points)
-            counter = 0
-            rect_points = []
-            rect_points.append(bbox_vertext_px)
+    # One bbox is defined by 4 points
+    for i in range(0, len(bboxes_vertices_px), 4):
+        rect_points = np.array(list(bboxes_vertices_px[i : i + 4]), dtype=np.int32)
+        rectangles.append(rect_points)
 
-        counter += 1
+    img = ghelp.draw_bboxes(img=img, rectangles=rectangles, color=(0, 255, 0))
 
-    img = ghelp.draw_bboxes(img=img, rectangles=rectangles)
-
-    return bboxes_vertices_px, img
+    return rectangles, img
 
 
 if __name__ == "__main__":
@@ -689,5 +680,27 @@ if __name__ == "__main__":
     rendered_img = render_scene(
         dst_folder=dst_folder, name="test.png", img_dims=requirements["img_output"]
     )
-    _, img = retrieve_bboxes_pixel_points(img=rendered_img)
+
+    # Obtain new bbox pixel coordinates
+    bboxes_px_points, img = retrieve_bboxes_pixel_points(
+        img=copy.deepcopy(rendered_img)
+    )
     cv2.imwrite(os.path.join(dst_folder, "bboxes.png"), img)
+
+    # Modify original labels with the new bboxes layout
+    modified_labels, segment_rectangles = ghelp.edit_json_labels(
+        json_path=sample_name, points=bboxes_px_points
+    )
+
+    # Draw the segments bboxes and write the output
+    segments_img = ghelp.draw_bboxes(
+        img=copy.deepcopy(rendered_img),
+        rectangles=segment_rectangles,
+        color=(0, 0, 255),
+    )
+    cv2.imwrite(os.path.join(dst_folder, "segments.png"), segments_img)
+
+    # Write a JSON with the bboxes modified according to the Blender scene modifications
+    ghelp.write_json(
+        data=modified_labels, file_path=os.path.join(dst_folder, "modified_labels.json")
+    )
