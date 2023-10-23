@@ -1,4 +1,3 @@
-from config import *
 import os
 import json
 import copy
@@ -142,7 +141,9 @@ def create_annotations_recursively(o: Any, depth=0):
         return copy.deepcopy(global_annotations)
 
 
-def update_course_tags(course_curriculum, annotations_page, max_subjects=15):
+def update_course_tags(
+    course_curriculum, annotations_page, verbose_level: int, max_subjects=15
+):
     success = 1
 
     for subject in course_curriculum[0:max_subjects]:
@@ -163,7 +164,9 @@ def update_course_tags(course_curriculum, annotations_page, max_subjects=15):
             check2 = segment_tag == "other"
 
             if check1 and check2:
-                found = update_answer_tag(annotations_page, tag, subject_grade)
+                found = update_answer_tag(
+                    annotations_page, tag, subject_grade, verbose_level
+                )
                 segment["label"] = tag
                 break
 
@@ -176,7 +179,7 @@ def update_course_tags(course_curriculum, annotations_page, max_subjects=15):
     return success
 
 
-def update_answer_tag(annotations_page, tag, subject_grade):
+def update_answer_tag(annotations_page, tag, subject_grade, verbose_level: int):
     found = 0
     subject_grade_verbose = return_verbose_grade(subject_grade, verbose_level)
 
@@ -198,8 +201,13 @@ def update_answer_tag(annotations_page, tag, subject_grade):
 
 
 class AnnotationsCreator:
-    def __init__(self, pdf_file_path: str):
-        self.pdf_file_path = pdf_file_path
+    def __init__(self, pdf_path: str, paths: dict, props: dict, reqs: dict):
+        self.paths = paths
+        self.pdf_file_path = pdf_path
+        self.props = props
+        self.possible_courses = self.props["possible_courses_global"]
+        self.courses_names = self.props["courses_names"]
+        self.reqs = reqs
         self.annotations = []
 
     def create_annotations(self, pdf_path: str):
@@ -216,12 +224,14 @@ class AnnotationsCreator:
             png_path = png_paths[i]
             # Get xxxx_x part of png file
             annotations_filename = os.path.basename(png_path)[:-4] + ".json"
-            annotations_full_path = os.path.join(annotations_path, annotations_filename)
+            annotations_full_path = os.path.join(
+                self.paths["annotations_path"], annotations_filename
+            )
 
             with open(annotations_full_path, "w") as outfile:
                 json.dump(self.annotations[i], outfile, indent=4)
 
-    def update_subject_grades_tags(self, curriculum: list, course_pages_array: list):
+    def update_subject_grades_tags(self, curriculum: list, courses_pages_array: list):
         success = 1
         for i, page in enumerate(courses_pages_array):
             for j, course in enumerate(page):
@@ -230,19 +240,17 @@ class AnnotationsCreator:
                 s = update_course_tags(
                     curriculum[course[0]],
                     self.annotations[i]["form"],
+                    self.reqs["verbose_level"],
                     max_subjects=course[1],
                 )
                 success = success * s
         return success
 
     def update_annotations_tags_courses(self):
-        possible_courses = possible_courses_global
-        courses_names = ["3_de_la_eso", "4_de_la_eso", "1_de_bachillerato"]
-
         found = 0
 
-        for i in range(len(possible_courses)):
-            course_name = possible_courses[i]
+        for i in range(len(self.possible_courses)):
+            course_name = self.possible_courses[i]
 
             for page in self.annotations:
                 for segment in page["form"]:
@@ -253,7 +261,7 @@ class AnnotationsCreator:
                     check2 = segment_tag == "other"
 
                     if check1 and check2:
-                        segment["label"] = courses_names[i]
+                        segment["label"] = self.courses_names[i]
                         found += 1
                         break
 
@@ -270,7 +278,7 @@ class AnnotationsCreator:
                     # Find subjects
                     segment = page["form"][i]
                     subject_tag = segment["label"]
-                    courses = courses_names
+                    courses = self.courses_names
                     is_subject = (
                         subject_tag != "other"
                         and subject_tag not in courses
@@ -303,9 +311,10 @@ class AnnotationsCreator:
 
 
 class AnnotationsView:
-    def __init__(self, annotations: list, pdf_file_path: str):
+    def __init__(self, annotations: list, pdf_file_path: str, reqs: dict):
         self.annotations = annotations
         self.pdf_file_path = pdf_file_path
+        self.font_path = reqs["font_path"]
 
     def output_annotations_view(self):
         """"""
@@ -317,6 +326,7 @@ class AnnotationsView:
         scaler = W_2 / W_1
 
         pdf = FPDF()
+        pdf.add_font("Arial", "", self.font_path)
 
         for annotations_page in self.annotations:
             pdf.add_page()
@@ -334,8 +344,6 @@ class AnnotationsView:
                 x = box[0] * scaler
                 y = box[1] * scaler
 
-                # print(f'x: {x}, y: {y}, width: {width}, height: {height}, text: {text}, label: {label}')
-
                 pdf.set_xy(x, y)
                 if label == "other":
                     border = "B"
@@ -352,8 +360,6 @@ class AnnotationsView:
         pass
 
     def output_annotations_words_view(self):
-        """"""
-
         W_1 = 1657
         W_2 = 210
         H_1 = 2339

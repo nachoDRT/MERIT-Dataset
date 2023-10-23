@@ -1,0 +1,33 @@
+{
+    "doc_name_zeros_fill": 4,
+    "courses_pages_array": [
+        [
+            [
+                0,
+                11
+            ]
+        ],
+        [
+            [
+                1,
+                10
+            ]
+        ],
+        [
+            [
+                2,
+                11
+            ]
+        ]
+    ],
+    "courses_names": [
+        "3_de_la_eso",
+        "4_de_la_eso",
+        "1_de_bachillerato"
+    ],
+    "possible_courses_global": [
+        "Tercer curso",
+        "Cuarto curso",
+        "BACHILLERATO"
+    ]
+}
