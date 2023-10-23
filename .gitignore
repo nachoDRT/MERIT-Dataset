@@ -10,4 +10,4 @@ src/blender_mod/mod.blend1
 src/blender_mod/scripts/__pycache__
 src/blender_mod/assets/textures/backgrounds/white_oak
 src/replication_pipeline/default
-src/replication_pipeline/src_doc/__pycache__
+src/replication_pipeline/scripts/__pycache__
