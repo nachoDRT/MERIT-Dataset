@@ -1,0 +1,176 @@
+{
+    "subjects": {
+        "aleman": [
+            "Alemán",
+            "Segunda Lengua Extranjera: Alemán",
+            "Lengua Extranjera: Alemán"
+        ],
+        "biologia": [
+            "Biología"
+        ],
+        "biologia_y_geologia": [
+            "Biología y Geología",
+            "Biología",
+            "Geología"
+        ],
+        "ciencias_del_mundo": [
+            "Ciencias del Mundo",
+            "Cultura Clásica",
+            "Historia del Mundo Contemporáneo",
+            "Sociales",
+            "Ciencias Sociales"
+        ],
+        "ciencias_naturales": [
+            "Ciencias Naturales"
+        ],
+        "dibujo_artistico": [
+            "Dibujo Artístico"
+        ],
+        "dibujo_tecnico": [
+            "Dibujo Técnico",
+            "Dibujo Técnico y Diseño"
+        ],
+        "economia": [
+            "Economía",
+            "Economía de la Empresa",
+            "Ciencias Económicas"
+        ],
+        "educacion_etico_civica": [
+            "Ética",
+            "Valores",
+            "Educación Cívica",
+            "Ciudadanía",
+            "Desarrollo Personal, Ciudadanía y Cívica"
+        ],
+        "educacion_fisica": [
+            "Educación Física"
+        ],
+        "educacion_plastica": [
+            "Educación Plástica",
+            "Educación Plástica Visual",
+            "Educación Plástica, Visual y Audiovisual",
+            "Arte",
+            "Artes Plásticas",
+            "Arte y Cultura"
+        ],
+        "filosofia": [
+            "Filosofía",
+            "Filosofia",
+            "Historia de la Filosofía"
+        ],
+        "fisica_y_quimica": [
+            "Física y Química",
+            "Física",
+            "Química"
+        ],
+        "frances": [
+            "Francés",
+            "Segunda Lengua Extranjera: Francés",
+            "Lengua Extranjera: Francés"
+        ],
+        "generic": [
+            "Cultura española",
+            "Drama",
+            "Lengua Inglesa",
+            "Literatura Universal",
+            "Literatura Inglesa",
+            "Psicología",
+            "Fundamentos de Administración y Gestión",
+            "Administración y Gestión",
+            "Cultura Científica",
+            "Enseñanza Científica",
+            "Italiano",
+            "Lengua Extranjera Italiano",
+            "Español",
+            "Castellano como segunda lengua",
+            "Tutoría",
+            "Ciencias Políticas",
+            "Educación para el Trabajo",
+            "Comunicación",
+            "Tecnologías de la Información y la Comunicación",
+            "Comportamiento",
+            "Chino",
+            "Chino Mandarín",
+            "Turismo",
+            "Lengua y Literatura Catalana",
+            "Catalán",
+            "Vasco"
+        ],
+        "geografia_e_historia": [
+            "Geografía e Historia",
+            "Geografía",
+            "Historia"
+        ],
+        "griego": [
+            "Griego"
+        ],
+        "historia": [
+            "Historia",
+            "Historia Española",
+            "Historia de España",
+            "Historia Universal"
+        ],
+        "informatica": [
+            "Informática"
+        ],
+        "ingles": [
+            "Inglés",
+            "Primera Lengua Extranjera: Inglés",
+            "Lengua Extranjera: Inglés"
+        ],
+        "latin": [
+            "Latín"
+        ],
+        "lengua_castellana": [
+            "Lengua",
+            "Lengua Castellana",
+            "Literatura",
+            "Lengua y Literatura",
+            "Lengua Española",
+            "Lengua Castellana y Literatura",
+            "Lengua y Literatura Españolas"
+        ],
+        "matematicas": [
+            "Matemáticas",
+            "Cálculo",
+            "Matemáticas Aplicadas",
+            "Álgebra",
+            "Matemáticas para las Enseñanzas Académicas",
+            "Matemáticas Aplicadas a las Ciencias Sociales",
+            "Matemáticas Aplicadas a las CC SS",
+            "Matemáticas Académicas",
+            "Matemáticas (en español)",
+            "Matemáticas (en inglés)"
+        ],
+        "musica": [
+            "Música"
+        ],
+        "media": [
+            "Media",
+            "Nota Media",
+            "Nota Media (con Religión)",
+            "Nota Media (sin optativas)",
+            "Media Curso",
+            "Nota Media del Curso"
+        ],
+        "religion": [
+            "Religión",
+            "Formación Religiosa",
+            "Educación Religiosa",
+            "Cristianismo"
+        ],
+        "tecnologia": [
+            "Tecnología",
+            "Tecnología, Programación y Robótica",
+            "Robótica",
+            "Programación",
+            "Ciencia y Tecnología"
+        ]
+    },
+    "academic_years_tags": [
+        "_3_de_la_eso",
+        "_4_de_la_eso",
+        "_1_de_bachillerato",
+        "_2_de_bachillerato"
+    ]
+}
