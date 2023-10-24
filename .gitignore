@@ -5,6 +5,8 @@ data/modified/test.png
 data/modified/bboxes.png
 data/modified/modified_labels.json
 data/modified/segments.png
+src/dashboard/dataset_blueprint.csv
+src/dashboard/.~lock.dataset_blueprint.csv#
 src/blender_mod/mod.blend
 src/blender_mod/mod.blend1
 src/blender_mod/scripts/__pycache__
