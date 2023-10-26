@@ -1,0 +1,10 @@
+.Select-control,
+.Select-menu-outer {
+    background-color: #000000 !important;
+    color: #FFFFFF !important;
+}
+
+.Select-value-label,
+.Select-option {
+    color: #FFFFFF !important;
+}
