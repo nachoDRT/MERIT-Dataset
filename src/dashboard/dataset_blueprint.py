@@ -3,6 +3,7 @@ import os
 from pathlib import Path
 import pandas as pd
 import random
+from os.path import dirname, abspath
 
 
 def read_json(name: str) -> dict:
@@ -16,7 +17,7 @@ def read_json(name: str) -> dict:
         dict: A dictionary containing the data from the JSON file.
 
     """
-    file_path = os.path.join(os.getcwd(), name)
+    file_path = os.path.join(dirname(abspath(__file__), name))
 
     with open(file_path, "r") as file:
         data = json.load(file)
@@ -102,7 +103,7 @@ def compute_mods_distribution(reqs: dict) -> list:
 
 
 # TODO Make it more pythonic
-def fill_database(attributes: dict, reqs: dict, props: dict) -> dict:
+def fill_blueprint(attributes: dict, reqs: dict, props: dict) -> dict:
     """
     Populate a database with information from user requirements and dataset properties.
     The output dictionary contains the blueprint that the generator pipeline (replicator
@@ -188,7 +189,7 @@ def write_csv(attributes: dict) -> None:
     df.to_csv("dataset_blueprint.csv", index=False)
 
 
-def generate_database(reqs: dict, props: dict) -> None:
+def generate_blueprint(reqs: dict, props: dict) -> None:
     """
     Generates a CSV file containing data with information from user requirements and
     dataset properties.
@@ -206,15 +207,17 @@ def generate_database(reqs: dict, props: dict) -> None:
     """
 
     attributes = set_database_headers()
-    attributes = fill_database(attributes, reqs, props)
+    attributes = fill_blueprint(attributes, reqs, props)
     write_csv(attributes)
 
 
 if __name__ == "__main__":
-    root = os.path.join(Path(os.getcwd()).parent, "replication_pipeline", "assets")
+    root = os.path.join(
+        Path(dirname(abspath(__file__)).parent, "replication_pipeline", "assets")
+    )
     reqs_path = os.path.join(root, "requirements_v2.json")
     props_path = os.path.join(root, "properties.json")
     reqs = read_json(name=reqs_path)
     props = read_json(name=props_path)
 
-    generate_database(reqs, props)
+    generate_blueprint(reqs, props)

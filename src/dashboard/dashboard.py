@@ -89,14 +89,20 @@ def configure_app_layout(app: dash.Dash, df: pd.DataFrame) -> dash.Dash:
                     ),
                 ],
             ),
+            dcc.Interval(
+                id="interval-component",
+                interval=1 * 1000,  # in milliseconds
+                n_intervals=0,
+            ),
         ],
     )
 
     @app.callback(
         dash.dependencies.Output("school-bar-plot", "figure"),
         [dash.dependencies.Input("language-selector", "value")],
+        [dash.dependencies.Input("interval-component", "n_intervals")],
     )
-    def update_school_plot(selected_language: str) -> go.Figure:
+    def update_school_plot(selected_language: str, _: int) -> go.Figure:
         """
         Updates the school bar plot based on the selected language.
 
@@ -120,6 +126,7 @@ def configure_app_layout(app: dash.Dash, df: pd.DataFrame) -> dash.Dash:
 
         """
 
+        df = pd.read_csv("dataset_blueprint.csv")
         filtered_df = df[df["language"] == selected_language]
         school_names = [
             school.capitalize() for school in filtered_df["school_name"].unique()
@@ -139,8 +146,9 @@ def configure_app_layout(app: dash.Dash, df: pd.DataFrame) -> dash.Dash:
     @app.callback(
         dash.dependencies.Output("replication-gauge", "figure"),
         [dash.dependencies.Input("language-selector", "value")],
+        [dash.dependencies.Input("interval-component", "n_intervals")],
     )
-    def update_replicas_gauge(selected_language: str) -> go.Figure:
+    def update_replicas_gauge(selected_language: str, _: int) -> go.Figure:
         """
         Updates the replication gauge figure based on the selected language.
 
@@ -162,7 +170,7 @@ def configure_app_layout(app: dash.Dash, df: pd.DataFrame) -> dash.Dash:
             go.Figure: The updated gauge figure showing the percentage of replications
                        completed for the selected language.
         """
-
+        df = pd.read_csv("dataset_blueprint.csv")
         gauge_title = f"Replicas in {selected_language.capitalize()} Completion"
         filtered_df = df[df["language"] == selected_language]
         true_count = filtered_df["replication_done"].sum()
@@ -175,8 +183,9 @@ def configure_app_layout(app: dash.Dash, df: pd.DataFrame) -> dash.Dash:
     @app.callback(
         dash.dependencies.Output("modification-gauge", "figure"),
         [dash.dependencies.Input("language-selector", "value")],
+        [dash.dependencies.Input("interval-component", "n_intervals")],
     )
-    def update_mods_gauge(selected_language: str) -> go.Figure:
+    def update_mods_gauge(selected_language: str, _: int) -> go.Figure:
         """
         Updates the modifications gauge figure based on the selected language.
 
@@ -199,6 +208,7 @@ def configure_app_layout(app: dash.Dash, df: pd.DataFrame) -> dash.Dash:
                        completed for the selected language.
         """
 
+        df = pd.read_csv("dataset_blueprint.csv")
         gauge_title = f"Modifications in {selected_language.capitalize()} Completion"
         filtered_df = df[df["language"] == selected_language]
         true_count = filtered_df["modification_done"].sum()
