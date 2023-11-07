@@ -12,7 +12,7 @@ import cv2
 
 def check_directories(paths: dict):
     """Check if directories exist, if not create them"""
-    if not os.path.exists(paths["base_path"]):
+    if not os.path.exists(paths["template_path"]):
         print("ERROR, create template first!")
 
     if not os.path.exists(paths["res_path"]):
@@ -35,20 +35,41 @@ class SchoolRecord:
     """Allows for pdf-png-annotations creation"""
 
     def __init__(
-        self, id: int, paths: dict, props: dict, reqs: dict, verbose_level: int = 0
+        self,
+        id: int,
+        paths: dict,
+        props: dict,
+        reqs: dict,
+        retrieved_info: dict,
+        verbose_level: int = 0,
+        new_school: bool = False,
+        new_student: bool = False,
     ) -> None:
         self.paths = paths
         self.props = props
         self.reqs = reqs
-        self.student = person_generator.Person(
-            res_path=self.paths["res_path"], student=True
-        )
-        self.secre = person_generator.Person(
-            res_path=self.paths["res_path"], student=False
-        )
-        self.director = person_generator.Person(
-            res_path=paths["res_path"], student=False
-        )
+        self.new_school = new_school
+        self.new_student = new_student
+
+        if self.new_school:
+            self.secre = person_generator.Person(
+                res_path=self.paths["res_path"], student=False
+            )
+            self.director = person_generator.Person(
+                res_path=paths["res_path"], student=False
+            )
+            self.student = person_generator.Person(
+                res_path=self.paths["res_path"], student=True
+            )
+        else:
+            self.secre = retrieved_info["secretary"]
+            self.director = retrieved_info["director"]
+            if self.new_student:
+                self.student = person_generator.Person(
+                    res_path=self.paths["res_path"], student=True
+                )
+            else:
+                self.student = retrieved_info["student_object"]
 
         self.set_replacements(verbose_level)
         self.id = id
@@ -60,12 +81,32 @@ class SchoolRecord:
 
         check_directories(paths=self.paths)
 
+    def get_info_retrieval(self):
+        info_retrieval = {}
+        if self.new_school:
+            info_retrieval["director"] = self.director.get_full_name()
+            info_retrieval["secretary"] = self.secre.get_full_name()
+        else:
+            info_retrieval["director"] = self.director
+            info_retrieval["secretary"] = self.secre
+
+        info_retrieval["student_object"] = self.student
+        info_retrieval["student_name"] = self.student.get_full_name()
+
+        return info_retrieval
+
     def set_replacements(self, verbose_level=0):
         """Populates replacements dictionary"""
+        # if self.new_student or self.new_school:
         self.replacements = self.student.get_replacements(verbose_level)
+        if self.new_school:
+            self.replacements["replace_director"] = self.director.get_full_name()
+            self.replacements["replace_secre"] = self.secre.get_full_name()
+        else:
+            self.replacements["replace_director"] = self.director
+            self.replacements["replace_secre"] = self.secre
+
         self.replacements["replace_alumno"] = self.student.get_full_name()
-        self.replacements["replace_secre"] = self.secre.get_full_name()
-        self.replacements["replace_director"] = self.director.get_full_name()
 
     def docx_replace(self, old_file, new_file, rep):
         """Replaces docx xml according to rep (replacements dictionary)"""

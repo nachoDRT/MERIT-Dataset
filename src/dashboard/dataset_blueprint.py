@@ -17,7 +17,8 @@ def read_json(name: str) -> dict:
         dict: A dictionary containing the data from the JSON file.
 
     """
-    file_path = os.path.join(dirname(abspath(__file__), name))
+
+    file_path = os.path.join(dirname(abspath(__file__)), name)
 
     with open(file_path, "r") as file:
         data = json.load(file)
@@ -43,8 +44,15 @@ def set_database_headers() -> dict:
     attributes["file_name"] = []
     attributes["language"] = []
     attributes["school_name"] = []
+    attributes["head_name"] = []
+    attributes["secretary_name"] = []
+    attributes["student_id"] = []
+    attributes["student_name"] = []
+    attributes["student_gender"] = []
+    attributes["student_ethnicity"] = []
+    attributes["academic_years"] = []
+    attributes["average_grades"] = []
     attributes["blender_mod"] = []
-    attributes["average_grade"] = []
     attributes["replication_done"] = []
     attributes["modification_done"] = []
 
@@ -127,6 +135,7 @@ def fill_blueprint(attributes: dict, reqs: dict, props: dict) -> dict:
     index = 0
     attributes["blender_mod"] = compute_mods_distribution(reqs)
 
+    general_student_id = 0
     for language, language_content in reqs["samples"].items():
         for school in language_content.values():
             students = school["students"]
@@ -155,7 +164,21 @@ def fill_blueprint(attributes: dict, reqs: dict, props: dict) -> dict:
                         attributes[key].append(language)
                     elif key == "school_name":
                         attributes[key].append(school["nickname"])
-                    elif key == "average_grade":
+                    elif key == "head_name":
+                        attributes[key].append(str(None))
+                    elif key == "secretary_name":
+                        attributes[key].append(str(None))
+                    elif key == "student_id":
+                        attributes[key].append(str(general_student_id))
+                    elif key == "student_name":
+                        attributes[key].append(str(None))
+                    elif key == "student_gender":
+                        attributes[key].append("N/A")
+                    elif key == "student_ethnicity":
+                        attributes[key].append("N/A")
+                    elif key == "academic_years":
+                        attributes[key].append(str(None))
+                    elif key == "average_grades":
                         attributes[key].append(str(None))
                     elif key == "replication_done":
                         attributes[key].append(False)
@@ -172,6 +195,7 @@ def fill_blueprint(attributes: dict, reqs: dict, props: dict) -> dict:
 
                 if (page + 1) % pages_per_student == 0:
                     student_index += 1
+                    general_student_id += 1
                     student_page_index = 0
 
     return attributes
@@ -186,7 +210,8 @@ def write_csv(attributes: dict) -> None:
     """
 
     df = pd.DataFrame(attributes)
-    df.to_csv("dataset_blueprint.csv", index=False)
+    csv_path = os.path.join(Path(__file__).resolve().parent, "dataset_blueprint.csv")
+    df.to_csv(csv_path, index=False)
 
 
 def generate_blueprint(reqs: dict, props: dict) -> None:
@@ -213,7 +238,7 @@ def generate_blueprint(reqs: dict, props: dict) -> None:
 
 if __name__ == "__main__":
     root = os.path.join(
-        Path(dirname(abspath(__file__)).parent, "replication_pipeline", "assets")
+        Path(__file__).resolve().parents[1], "replication_pipeline", "assets"
     )
     reqs_path = os.path.join(root, "requirements_v2.json")
     props_path = os.path.join(root, "properties.json")
