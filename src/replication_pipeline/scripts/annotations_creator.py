@@ -146,7 +146,8 @@ def update_course_tags(
 ):
     success = 1
 
-    for subject in course_curriculum[0:max_subjects]:
+    # for subject in course_curriculum[0:max_subjects]:
+    for subject in course_curriculum:
         tag = list(subject.keys())[0]
         verbose_name = subject[tag]["verbose_name"]
         subject_grade = subject[tag]["grade"]
@@ -231,6 +232,18 @@ class AnnotationsCreator:
             with open(annotations_full_path, "w") as outfile:
                 json.dump(self.annotations[i], outfile, indent=4)
 
+    def new_update_subject_grades_tags(self, curriculum: list, n_subjects: int):
+        success = 1
+        s = update_course_tags(
+            curriculum[0],
+            self.annotations[0]["form"],
+            self.reqs["verbose_level"],
+            max_subjects=n_subjects,
+        )
+        success = success * s
+        return success
+
+    # TODO The following method might be deprecated
     def update_subject_grades_tags(self, curriculum: list, courses_pages_array: list):
         success = 1
         for i, page in enumerate(courses_pages_array):

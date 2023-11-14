@@ -4,6 +4,7 @@ from pathlib import Path
 import pandas as pd
 import random
 from os.path import dirname, abspath
+import numpy as np
 
 
 def read_json(name: str) -> dict:
@@ -50,8 +51,10 @@ def set_database_headers() -> dict:
     attributes["student_name"] = []
     attributes["student_gender"] = []
     attributes["student_ethnicity"] = []
-    attributes["academic_years"] = []
-    attributes["average_grades"] = []
+    attributes["student_courses"] = []
+    attributes["academic_years_in_sample"] = []
+    attributes["num_subjects"] = []
+    attributes["average_grade"] = []
     attributes["blender_mod"] = []
     attributes["replication_done"] = []
     attributes["modification_done"] = []
@@ -78,7 +81,7 @@ def compute_num_samples(reqs: dict) -> int:
     for language in reqs["samples"].values():
         for school in language.values():
             students = school["students"]
-            pages_per_student = school["template_layout"]["pages"]
+            pages_per_student = len(school["template_layout"])
             pages = students * pages_per_student
             num_samples += pages
 
@@ -110,6 +113,31 @@ def compute_mods_distribution(reqs: dict) -> list:
     return mods_distribution
 
 
+def get_tables_info(layout: dict):
+    """
+    Get the list of academic years per page from the layout info and the number of
+    subjects per academic year.
+
+    This method extracts the list of academic years for each page in the provided layout
+    dictionary and checks if the number of academic years matches the number of subjects
+    for each page.
+
+    Args:
+        layout (dict): A dictionary representing the layout of academic records.
+
+    Returns:
+        list: A list of academic years per page.
+    """
+    table_per_page = [page_value["academic_years"] for page_value in layout.values()]
+    subjects_per_table = [page_value["num_subjects"] for page_value in layout.values()]
+    for page_value in layout.values():
+        if len(page_value["academic_years"]) != len(page_value["num_subjects"]):
+            print("WARNING: every record TABLE should have ONE ACADEMIC YEAR:")
+            print("Check your requirements.json file")
+
+    return table_per_page, subjects_per_table
+
+
 # TODO Make it more pythonic
 def fill_blueprint(attributes: dict, reqs: dict, props: dict) -> dict:
     """
@@ -139,12 +167,15 @@ def fill_blueprint(attributes: dict, reqs: dict, props: dict) -> dict:
     for language, language_content in reqs["samples"].items():
         for school in language_content.values():
             students = school["students"]
-            pages_per_student = school["template_layout"]["pages"]
+            pages_per_student = len(school["template_layout"])
             pages = students * pages_per_student
 
             student_index = 0
             student_page_index = 0
-
+            table_per_page, subjects_per_table = get_tables_info(
+                school["template_layout"]
+            )
+            student_courses = [course[0] for course in table_per_page]
             for page in range(pages):
                 for key in attributes:
                     if key == "file_name":
@@ -176,9 +207,15 @@ def fill_blueprint(attributes: dict, reqs: dict, props: dict) -> dict:
                         attributes[key].append("N/A")
                     elif key == "student_ethnicity":
                         attributes[key].append("N/A")
-                    elif key == "academic_years":
-                        attributes[key].append(str(None))
-                    elif key == "average_grades":
+                    elif key == "academic_years_in_sample":
+                        attributes[key].append(str(table_per_page[student_page_index]))
+                    elif key == "student_courses":
+                        attributes[key].append(student_courses)
+                    elif key == "num_subjects":
+                        attributes[key].append(
+                            str(subjects_per_table[student_page_index])
+                        )
+                    elif key == "average_grade":
                         attributes[key].append(str(None))
                     elif key == "replication_done":
                         attributes[key].append(False)

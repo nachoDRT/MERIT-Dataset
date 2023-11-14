@@ -1,16 +1,16 @@
 import tqdm
 import general_helper as ghelper
 from pathlib import Path
+from typing import List, Dict
 import os
 import pandas as pd
-from os.path import dirname, abspath
 import copy
+import ast
 
 import records_creator
 import annotations_creator
 
 OUTPUT_ANNOTATIONS_PDF = False
-DEPRECATED = False
 
 
 def get_reqs_and_props() -> tuple:
@@ -39,45 +39,14 @@ def get_reqs_and_props() -> tuple:
     return reqs, props
 
 
-def define_paths(school_nickname: str) -> dict:
+def define_paths(language: str, school: str) -> dict:
     """
     Construct a dictionary containing file paths used in the script, based on a given
     school nickname. The paths are constructed relative to the parent directory of the
     current working directory.
 
     Args:
-        school_nickname (str): The nickname of the school, used to customize the base
-        path for this particular school's data.
-
-    Returns:
-        dict: A dictionary where keys are descriptive names of paths, and values are the
-        corresponding file paths.
-    """
-
-    paths = {}
-
-    paths["root"] = Path(os.getcwd()).parent
-
-    paths["base_path"] = os.path.join(paths["root"], school_nickname)
-    paths["res_path"] = os.path.join(paths["root"], "assets")
-
-    paths["ds_path"] = os.path.join(paths["base_path"], "dataset_output")
-    paths["template_path"] = os.path.join(paths["base_path"], "template.docx")
-
-    paths["annotations_path"] = os.path.join(paths["ds_path"], "annotations")
-    paths["images_path"] = os.path.join(paths["ds_path"], "images")
-    paths["pdf_path"] = os.path.join(paths["ds_path"], "synthetic_pdf_docs")
-
-    return paths
-
-
-def new_define_paths(language: str, school: str) -> dict:
-    """
-    Construct a dictionary containing file paths used in the script, based on a given
-    school nickname. The paths are constructed relative to the parent directory of the
-    current working directory.
-
-    Args:
+        language (str): The language used: English, Spanish, etc.
         school (str): The nickname of the school, used to customize the base path for
         this particular school's data.
 
@@ -122,66 +91,103 @@ def new_define_paths(language: str, school: str) -> dict:
     return paths
 
 
-def create_documents(reqs: dict, props: dict, paths: dict) -> None:
+def get_students_num_subjects(indices: List, df: pd.DataFrame):
+    """
+    Extracts and processes the number of subjects for every student that has replicas
+    still to be done.
+
+    This method iterates through the list of indices that determine a student change in
+    the blueprint. The method uses each pair of adjacent indices to slice a portion of
+    the DataFrame 'df' (blueprint). It extracts the 'num_subjects' column from these
+    slices, processes the values (the number os subjects), and aggregates them into a
+    list.
+
+    Parameters:
+        indices (List): A list of indices used to slice the DataFrame. Each pair of ad-
+                        jacent indices defines the start and end (exclusive) of a slice.
+                        These indices indicate a new student in the blueprint.
+        df (pd.DataFrame): The blueprint.
+
+    Returns:
+        List: Each element in the list corresponds to one student. Every element in the
+        list is another list with the number of subjects for that student's sample.
+
+    Note:
+        The 'num_subjects' column in the DataFrame is expected to contain string repre-
+        sentations of lists. This function converts these strings into actual lists and
+        extracts the first element of each list.
+    """
+
+    selected_items = []
+    for i in range(len(indices) - 1):
+        start_index = indices[i]
+        end_index = indices[i + 1]
+        items = df.loc[start_index : end_index - 1, "num_subjects"].tolist()
+        items = [ast.literal_eval(item)[0] for item in items]
+        selected_items.append(items)
+
+    return selected_items
+
+
+def check_chaotic_crash(
+    n_subjects: List,
+    courses: List[str],
+    index: int,
+    df: pd.DataFrame,
+) -> Dict:
+    """
+    Check if a 'chaotic crash' happened: a pipeline crash happening in the middle of the
+    documents generation of one student.
+
+    This method compares the lengths of 'n_subjects' and 'courses' lists. If they are
+    not equal, it indicates a 'chaotic crash', and various details related to the crash
+    are gathered from the blueprint and returned in a dictionary.
+
+    Parameters:
+        n_subjects (List): A list containing the number of subjects.
+        courses (List[str]): A list of course names.
+        index (int): The index in the DataFrame 'df' (blueprint) to extract crash de-
+        tails from.
+        df (pd.DataFrame): A pandas DataFrame containing the blueprint.
+
+    Returns:
+        Dict: A dictionary with details about the 'chaotic crash'. If a crash has happe-
+              ned, it includes keys like 'courses', 'n_subjects', 'language', 'direc-
+              tor', 'secretary', 'student_name', and 'school_name'. If no crash happe-
+              ned, it only contains the key 'happened' set to False.
+    """
+
+    crash = {}
+    crash["happened"] = False
+
+    if len(n_subjects) != len(courses):
+        crash["happened"] = True
+        crash["courses"] = courses[-(len(n_subjects)) :]
+        crash["n_subjects"] = n_subjects
+        crash["language"] = df.at[index - 1, "language"]
+        crash["director"] = df.at[index - 1, "head_name"]
+        crash["secretary"] = df.at[index - 1, "secretary_name"]
+        crash["student_name"] = df.at[index - 1, "student_name"]
+        crash["school_name"] = df.at[index - 1, "school_name"]
+
+    return crash
+
+
+def create_documents(df: pd.DataFrame, blueprint_path: str):
     """
     Generates synthetic student records and related documents (PDF and PNG), along with
-    their annotations. This method iterates through a range of students, creating syn-
-    thetic records, documents, and annotations for each. It also manages the tagging of
-    subjects, grades, and courses within the annotations, and writes the annotations to
-    a JSON file. Optionally, it can output a PDF view of the annotations.
+    their annotations. This method iterates through the students still lacking replicas,
+    creating synthetic records, documents, and annotations for each. It also manages the
+    tagging of subjects, grades, and courses within the annotations, and writes the
+    annotations to a JSON file. Optionally, it can output a PDF view of the annotations.
 
     Args:
-        reqs (dict): Requirements for document generation.
-        props (dict): Properties for document generation and annotation.
-        paths (dict): File paths used for document generation, annotation, and storage.
+        df (pd.DataFrame): The blueprint content.
+        blueprint_path (str): The blueprint path.
     """
 
-    first_student = reqs["first_student"]
-    students = reqs["students"]
+    # TODO molotic method, subdivide in speficic methods
 
-    print(f"Starting at student: {first_student} of {students}")
-
-    for student_n in tqdm.trange(
-        first_student, students, initial=first_student, total=students
-    ):
-        # Create synthetic student records
-        record = records_creator.SchoolRecord(student_n, paths, props, reqs)
-
-        # Create pdf and png documents
-        pdf_file_path = record.create_pdf()
-        png_paths = record.create_pngs()
-
-        # Create annotations
-        annotations_class = annotations_creator.AnnotationsCreator(
-            pdf_file_path, paths, props=props, reqs=reqs
-        )
-        annotations_class.create_annotations(pdf_file_path)
-
-        # Tag subjects and grades
-        annotations_class.update_subject_grades_tags(
-            record.student.curriculum, props["courses_pages_array"]
-        )
-
-        # Tag courses
-        annotations_class.update_annotations_tags_courses()
-        annotations_class.sort_annotations()
-
-        # Write to json
-        annotations_class.dump_annotations_json(png_paths)
-
-        # Optionally output annotations view of pdf
-        if OUTPUT_ANNOTATIONS_PDF:
-            annotations_view = annotations_creator.AnnotationsView(
-                annotations_class.annotations, pdf_file_path, reqs
-            )
-            annotations_view.output_annotations_view()
-            annotations_view.output_annotations_words_view()
-
-        # Next time start from next student
-        first_student = student_n
-
-
-def new_create_documents(df: pd.DataFrame, blueprint_path: str):
     # Select only those samples still to be generated
     mask = df["replication_done"] == False
     filtered_df = df[mask]
@@ -194,26 +200,59 @@ def new_create_documents(df: pd.DataFrame, blueprint_path: str):
     language_change_indices = filtered_df.index[language_changes]
     school_change_indices = filtered_df.index[school_changes]
     student_changes_indices = filtered_df.index[student_changes]
+    last_student_id = df.shape[0]
+    student_changes_indices = student_changes_indices.tolist()
+    student_changes_indices.append(last_student_id)
+
+    students_n_subjects = get_students_num_subjects(
+        student_changes_indices, filtered_df
+    )
 
     retrieved_info = {}
+    index_offset = int(df.at[df["replication_done"].sum(), "student_id"])
+
     for index, sample_name in tqdm.tqdm(
         filtered_df["file_name"].items(), total=filtered_df.shape[0]
     ):
         new_school = False
         new_student = False
-        if index in language_change_indices.tolist():
-            language = df.at[index, "language"]
-            school = df.at[index, "school_name"]
-            paths = new_define_paths(language=language, school=school)
-            new_school = True
 
-        elif index in school_change_indices.tolist():
-            school = df.at[index, "school_name"]
-            paths = new_define_paths(language=language, school=school)
-            new_school = True
+        print(sample_name)
 
-        if index in student_changes_indices.tolist():
-            new_student = True
+        courses = ast.literal_eval(df.at[index, "student_courses"])
+
+        student_id = int(df.at[index, "student_id"])
+        student_id -= index_offset
+        n_subjects = students_n_subjects[student_id]
+
+        crash_data = check_chaotic_crash(n_subjects, courses, index, df)
+
+        if crash_data["happened"]:
+            n_subjects = crash_data["n_subjects"]
+            courses = crash_data["courses"]
+            retrieved_info["director"] = crash_data["director"]
+            retrieved_info["secretary"] = crash_data["secretary"]
+            retrieved_info["student_name"] = crash_data["student_name"]
+            retrieved_info["re_spawn_student"] = True
+            school = crash_data["school_name"]
+            lang = crash_data["language"]
+            paths = define_paths(language=lang, school=school)
+
+        else:
+            lang = df.at[index, "language"]
+
+            if index in language_change_indices.tolist():
+                school = df.at[index, "school_name"]
+                paths = define_paths(language=lang, school=school)
+                new_school = True
+
+            elif index in school_change_indices.tolist():
+                school = df.at[index, "school_name"]
+                paths = define_paths(language=lang, school=school)
+                new_school = True
+
+            if index in student_changes_indices:
+                new_student = True
 
         # Create synthetic student records
         record = records_creator.SchoolRecord(
@@ -221,10 +260,19 @@ def new_create_documents(df: pd.DataFrame, blueprint_path: str):
             paths,
             props,
             reqs,
+            lang,
+            courses,
+            n_subjects,
             retrieved_info=retrieved_info,
             new_school=new_school,
             new_student=new_student,
         )
+
+        if crash_data["happened"]:
+            # TODO make sure you recover every student piece of data
+            record.student._name = crash_data["student_name"].split()[0]
+            record.student._first_surname = crash_data["student_name"].split()[1]
+            record.student._second_surname = crash_data["student_name"].split()[2]
 
         # Create pdf and png documents
         pdf_file_path = record.create_pdf()
@@ -236,16 +284,14 @@ def new_create_documents(df: pd.DataFrame, blueprint_path: str):
         )
         annotations_class.create_annotations(pdf_file_path)
 
-        # Tag subjects and grades
-        print(len(record.student.curriculum[0]))
-        print("")
-        print(len(record.student.curriculum[1]))
-        print("")
-        print(len(record.student.curriculum[2]))
-        # TODO prop["courses_pages_array"] must be present when creating the curriculum
+        # print(len(record.student.curriculum[0]))
+        # print(len(record.student.curriculum[1]))
+        # print(len(record.student.curriculum[2]))
+        # TODO extract average grade and write the values on the blueprint
 
-        annotations_class.update_subject_grades_tags(
-            record.student.curriculum, props["courses_pages_array"]
+        # Tag subjects and grades
+        annotations_class.new_update_subject_grades_tags(
+            record.student.curriculum, n_subjects
         )
 
         # Tag courses
@@ -265,6 +311,19 @@ def new_create_documents(df: pd.DataFrame, blueprint_path: str):
 
 
 def get_blueprint():
+    """
+    Retrieves the dataset blueprint from a CSV file.
+
+    This method builds the path to the CSV blueprint ('dataset_blueprint.csv'),
+    located in the 'dashboard' directory. It then reads the CSV file into a pandas
+    DataFrame.
+
+    Returns:
+        tuple: A tuple containing two elements:
+            - pandas.DataFrame: The DataFrame created from the CSV file.
+            - str: The file path to the CSV file.
+    """
+
     blueprint_path = os.path.join(
         Path(__file__).resolve().parents[2], "dashboard", "dataset_blueprint.csv"
     )
@@ -274,22 +333,10 @@ def get_blueprint():
 
 
 if __name__ == "__main__":
-    if DEPRECATED:
-        # Load requirements and properties
-        reqs, props = get_reqs_and_props()
+    blueprint_df, blueprint_path = get_blueprint()
+    blueprint_copy_df = copy.deepcopy(blueprint_df)
 
-        # Define intermediate and output paths
-        paths = define_paths(school_nickname=reqs["school_nickname"])
-
-        # Delete previous files starting from "first_student" onwards
-        ghelper.delete_files(reqs, props, ds_path=paths["ds_path"])
-        create_documents(reqs=reqs, props=props, paths=paths)
-
-    else:
-        reqs, props = get_reqs_and_props()
-        blueprint_df, blueprint_path = get_blueprint()
-        blueprint_copy_df = copy.deepcopy(blueprint_df)
-
-        reqs, props = get_reqs_and_props()
-        new_create_documents(blueprint_df, blueprint_path)
-        # blueprint_copy_df.to_csv(blueprint_path, index=False)
+    reqs, props = get_reqs_and_props()
+    create_documents(blueprint_df, blueprint_path)
+    # Recover the original csv: just useful for debugging purposes
+    # blueprint_copy_df.to_csv(blueprint_path, index=False)

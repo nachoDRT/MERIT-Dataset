@@ -5,18 +5,28 @@
                 "nickname": "eng_1",
                 "students": 5,
                 "template_layout": {
-                    "pages": 2,
                     "page_1": {
-                        "tables": 2,
                         "num_subjects": [
-                            11,
-                            10
+                            11
+                        ],
+                        "academic_years": [
+                            "3_de_la_eso"
                         ]
                     },
                     "page_2": {
-                        "tables": 1,
                         "num_subjects": [
-                            9
+                            10
+                        ],
+                        "academic_years": [
+                            "4_de_la_eso"
+                        ]
+                    },
+                    "page_3": {
+                        "num_subjects": [
+                            11
+                        ],
+                        "academic_years": [
+                            "1_de_bachillerato"
                         ]
                     }
                 }
@@ -25,10 +35,30 @@
                 "nickname": "eng_2",
                 "students": 10,
                 "template_layout": {
-                    "pages": 1,
-                    "page_1": [
-                        10
-                    ]
+                    "page_1": {
+                        "num_subjects": [
+                            11
+                        ],
+                        "academic_years": [
+                            "3_de_la_eso"
+                        ]
+                    },
+                    "page_2": {
+                        "num_subjects": [
+                            10
+                        ],
+                        "academic_years": [
+                            "4_de_la_eso"
+                        ]
+                    },
+                    "page_3": {
+                        "num_subjects": [
+                            11
+                        ],
+                        "academic_years": [
+                            "1_de_bachillerato"
+                        ]
+                    }
                 }
             }
         },
@@ -37,28 +67,58 @@
                 "nickname": "esp_1",
                 "students": 2,
                 "template_layout": {
-                    "pages": 1,
-                    "page_1": [
-                        10
-                    ]
+                    "page_1": {
+                        "num_subjects": [
+                            11
+                        ],
+                        "academic_years": [
+                            "3_de_la_eso"
+                        ]
+                    },
+                    "page_2": {
+                        "num_subjects": [
+                            10
+                        ],
+                        "academic_years": [
+                            "4_de_la_eso"
+                        ]
+                    },
+                    "page_3": {
+                        "num_subjects": [
+                            11
+                        ],
+                        "academic_years": [
+                            "1_de_bachillerato"
+                        ]
+                    }
                 }
             },
             "esp_school_2": {
                 "nickname": "esp_2",
                 "students": 3,
                 "template_layout": {
-                    "pages": 2,
                     "page_1": {
-                        "tables": 2,
                         "num_subjects": [
-                            11,
-                            10
+                            11
+                        ],
+                        "academic_years": [
+                            "3_de_la_eso"
                         ]
                     },
                     "page_2": {
-                        "tables": 1,
                         "num_subjects": [
-                            9
+                            10
+                        ],
+                        "academic_years": [
+                            "4_de_la_eso"
+                        ]
+                    },
+                    "page_3": {
+                        "num_subjects": [
+                            11
+                        ],
+                        "academic_years": [
+                            "1_de_bachillerato"
                         ]
                     }
                 }

@@ -2,8 +2,7 @@ import json
 import random
 import csv
 import copy
-
-# from config import res_path
+import os
 
 
 def load_csv(filepath: str):
@@ -58,13 +57,22 @@ class DataLoader:
     surnames = []
     subjects = {}
 
-    def __init__(self, res_path) -> None:
+    def __init__(self, res_path, language) -> None:
         # Load names, surnames and subjects
-        self.names = load_csv(res_path + "/first_names/first_names_spanish.txt")
-        self.surnames = load_csv(res_path + "/family_names/family_names_spanish.txt")
-        self.subjects_json = load_json(res_path + "/subjects/subjects_spanish.json")
+        names_path = os.path.join(
+            res_path, "first_names", "".join(["first_names_", language, ".txt"])
+        )
+        surnames_path = os.path.join(
+            res_path, "family_names", "".join(["family_names_", language, ".txt"])
+        )
+        subjects_path = os.path.join(
+            res_path, "subjects", "".join(["subjects_", language, ".json"])
+        )
+        self.names = load_csv(names_path)
+        self.surnames = load_csv(surnames_path)
+        self.subjects_json = load_json(subjects_path)
         self.subjects = self.subjects_json["subjects"]
-        self.academic_year_tags = self.subjects_json["academic_years_tags"]
+        # self.academic_year_tags = self.subjects_json["academic_years_tags"]
 
 
 class Person:
@@ -73,29 +81,37 @@ class Person:
     curriculum = []  #
     N_subjects = 15  # More subjects are generated than required
 
-    def __init__(self, res_path: str, student: bool = True) -> None:
-        self.dataLoader = DataLoader(res_path=res_path)
+    def __init__(
+        self,
+        res_path: str,
+        language: str,
+        courses: list = [],
+        student: bool = True,
+        n_subjects: int = 0,
+    ) -> None:
+        self.dataLoader = DataLoader(res_path=res_path, language=language)
         self._name = random.choice(list(self.dataLoader.names))
         self._first_surname = random.choice(list(self.dataLoader.surnames))
         self._second_surname = random.choice(list(self.dataLoader.surnames))
         self.curriculum = []
 
         if student:
-            self.years = self.dataLoader.academic_year_tags
-            self.populate_courses()
+            # self.years = self.dataLoader.academic_year_tags
+            self.years = courses
+            self.populate_courses(n_subjects)
 
     def get_full_name(self):
         full_name = self._name + " " + self._first_surname + " " + self._second_surname
         return full_name
 
-    def populate_courses(self):
+    def populate_courses(self, n_subjects: int):
         """Choose subjects randomly and assign grades"""
         if len(self.curriculum) == 0:
-            for year in self.years:
+            for year_index, year in enumerate(self.years):
                 course = []
                 subjects = list(self.dataLoader.subjects)
                 random.shuffle(subjects)
-                subjects = subjects[0 : self.N_subjects]
+                subjects = subjects[0 : n_subjects[year_index]]
 
                 for subject in subjects:
                     subject_dict = {}

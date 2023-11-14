@@ -40,6 +40,9 @@ class SchoolRecord:
         paths: dict,
         props: dict,
         reqs: dict,
+        lang: str,
+        courses: list,
+        n_subjects: int,
         retrieved_info: dict,
         verbose_level: int = 0,
         new_school: bool = False,
@@ -53,20 +56,29 @@ class SchoolRecord:
 
         if self.new_school:
             self.secre = person_generator.Person(
-                res_path=self.paths["res_path"], student=False
+                res_path=self.paths["res_path"], language=lang, student=False
             )
             self.director = person_generator.Person(
-                res_path=paths["res_path"], student=False
+                res_path=paths["res_path"], language=lang, student=False
             )
             self.student = person_generator.Person(
-                res_path=self.paths["res_path"], student=True
+                res_path=self.paths["res_path"],
+                language=lang,
+                courses=courses,
+                student=True,
+                n_subjects=n_subjects,
             )
+
         else:
             self.secre = retrieved_info["secretary"]
             self.director = retrieved_info["director"]
-            if self.new_student:
+            if self.new_student or retrieved_info["re_spawn_student"]:
                 self.student = person_generator.Person(
-                    res_path=self.paths["res_path"], student=True
+                    res_path=self.paths["res_path"],
+                    language=lang,
+                    courses=courses,
+                    student=True,
+                    n_subjects=n_subjects,
                 )
             else:
                 self.student = retrieved_info["student_object"]
@@ -92,6 +104,7 @@ class SchoolRecord:
 
         info_retrieval["student_object"] = self.student
         info_retrieval["student_name"] = self.student.get_full_name()
+        info_retrieval["re_spawn_student"] = False
 
         return info_retrieval
 
