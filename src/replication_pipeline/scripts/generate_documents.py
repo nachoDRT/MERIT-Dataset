@@ -1,5 +1,6 @@
 import tqdm
 import general_helper as ghelper
+import numpy as np
 from pathlib import Path
 from typing import List, Dict
 import os
@@ -144,7 +145,7 @@ def check_chaotic_crash(
     are gathered from the blueprint and returned in a dictionary.
 
     Parameters:
-        n_subjects (List): A list containing the number of subjects.
+        n_subjects (List): A list containing the number of subjects for one student.
         courses (List[str]): A list of course names.
         index (int): The index in the DataFrame 'df' (blueprint) to extract crash de-
         tails from.
@@ -169,8 +170,95 @@ def check_chaotic_crash(
         crash["secretary"] = df.at[index - 1, "secretary_name"]
         crash["student_name"] = df.at[index - 1, "student_name"]
         crash["school_name"] = df.at[index - 1, "school_name"]
+        crash["student_sample_index"] = -len(n_subjects)
 
     return crash
+
+
+def get_courses_indices_in_sample(df: pd.DataFrame, index: int, courses: list):
+    """
+    Extract the indices of the academic yars present in one sample. The indeces are re-
+    lative to one unique student.
+
+    Parameters:
+        df (pd.DataFrame): The Blueprint data content
+        index (int): The row index in the DataFrame i.e. the sample index.
+        courses (list): The list of course names or academic years relevant for specific
+                        student.
+
+    Returns:
+        list: A list of indices corresponding to those academic years present in one
+              specific sample
+    """
+
+    academic_years_in_sample = df.at[index, "academic_years_in_sample"]
+    student_sample_indeces = [
+        i
+        for i, academic_year in enumerate(courses)
+        if academic_year in academic_years_in_sample
+    ]
+
+    return student_sample_indeces
+
+
+def compute_average_grade(curriculum: list):
+    """
+    Compute the average grade from a list of subjects, each represented as a dictionary.
+
+    This method iterates through each subject in the 'curriculum' list. Each subject is
+    expected to be a dictionary where one of the values is another dictionary containing
+    the key 'grade'. It extracts all these 'grade' values, calculates their average, and
+    returns it.
+
+    Parameters:
+        curriculum (list): A list where each element is a dictionary representing a sub-
+                           ject. Each subject's dictionary should contain a key-value
+                           pair where the value is another dictionary with the key
+                           'grade'.
+
+    Returns:
+        float: The average of all the 'grade' values found in the curriculum.
+    """
+
+    grades = []
+
+    for subject in curriculum:
+        for subject_values in subject.values():
+            grades.append(subject_values["grade"])
+
+    grades = np.array(grades)
+    average = grades.mean()
+
+    return average
+
+
+def compute_average_grades(indices: list, record: records_creator.SchoolRecord):
+    """
+    Computes the average grades for the given indices in a student's curriculum record.
+    The indices point towards the academic years present in one specific sample. Then
+    the method computes the average.
+
+    Parameters:
+        indices (list): A list of integers representing the indices of the academic
+                        years present in one specific sample.
+
+        record (records_creator.SchoolRecord): A student's record.
+
+    Returns:
+        list: A list containing one average (float) for every academic year present in
+              the sample.
+    """
+
+    averages = []
+    for index in indices:
+        averages.append(
+            round(
+                compute_average_grade(record.student.curriculum[index]),
+                2,
+            )
+        )
+
+    return averages
 
 
 def create_documents(df: pd.DataFrame, blueprint_path: str):
@@ -186,7 +274,7 @@ def create_documents(df: pd.DataFrame, blueprint_path: str):
         blueprint_path (str): The blueprint path.
     """
 
-    # TODO molotic method, subdivide in speficic methods
+    # TODO monolitic method, subdivide in speficic methods
 
     # Select only those samples still to be generated
     mask = df["replication_done"] == False
@@ -194,36 +282,37 @@ def create_documents(df: pd.DataFrame, blueprint_path: str):
 
     language_changes = filtered_df["language"] != filtered_df["language"].shift(1)
     school_changes = filtered_df["school_name"] != filtered_df["school_name"].shift(1)
-    student_changes = filtered_df["student_id"] != filtered_df["student_id"].shift(1)
+    student_changes = filtered_df["student_index"] != filtered_df[
+        "student_index"
+    ].shift(1)
 
     # Filter indeces where there are changes in language and school names
     language_change_indices = filtered_df.index[language_changes]
     school_change_indices = filtered_df.index[school_changes]
     student_changes_indices = filtered_df.index[student_changes]
-    last_student_id = df.shape[0]
+    last_student_index = df.shape[0]
     student_changes_indices = student_changes_indices.tolist()
-    student_changes_indices.append(last_student_id)
+    student_changes_indices.append(last_student_index)
 
     students_n_subjects = get_students_num_subjects(
         student_changes_indices, filtered_df
     )
 
     retrieved_info = {}
-    index_offset = int(df.at[df["replication_done"].sum(), "student_id"])
+    index_offset = int(df.at[df["replication_done"].sum(), "student_index"])
 
     for index, sample_name in tqdm.tqdm(
         filtered_df["file_name"].items(), total=filtered_df.shape[0]
     ):
+        # TODO check crash only in the first iteration of the loop
         new_school = False
         new_student = False
 
-        print(sample_name)
-
         courses = ast.literal_eval(df.at[index, "student_courses"])
 
-        student_id = int(df.at[index, "student_id"])
-        student_id -= index_offset
-        n_subjects = students_n_subjects[student_id]
+        student_index = int(df.at[index, "student_index"])
+        student_index -= index_offset
+        n_subjects = students_n_subjects[student_index]
 
         crash_data = check_chaotic_crash(n_subjects, courses, index, df)
 
@@ -236,6 +325,7 @@ def create_documents(df: pd.DataFrame, blueprint_path: str):
             retrieved_info["re_spawn_student"] = True
             school = crash_data["school_name"]
             lang = crash_data["language"]
+            # student_sample_index = crash_data["student_sample_index"]
             paths = define_paths(language=lang, school=school)
 
         else:
@@ -256,7 +346,7 @@ def create_documents(df: pd.DataFrame, blueprint_path: str):
 
         # Create synthetic student records
         record = records_creator.SchoolRecord(
-            index,
+            sample_name,
             paths,
             props,
             reqs,
@@ -284,10 +374,10 @@ def create_documents(df: pd.DataFrame, blueprint_path: str):
         )
         annotations_class.create_annotations(pdf_file_path)
 
-        # print(len(record.student.curriculum[0]))
-        # print(len(record.student.curriculum[1]))
-        # print(len(record.student.curriculum[2]))
-        # TODO extract average grade and write the values on the blueprint
+        # For this sample, get the indices of the academic years present
+        student_sample_indices = get_courses_indices_in_sample(df, index, courses)
+
+        averages = compute_average_grades(student_sample_indices, record)
 
         # Tag subjects and grades
         annotations_class.new_update_subject_grades_tags(
@@ -307,6 +397,7 @@ def create_documents(df: pd.DataFrame, blueprint_path: str):
         df.at[index, "secretary_name"] = retrieved_info["secretary"]
         df.at[index, "student_name"] = retrieved_info["student_name"]
         df.at[index, "replication_done"] = True
+        df.at[index, "average_grade"] = averages
         df.to_csv(blueprint_path, index=False)
 
 

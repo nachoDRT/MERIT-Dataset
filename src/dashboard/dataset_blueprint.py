@@ -47,7 +47,7 @@ def set_database_headers() -> dict:
     attributes["school_name"] = []
     attributes["head_name"] = []
     attributes["secretary_name"] = []
-    attributes["student_id"] = []
+    attributes["student_index"] = []
     attributes["student_name"] = []
     attributes["student_gender"] = []
     attributes["student_ethnicity"] = []
@@ -163,7 +163,7 @@ def fill_blueprint(attributes: dict, reqs: dict, props: dict) -> dict:
     index = 0
     attributes["blender_mod"] = compute_mods_distribution(reqs)
 
-    general_student_id = 0
+    general_student_index = 0
     for language, language_content in reqs["samples"].items():
         for school in language_content.values():
             students = school["students"]
@@ -199,8 +199,8 @@ def fill_blueprint(attributes: dict, reqs: dict, props: dict) -> dict:
                         attributes[key].append(str(None))
                     elif key == "secretary_name":
                         attributes[key].append(str(None))
-                    elif key == "student_id":
-                        attributes[key].append(str(general_student_id))
+                    elif key == "student_index":
+                        attributes[key].append(str(general_student_index))
                     elif key == "student_name":
                         attributes[key].append(str(None))
                     elif key == "student_gender":
@@ -232,7 +232,7 @@ def fill_blueprint(attributes: dict, reqs: dict, props: dict) -> dict:
 
                 if (page + 1) % pages_per_student == 0:
                     student_index += 1
-                    general_student_id += 1
+                    general_student_index += 1
                     student_page_index = 0
 
     return attributes

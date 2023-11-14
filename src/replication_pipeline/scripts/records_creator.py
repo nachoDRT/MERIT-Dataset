@@ -174,6 +174,9 @@ class SchoolRecord:
                 stderr=subprocess.DEVNULL,
             )
 
+        # Remove the docx
+        os.remove(new_file_path)
+
         return self.pdf_path
 
     def create_pngs(self):
@@ -188,9 +191,7 @@ class SchoolRecord:
             image_copy = cv2.cvtColor(image_copy, cv2.COLOR_BGR2RGB)
 
             png_filename = (
-                self.reqs["school_nickname"]
-                + "_"
-                + str(self.id).zfill(self.props["doc_name_zeros_fill"])
+                str(self.id).zfill(self.props["doc_name_zeros_fill"])
                 + "_"
                 + str(i)
                 + ".png"
