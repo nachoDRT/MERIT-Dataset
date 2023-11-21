@@ -8,3 +8,11 @@
 .Select-option {
     color: #FFFFFF !important;
 }
+.custom-slider {
+    width: 75%;
+    margin: auto;
+    color: white;
+}
+.rc-slider-mark-text {
+    color: white;
+}

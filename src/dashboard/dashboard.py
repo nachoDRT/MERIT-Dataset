@@ -1,16 +1,248 @@
+from dash import Dash, html, dcc, Input, Output, ALL, State
 import dash
-from dash import dcc, html
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
+import os
+from os.path import dirname, abspath
+from dash.exceptions import PreventUpdate
+import dashboard_helper as dhelp
+import dash_bootstrap_components as dbc
 
 START_COLOR = "#ccffff"
 END_COLOR = "#009933"
 BACK_COLOR = "#000000"
 TEXT_COLOR = "#FFFFFF"
 
+external_stylesheets = ["https://codepen.io/chriddyp/pen/bWLwgP.css"]
 
-def configure_app_layout(app: dash.Dash, df: pd.DataFrame) -> dash.Dash:
+blueprint_name = "dataset_blueprint.csv"
+blueprint_path = os.path.join(dirname(abspath(__file__)), blueprint_name)
+df = pd.read_csv(blueprint_path)
+css_path = os.path.join(dirname(abspath(__file__)), "assets", "styles.css")
+app = dash.Dash(
+    __name__,
+    external_stylesheets=[dbc.themes.QUARTZ, css_path],
+    suppress_callback_exceptions=True,
+)
+
+langs_dict = dhelp.get_available_schools_per_language()
+
+
+def create_header():
+    return html.Div(
+        [
+            html.H1("Dataset Inputs"),
+            html.P("Design your own dasaset"),
+            dcc.Link("Go to Dataset Statistics Page", href="/statistics"),
+        ]
+    )
+
+
+def create_prop_slider(
+    team_a: str, team_b: str, step: int = 10, min: int = 0, max: int = 100
+):
+    title = f"{team_a}/{team_b} Proportion"
+    mean = (max - min) / 2
+    slider_id = f"slider-{team_a}-{team_b}"
+    output_id = f"output-{team_a}-{team_b}"
+
+    return html.Div(
+        [
+            html.H3(title, style={"marginTop": "1.5em"}),
+            html.Div(
+                [
+                    dcc.Slider(
+                        min,
+                        max,
+                        step,
+                        value=mean,
+                        id={"type": "slider", "index": slider_id},
+                        className="custom-slider",
+                    ),
+                    html.Div(
+                        id={"type": "output", "index": output_id},
+                        style={
+                            "display": "flex",
+                            "justifyContent": "center",
+                            "fontSize": 12,
+                            "marginTop": "0.5em",
+                        },
+                    ),
+                ],
+                style={"marginTop": "25px"},
+            ),
+        ],
+        style={"marginTop": "20px"},
+    )
+
+
+@app.callback(
+    Output({"type": "output", "index": ALL}, "children"),
+    [Input({"type": "slider", "index": ALL}, "value")],
+    [State({"type": "slider", "index": ALL}, "id")],
+)
+def update_output(values, ids):
+    if not dash.callback_context.triggered:
+        raise PreventUpdate
+
+    value = values[0]
+    id = ids[0]
+
+    slider_id = id["index"]
+    _, team_a, team_b = slider_id.split("-")
+    response = f"Selection: {value}% {team_a}, {100 - value}% {team_b}"
+
+    dhelp.update_fe_male_proportion_requirements(value)
+
+    return [response]
+
+
+# Define the layout for the dataset input page
+def layout_input_dataset() -> dash.Dash.layout:
+    in_layout = [
+        html.Div(
+            [
+                html.H1(
+                    "Dataset Inputs",
+                    style={
+                        "marginTop": "0.5em",
+                        "marginBottom": "0.05em",
+                        "fontWeight": "bold",
+                    },
+                ),
+                html.P("Design your own dasaset", style={"marginTop": "0.05em"}),
+            ]
+        )
+    ]
+    in_layout.extend(
+        [html.H3("Select Languages and School Templates", style={"marginTop": "1.5em"})]
+    )
+    langs = [lang for lang in langs_dict.keys()]
+    langs_selectors = [create_lang_selector(lang) for lang in langs_dict.keys()]
+    row = generate_lang_card(langs, langs_selectors)
+    in_layout.extend(row)
+    in_layout.extend([create_prop_slider(team_a="Female", team_b="Male")])
+    in_layout.extend(create_continue_button())
+
+    layout = dbc.Container(
+        [
+            dbc.Row(
+                [
+                    dbc.Col(width=2),
+                    dbc.Col(in_layout, width=8, style={"margin": "0 auto"}),
+                    dbc.Col(width=2),
+                ]
+            )
+        ],
+        fluid=True,
+    )
+    return html.Div(layout)
+
+
+def create_lang_selector(lang: str):
+    lang_card = dbc.Card(
+        [
+            dbc.Checklist(
+                options=[{"label": lang.capitalize(), "value": lang}],
+                value=[],
+                id=f"checkbox-{lang}",
+                switch=True,
+            ),
+            dbc.Collapse(
+                dbc.Checklist(
+                    options=[
+                        {"label": elemento, "value": elemento}
+                        for elemento in langs_dict[lang]
+                    ],
+                    value=[],
+                    id=f"checklist-{lang}",
+                    inline=True,
+                ),
+                id=f"collapse-lang-{lang}",
+            ),
+        ]
+    )
+    return lang_card
+
+
+@app.callback(
+    [Output(f"collapse-lang-{lang}", "is_open") for lang in langs_dict.keys()],
+    [Input(f"checkbox-{lang}", "value") for lang in langs_dict.keys()],
+)
+def update_collapse(*language_selections):
+    updates = [bool(value) for value in language_selections]
+
+    return updates
+
+
+@app.callback(
+    [Output("continue-button", "style"), Output("continue-button", "className")],
+    [Input(f"checklist-{lang}", "value") for lang in langs_dict.keys()],
+)
+def update_collapse(*school_selections):
+    selected_schools = [school for language in school_selections for school in language]
+
+    dhelp.update_schools_requirements(selected_schools)
+
+    if len(selected_schools) != 0:
+        return {
+            "display": "block",
+            "justifyContent": "center",
+            "marginTop": "20px",
+        }, "btn btn-secondary"
+    else:
+        return {
+            "display": "none",
+        }, "btn btn-outline-dark"
+
+
+def generate_lang_card(langs: list, langs_selectors: list):
+    row = dbc.Row(
+        [
+            dbc.Col(
+                dbc.Card(
+                    [
+                        dbc.CardHeader(f"Option {i + 1}"),
+                        dbc.CardBody(card_content),
+                    ]
+                )
+            )
+            for i, (_, card_content) in enumerate(zip(langs, langs_selectors))
+        ],
+        className="g-10",
+    )
+    return [row]
+
+
+def create_continue_button():
+    continue_button = dbc.Row(
+        [
+            dbc.Col(
+                html.Button(
+                    "Run Generator",
+                    id="continue-button",
+                ),
+                width=2,
+                style={"margin": "auto"},
+            )
+        ]
+    )
+    return [continue_button]
+
+
+@app.callback(
+    Output("url", "pathname"),
+    Input("continue-button", "n_clicks"),
+    prevent_initial_call=True,
+)
+def navigate_to_statistics(n_clicks):
+    if n_clicks:
+        return "/statistics"
+    return dash.no_update
+
+
+def layout_statistics_dataset() -> dash.Dash.layout:
     """
     Configures the layout of the Dash app and sets up callback functions for interactive
     elements.
@@ -28,14 +260,36 @@ def configure_app_layout(app: dash.Dash, df: pd.DataFrame) -> dash.Dash:
         df (pandas.DataFrame): The DataFrame with the data to display on the dashboard.
 
     Returns:
-        dash.Dash: The configured Dash app instance with the layout and callbacks.
+        dash.Dash.layout: The app page layout.
     """
 
     languages_bar_plot_title = "Samples Distribution per Language"
     capitalized_languages = [lang.capitalize() for lang in df["language"].unique()]
 
-    app.layout = html.Div(
+    object = html.Div(
         [
+            html.Div(
+                [
+                    html.H1(
+                        "Data Visualization Page",
+                    ),
+                    dcc.Link(
+                        "Go Back",
+                        href="/",
+                        style={
+                            "backgroundColor": BACK_COLOR,
+                            "color": TEXT_COLOR,
+                            "textDecoration": "none",
+                            "fontFamily": "Arial",
+                        },
+                    ),
+                ],
+                style={
+                    "backgroundColor": BACK_COLOR,
+                    "color": TEXT_COLOR,
+                    "fontFamily": "Arial",
+                },
+            ),
             # First Bar Plot
             dcc.Graph(
                 id="language-bar-plot",
@@ -89,136 +343,137 @@ def configure_app_layout(app: dash.Dash, df: pd.DataFrame) -> dash.Dash:
                     ),
                 ],
             ),
-            dcc.Interval(
-                id="interval-component",
-                interval=1 * 1000,  # in milliseconds
-                n_intervals=0,
-            ),
         ],
     )
 
-    @app.callback(
-        dash.dependencies.Output("school-bar-plot", "figure"),
-        [dash.dependencies.Input("language-selector", "value")],
-        [dash.dependencies.Input("interval-component", "n_intervals")],
+    return object
+
+
+@app.callback(
+    dash.dependencies.Output("school-bar-plot", "figure"),
+    [dash.dependencies.Input("language-selector", "value")],
+    [dash.dependencies.Input("interval-component", "n_intervals")],
+)
+def update_school_plot(selected_language: str, _: int = None) -> go.Figure:
+    """
+    Updates the school bar plot based on the selected language.
+
+    This method is decorated with `@app.callback`, making it a callback function
+    within the Dash app. It gets triggered whenever the dropdown changes.
+
+    The method first filters the dataset to include only the samples corresponding
+    to the selected language. It retrieves the unique school names from the filtered
+    dataset and capitalizes each school name. A title string for the bar plot is
+    constructed to include the selected language. The 'config_fig' method is then
+    called with the filtered dataset, the key for the school name column, the title
+    string, the list of capitalized school names, and the x-axis title "School" to
+    generate a new bar plot figure, which is then returned.
+
+    Args:
+        selected_language (str): The currently selected language in dropdown.
+
+    Returns:
+        go.Figure: The updated bar plot figure showing the number of samples per
+                    school for the selected language.
+
+    """
+    blueprint_name = "dataset_blueprint.csv"
+    blueprint_path = os.path.join(dirname(abspath(__file__)), blueprint_name)
+    df = pd.read_csv(blueprint_path)
+    filtered_df = df[df["language"] == selected_language]
+    school_names = [
+        school.capitalize() for school in filtered_df["school_name"].unique()
+    ]
+    schools_bar_plot_title = f"Samples per School in {selected_language.capitalize()}"
+    figure = config_fig(
+        filtered_df,
+        "school_name",
+        schools_bar_plot_title,
+        school_names,
+        "School",
     )
-    def update_school_plot(selected_language: str, _: int) -> go.Figure:
-        """
-        Updates the school bar plot based on the selected language.
+    return figure
 
-        This method is decorated with `@app.callback`, making it a callback function
-        within the Dash app. It gets triggered whenever the dropdown changes.
 
-        The method first filters the dataset to include only the samples corresponding
-        to the selected language. It retrieves the unique school names from the filtered
-        dataset and capitalizes each school name. A title string for the bar plot is
-        constructed to include the selected language. The 'config_fig' method is then
-        called with the filtered dataset, the key for the school name column, the title
-        string, the list of capitalized school names, and the x-axis title "School" to
-        generate a new bar plot figure, which is then returned.
+@app.callback(
+    dash.dependencies.Output("replication-gauge", "figure"),
+    [dash.dependencies.Input("language-selector", "value")],
+    [dash.dependencies.Input("interval-component", "n_intervals")],
+)
+def update_replicas_gauge(selected_language: str, _: int = None) -> go.Figure:
+    """
+    Updates the replication gauge figure based on the selected language.
 
-        Args:
-            selected_language (str): The currently selected language in dropdown.
+    This method is decorated with '@app.callback', making it a callback function
+    within the Dash app. It gets triggered whenever the value of the language
+    selector dropdown changes.
 
-        Returns:
-            go.Figure: The updated bar plot figure showing the number of samples per
-                       school for the selected language.
+    The method first constructs a title string for the gauge that includes the se-
+    lected language. It then filters the dataset to include only the samples corres-
+    ponding to the selected language, and computes the fraction of these samples for
+    which the replication has been completed (i.e., the "replication_done" column is
+    True). This fraction is passed to 'update_gauge' along with the title string to
+    generate a new gauge figure, which is then returned.
 
-        """
+    Args:
+        selected_language (str): The currently selected language in the dropdown.
 
-        df = pd.read_csv("dataset_blueprint.csv")
-        filtered_df = df[df["language"] == selected_language]
-        school_names = [
-            school.capitalize() for school in filtered_df["school_name"].unique()
-        ]
-        schools_bar_plot_title = (
-            f"Samples per School in {selected_language.capitalize()}"
-        )
-        figure = config_fig(
-            filtered_df,
-            "school_name",
-            schools_bar_plot_title,
-            school_names,
-            "School",
-        )
-        return figure
+    Returns:
+        go.Figure: The updated gauge figure showing the percentage of replications
+                    completed for the selected language.
+    """
+    blueprint_name = "dataset_blueprint.csv"
+    blueprint_path = os.path.join(dirname(abspath(__file__)), blueprint_name)
+    df = pd.read_csv(blueprint_path)
+    gauge_title = f"Replicas in {selected_language.capitalize()} Completion"
+    filtered_df = df[df["language"] == selected_language]
+    true_count = filtered_df["replication_done"].sum()
+    total_count = len(filtered_df)
+    fraction = true_count / total_count
+    gauge_figure = update_gauge(gauge_title, fraction)
 
-    @app.callback(
-        dash.dependencies.Output("replication-gauge", "figure"),
-        [dash.dependencies.Input("language-selector", "value")],
-        [dash.dependencies.Input("interval-component", "n_intervals")],
-    )
-    def update_replicas_gauge(selected_language: str, _: int) -> go.Figure:
-        """
-        Updates the replication gauge figure based on the selected language.
+    return gauge_figure
 
-        This method is decorated with '@app.callback', making it a callback function
-        within the Dash app. It gets triggered whenever the value of the language
-        selector dropdown changes.
 
-        The method first constructs a title string for the gauge that includes the se-
-        lected language. It then filters the dataset to include only the samples corres-
-        ponding to the selected language, and computes the fraction of these samples for
-        which the replication has been completed (i.e., the "replication_done" column is
-        True). This fraction is passed to 'update_gauge' along with the title string to
-        generate a new gauge figure, which is then returned.
+@app.callback(
+    dash.dependencies.Output("modification-gauge", "figure"),
+    [dash.dependencies.Input("language-selector", "value")],
+    [dash.dependencies.Input("interval-component", "n_intervals")],
+)
+def update_mods_gauge(selected_language: str, _: int = None) -> go.Figure:
+    """
+    Updates the modifications gauge figure based on the selected language.
 
-        Args:
-            selected_language (str): The currently selected language in the dropdown.
+    This method is decorated with '@app.callback', making it a callback function
+    within the Dash app. It gets triggered whenever the value of the language selec-
+    tor dropdown changes.
 
-        Returns:
-            go.Figure: The updated gauge figure showing the percentage of replications
-                       completed for the selected language.
-        """
-        df = pd.read_csv("dataset_blueprint.csv")
-        gauge_title = f"Replicas in {selected_language.capitalize()} Completion"
-        filtered_df = df[df["language"] == selected_language]
-        true_count = filtered_df["replication_done"].sum()
-        total_count = len(filtered_df)
-        fraction = true_count / total_count
-        gauge_figure = update_gauge(gauge_title, fraction)
+    The method first constructs a title string for the gauge that includes the
+    selected language. It then filters the dataset to include only the samples co-
+    rresponding to the selected language, and computes the fraction of these samples
+    for which the modification has been completed (i.e., the "modification_done" co-
+    lumn is True). This fraction is passed to 'update_gauge' along with the title
+    string to generate a new gauge figure, which is then returned.
 
-        return gauge_figure
+    Args:
+        selected_language (str): The currently selected language in the dropdown.
 
-    @app.callback(
-        dash.dependencies.Output("modification-gauge", "figure"),
-        [dash.dependencies.Input("language-selector", "value")],
-        [dash.dependencies.Input("interval-component", "n_intervals")],
-    )
-    def update_mods_gauge(selected_language: str, _: int) -> go.Figure:
-        """
-        Updates the modifications gauge figure based on the selected language.
+    Returns:
+        go.Figure: The updated gauge figure showing the percentage of modifications
+                    completed for the selected language.
+    """
 
-        This method is decorated with '@app.callback', making it a callback function
-        within the Dash app. It gets triggered whenever the value of the language selec-
-        tor dropdown changes.
+    blueprint_name = "dataset_blueprint.csv"
+    blueprint_path = os.path.join(dirname(abspath(__file__)), blueprint_name)
+    df = pd.read_csv(blueprint_path)
+    gauge_title = f"Modifications in {selected_language.capitalize()} Completion"
+    filtered_df = df[df["language"] == selected_language]
+    true_count = filtered_df["modification_done"].sum()
+    total_count = (~filtered_df["modification_done"].astype(bool)).sum()
+    fraction = true_count / total_count
+    gauge_figure = update_gauge(gauge_title, fraction)
 
-        The method first constructs a title string for the gauge that includes the
-        selected language. It then filters the dataset to include only the samples co-
-        rresponding to the selected language, and computes the fraction of these samples
-        for which the modification has been completed (i.e., the "modification_done" co-
-        lumn is True). This fraction is passed to 'update_gauge' along with the title
-        string to generate a new gauge figure, which is then returned.
-
-        Args:
-            selected_language (str): The currently selected language in the dropdown.
-
-        Returns:
-            go.Figure: The updated gauge figure showing the percentage of modifications
-                       completed for the selected language.
-        """
-
-        df = pd.read_csv("dataset_blueprint.csv")
-        gauge_title = f"Modifications in {selected_language.capitalize()} Completion"
-        filtered_df = df[df["language"] == selected_language]
-        true_count = filtered_df["modification_done"].sum()
-        total_count = (~filtered_df["modification_done"].astype(bool)).sum()
-        fraction = true_count / total_count
-        gauge_figure = update_gauge(gauge_title, fraction)
-
-        return gauge_figure
-
-    return app
+    return gauge_figure
 
 
 def update_gauge(gauge_title: str, fraction: float) -> go.Figure:
@@ -380,8 +635,31 @@ def config_fig(
     return figure
 
 
+# Main layout of the app
+app.layout = html.Div(
+    [
+        dcc.Location(id="url", refresh=False),
+        html.Div(id="page-content"),
+        dcc.Interval(
+            id="interval-component",
+            interval=1 * 1000,  # in milliseconds
+            n_intervals=0,
+        ),
+    ]
+)
+
+
+@app.callback(
+    Output("page-content", "children"),
+    [Input("url", "pathname")],
+)
+def display_page(pathname: str):
+    if pathname == "/statistics":
+        return layout_statistics_dataset()
+    else:
+        return layout_input_dataset()
+
+
+# Run the app
 if __name__ == "__main__":
-    df = pd.read_csv("dataset_blueprint.csv")
-    app = dash.Dash(__name__, external_stylesheets=["/assets/styles.css"])
-    app = configure_app_layout(app=app, df=df)
     app.run_server(debug=True)

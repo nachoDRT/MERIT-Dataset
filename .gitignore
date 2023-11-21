@@ -7,6 +7,7 @@ data/modified/test.png
 data/modified/bboxes.png
 data/modified/modified_labels.json
 data/modified/segments.png
+src/dashboard/__pycache__
 src/dashboard/dataset_blueprint.csv
 src/dashboard/.~lock.dataset_blueprint.csv#
 src/blender_mod/mod.blend

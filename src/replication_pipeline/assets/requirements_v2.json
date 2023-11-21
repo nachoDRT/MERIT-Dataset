@@ -1,8 +1,8 @@
 {
     "samples": {
         "english": {
-            "eng_school_1": {
-                "nickname": "eng_1",
+            "eng_1": {
+                "nickname": "eng_school_1",
                 "students": 5,
                 "template_layout": {
                     "page_1": {
@@ -29,10 +29,11 @@
                             "1_de_bachillerato"
                         ]
                     }
-                }
+                },
+                "include": false
             },
-            "eng_school_2": {
-                "nickname": "eng_2",
+            "eng_2": {
+                "nickname": "eng_school_2",
                 "students": 10,
                 "template_layout": {
                     "page_1": {
@@ -59,12 +60,13 @@
                             "1_de_bachillerato"
                         ]
                     }
-                }
+                },
+                "include": false
             }
         },
         "spanish": {
-            "esp_school_1": {
-                "nickname": "esp_1",
+            "esp_1": {
+                "nickname": "esp_school_1",
                 "students": 2,
                 "template_layout": {
                     "page_1": {
@@ -91,10 +93,11 @@
                             "1_de_bachillerato"
                         ]
                     }
-                }
+                },
+                "include": false
             },
-            "esp_school_2": {
-                "nickname": "esp_2",
+            "esp_2": {
+                "nickname": "esp_school_2",
                 "students": 3,
                 "template_layout": {
                     "page_1": {
@@ -121,11 +124,14 @@
                             "1_de_bachillerato"
                         ]
                     }
-                }
+                },
+                "include": false
             }
         }
     },
     "blender_modified": 0.5,
+    "female_proportion": 0.5,
+    "male_proportion": 0.5,
     "first_student": 0,
     "verbose_level": 0,
     "font_path": "/home/msi/.config/Ultralytics/Arial.ttf"
