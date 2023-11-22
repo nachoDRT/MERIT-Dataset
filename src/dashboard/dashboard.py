@@ -29,16 +29,6 @@ app = dash.Dash(
 langs_dict = dhelp.get_available_schools_per_language()
 
 
-def create_header():
-    return html.Div(
-        [
-            html.H1("Dataset Inputs"),
-            html.P("Design your own dasaset"),
-            dcc.Link("Go to Dataset Statistics Page", href="/statistics"),
-        ]
-    )
-
-
 def create_prop_slider(
     team_a: str, team_b: str, step: int = 10, min: int = 0, max: int = 100
 ):
@@ -103,7 +93,7 @@ def generate_carousel_item(language: str):
 
     if language == "no_lang":
         header = "No Language Options"
-        caption = "Select one school"
+        caption = "Select a school"
     else:
         header = language.capitalize()
         caption = language.capitalize()
@@ -126,6 +116,7 @@ def create_lang_options_carousel():
                     "maxWidth": "300px",
                     "height": "150px",
                     "margin": "auto",
+                    "marginBottom": "10em",
                 },
                 id="lang-options-carousel",
             )
@@ -160,7 +151,7 @@ def layout_input_dataset() -> dash.Dash.layout:
     in_layout.extend(row)
     in_layout.extend([create_prop_slider(team_a="Female", team_b="Male")])
     in_layout.extend(create_lang_options_carousel())
-    in_layout.extend(create_continue_button())
+    # in_layout.extend(create_continue_button())
 
     layout = dbc.Container(
         [
@@ -170,7 +161,8 @@ def layout_input_dataset() -> dash.Dash.layout:
                     dbc.Col(in_layout, width=8, style={"margin": "0 auto"}),
                     dbc.Col(width=2),
                 ]
-            )
+            ),
+            create_continue_button(),
         ],
         fluid=True,
     )
@@ -189,8 +181,8 @@ def create_lang_selector(lang: str):
             dbc.Collapse(
                 dbc.Checklist(
                     options=[
-                        {"label": elemento, "value": elemento}
-                        for elemento in langs_dict[lang]
+                        {"label": element.capitalize(), "value": element}
+                        for element in langs_dict[lang]
                     ],
                     value=[],
                     id=f"checklist-{lang}",
@@ -209,8 +201,25 @@ def create_lang_selector(lang: str):
 )
 def update_collapse(*language_selections):
     updates = [bool(value) for value in language_selections]
-
     return updates
+
+
+@app.callback(
+    [Output(f"checklist-{lang}", "value") for lang in langs_dict.keys()],
+    [Input(f"collapse-lang-{lang}", "is_open") for lang in langs_dict.keys()]
+    + [Input(f"checklist-{lang}", "value") for lang in langs_dict.keys()],
+)
+def update_checklist(*args):
+    num_langs = len(langs_dict.keys())
+    callapse_open_values = args[:num_langs]
+    checklist_values = args[num_langs:]
+    checklist_values_list = list(checklist_values)
+
+    for i, collapse_open_value in enumerate(callapse_open_values):
+        if collapse_open_value == False:
+            checklist_values_list[i] = []
+
+    return tuple(checklist_values_list)
 
 
 @app.callback(
@@ -281,7 +290,7 @@ def create_continue_button():
             )
         ]
     )
-    return [continue_button]
+    return continue_button
 
 
 @app.callback(
