@@ -82,7 +82,7 @@ def create_prop_slider(
     [Input({"type": "slider", "index": ALL}, "value")],
     [State({"type": "slider", "index": ALL}, "id")],
 )
-def update_output(values, ids):
+def update_slider_output(values, ids):
     if not dash.callback_context.triggered:
         raise PreventUpdate
 
@@ -96,6 +96,42 @@ def update_output(values, ids):
     dhelp.update_fe_male_proportion_requirements(value)
 
     return [response]
+
+
+def generate_carousel_item(language: str):
+    carousel_dict = {}
+
+    if language == "no_lang":
+        header = "No Language Options"
+        caption = "Select one school"
+    else:
+        header = language.capitalize()
+        caption = language.capitalize()
+
+    carousel_dict["key"] = language
+    carousel_dict["src"] = "".join(["/assets/", language, ".svg"])
+    carousel_dict["header"] = header
+    carousel_dict["caption"] = caption
+
+    return carousel_dict
+
+
+def create_lang_options_carousel():
+    carousel = dbc.Row(
+        dbc.Col(
+            dbc.Carousel(
+                items=[generate_carousel_item("no_lang")],
+                style={
+                    "marginTop": "1em",
+                    "maxWidth": "300px",
+                    "height": "150px",
+                    "margin": "auto",
+                },
+                id="lang-options-carousel",
+            )
+        )
+    )
+    return [carousel]
 
 
 # Define the layout for the dataset input page
@@ -123,6 +159,7 @@ def layout_input_dataset() -> dash.Dash.layout:
     row = generate_lang_card(langs, langs_selectors)
     in_layout.extend(row)
     in_layout.extend([create_prop_slider(team_a="Female", team_b="Male")])
+    in_layout.extend(create_lang_options_carousel())
     in_layout.extend(create_continue_button())
 
     layout = dbc.Container(
@@ -177,24 +214,40 @@ def update_collapse(*language_selections):
 
 
 @app.callback(
-    [Output("continue-button", "style"), Output("continue-button", "className")],
+    [
+        Output("continue-button", "style"),
+        Output("continue-button", "className"),
+        Output("lang-options-carousel", "items"),
+    ],
     [Input(f"checklist-{lang}", "value") for lang in langs_dict.keys()],
 )
 def update_collapse(*school_selections):
     selected_schools = [school for language in school_selections for school in language]
 
     dhelp.update_schools_requirements(selected_schools)
+    selected_languages = dhelp.get_langs_with_replicas()
+    if len(selected_languages) == 0:
+        selected_languages.append("no_lang")
+    carousel_items = [generate_carousel_item(str(i)) for i in selected_languages]
 
     if len(selected_schools) != 0:
-        return {
-            "display": "block",
-            "justifyContent": "center",
-            "marginTop": "20px",
-        }, "btn btn-secondary"
+        return (
+            {
+                "display": "block",
+                "justifyContent": "center",
+                "marginTop": "20px",
+            },
+            "btn btn-secondary",
+            carousel_items,
+        )
     else:
-        return {
-            "display": "none",
-        }, "btn btn-outline-dark"
+        return (
+            {
+                "display": "none",
+            },
+            "btn btn-outline-dark",
+            carousel_items,
+        )
 
 
 def generate_lang_card(langs: list, langs_selectors: list):

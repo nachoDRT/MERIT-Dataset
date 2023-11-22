@@ -113,5 +113,27 @@ def update_fe_male_proportion_requirements(team_a_percentage: int):
     save_json(REQS_PATH, updated_data)
 
 
+def get_langs_with_replicas():
+    """
+    Get those languages containing schools the user wants to replicate.
+
+    Returns:
+        List: A list of strings with the languages of interest
+    """
+
+    langs_of_interest = []
+    data = read_json(REQS_PATH)
+
+    languages_data = data["samples"]
+
+    for lang, language_data in languages_data.items():
+        for school_data in language_data.values():
+            if school_data["include"] == True:
+                langs_of_interest.append(lang)
+                break
+
+    return langs_of_interest
+
+
 if __name__ == "__main__":
     pass

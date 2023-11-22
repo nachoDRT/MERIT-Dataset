@@ -130,8 +130,8 @@
         }
     },
     "blender_modified": 0.5,
-    "female_proportion": 0.5,
-    "male_proportion": 0.5,
+    "female_proportion": 0.6,
+    "male_proportion": 0.4,
     "first_student": 0,
     "verbose_level": 0,
     "font_path": "/home/msi/.config/Ultralytics/Arial.ttf"
