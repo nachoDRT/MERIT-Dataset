@@ -16,3 +16,22 @@
 .rc-slider-mark-text {
     color: white;
 }
+.custom-switch .form-check-input:checked {
+    background-color: rgba(255, 255, 255, 1);
+    border-color: rgba(255, 255, 255, 1);
+}
+
+.custom-switch .form-check-input:focus {
+    border-color: rgba(255, 255, 255, 0.4); 
+    outline: 0; 
+    box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.25);
+}
+.form-check-input:checked {
+  background-color: rgba(255, 255, 255, 1);
+  border-color: rgba(255, 255, 255, 1);
+}
+.form-check-input:focus {
+  border-color: rgba(255,255,255,.4);
+  outline: 0;
+  box-shadow: 0 0 0 .25rem rgba(255, 255, 255, 0.25);
+}

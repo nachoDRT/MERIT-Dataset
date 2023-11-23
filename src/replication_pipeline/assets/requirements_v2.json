@@ -125,13 +125,77 @@
                         ]
                     }
                 },
-                "include": true
+                "include": false
+            }
+        },
+        "japanese": {
+            "jap_1": {
+                "nickname": "jap_school_1",
+                "students": 2,
+                "template_layout": {
+                    "page_1": {
+                        "num_subjects": [
+                            11
+                        ],
+                        "academic_years": [
+                            "3_de_la_eso"
+                        ]
+                    },
+                    "page_2": {
+                        "num_subjects": [
+                            10
+                        ],
+                        "academic_years": [
+                            "4_de_la_eso"
+                        ]
+                    },
+                    "page_3": {
+                        "num_subjects": [
+                            11
+                        ],
+                        "academic_years": [
+                            "1_de_bachillerato"
+                        ]
+                    }
+                },
+                "include": false
+            },
+            "jap_2": {
+                "nickname": "jap_school_2",
+                "students": 3,
+                "template_layout": {
+                    "page_1": {
+                        "num_subjects": [
+                            11
+                        ],
+                        "academic_years": [
+                            "3_de_la_eso"
+                        ]
+                    },
+                    "page_2": {
+                        "num_subjects": [
+                            10
+                        ],
+                        "academic_years": [
+                            "4_de_la_eso"
+                        ]
+                    },
+                    "page_3": {
+                        "num_subjects": [
+                            11
+                        ],
+                        "academic_years": [
+                            "1_de_bachillerato"
+                        ]
+                    }
+                },
+                "include": false
             }
         }
     },
     "blender_modified": 0.5,
-    "female_proportion": 0.5,
-    "male_proportion": 0.5,
+    "female_proportion": 0.6,
+    "male_proportion": 0.4,
     "first_student": 0,
     "verbose_level": 0,
     "font_path": "/home/msi/.config/Ultralytics/Arial.ttf"

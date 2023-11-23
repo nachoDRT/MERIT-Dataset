@@ -8,13 +8,13 @@ from os.path import dirname, abspath
 from dash.exceptions import PreventUpdate
 import dashboard_helper as dhelp
 import dash_bootstrap_components as dbc
+import json
 
 START_COLOR = "#ccffff"
 END_COLOR = "#009933"
 BACK_COLOR = "#000000"
 TEXT_COLOR = "#FFFFFF"
 
-external_stylesheets = ["https://codepen.io/chriddyp/pen/bWLwgP.css"]
 
 blueprint_name = "dataset_blueprint.csv"
 blueprint_path = os.path.join(dirname(abspath(__file__)), blueprint_name)
@@ -96,7 +96,7 @@ def generate_carousel_item(language: str):
         caption = "Select a school"
     else:
         header = language.capitalize()
-        caption = language.capitalize()
+        caption = f"Explore options for {language}"
 
     carousel_dict["key"] = language
     carousel_dict["src"] = "".join(["/assets/", language, ".svg"])
@@ -107,22 +107,119 @@ def generate_carousel_item(language: str):
 
 
 def create_lang_options_carousel():
+    carousel_items = [generate_carousel_item("no_lang")]
     carousel = dbc.Row(
         dbc.Col(
-            dbc.Carousel(
-                items=[generate_carousel_item("no_lang")],
-                style={
-                    "marginTop": "1em",
-                    "maxWidth": "300px",
-                    "height": "150px",
-                    "margin": "auto",
-                    "marginBottom": "10em",
-                },
-                id="lang-options-carousel",
-            )
+            [
+                dbc.Carousel(
+                    items=carousel_items,
+                    style={
+                        "marginTop": "1em",
+                        "maxWidth": "300px",
+                        "height": "150px",
+                        "margin": "auto",
+                        "marginBottom": "10em",
+                    },
+                    id="lang-options-carousel",
+                ),
+                html.Div(
+                    id="hidden-div-carousel",
+                    style={"display": "none"},
+                    children=json.dumps(carousel_items),
+                ),
+            ]
         )
     )
     return [carousel]
+
+
+def create_student_origin_x():
+    lang = "portuguese"
+    iterable_dict = ["hola", "hola_1"]
+    origin_layout = [html.H3("Select Students' Features", style={"marginTop": "1.5em"})]
+    row = dbc.Row(
+        [
+            dbc.Col(
+                [
+                    dbc.Card(
+                        [
+                            dbc.CardHeader(html.Div(id="card-title")),
+                            dbc.CardBody(
+                                html.Div(id="card-content"),
+                            ),
+                        ],
+                        id="origin-proportion-card",
+                    )
+                    # dbc.Checklist(
+                    #     options=[{"label": lang.capitalize(), "value": lang}],
+                    #     value=[],
+                    #     id=f"origin-dropdown-{lang}",
+                    #     switch=True,
+                    #     className="custom-switch",
+                    # ),
+                    #     dbc.Collapse(
+                    #         dbc.Checklist(
+                    #             options=[
+                    #                 {"label": element.capitalize(), "value": element}
+                    #                 for element in iterable_dict
+                    #             ],
+                    #             value=["hola"],
+                    #             id=f"checklist-{lang}",
+                    #             inline=True,
+                    #         ),
+                    #         id=f"collapse-lang-{lang}",
+                    #     ),
+                ]
+            ),
+            dbc.Col(
+                dbc.Card(
+                    [
+                        dbc.CardHeader(f"Option B"),
+                        dbc.CardBody("HELLO"),
+                    ],
+                    id="origin-proportion-card",
+                )
+            ),
+            dbc.Col(
+                dbc.Card(
+                    [
+                        dbc.CardHeader(f"Option C"),
+                        dbc.CardBody("HELLO"),
+                    ],
+                    id="origin-marks-bias-card",
+                )
+            ),
+        ]
+    )
+    origin_layout.extend([row])
+    return origin_layout
+
+
+@app.callback(
+    Output("card-title", "children"),
+    Output("card-content", "children"),
+    Input("lang-options-carousel", "active_index"),
+    Input("hidden-div-carousel", "children"),
+)
+def update_language_origin_selector(active_index, json_data):
+    print(json_data)
+    print(active_index)
+
+    if isinstance(json_data, str):
+        json_data = eval(json_data)
+
+    if json_data[0]["key"] == "no_lang":
+        title = "No language Option"
+        body = "Select a school"
+
+    else:
+        if active_index == None:
+            active_index = 0
+        elif active_index >= len(json_data):
+            active_index -= 1
+        title = json_data[active_index]["header"]
+        body = title
+    return title, body
 
 
 # Define the layout for the dataset input page
@@ -147,11 +244,10 @@ def layout_input_dataset() -> dash.Dash.layout:
     )
     langs = [lang for lang in langs_dict.keys()]
     langs_selectors = [create_lang_selector(lang) for lang in langs_dict.keys()]
-    row = generate_lang_card(langs, langs_selectors)
-    in_layout.extend(row)
+    in_layout.extend(generate_lang_card(langs, langs_selectors))
     in_layout.extend([create_prop_slider(team_a="Female", team_b="Male")])
     in_layout.extend(create_lang_options_carousel())
-    # in_layout.extend(create_continue_button())
+    in_layout.extend(create_student_origin_x())
 
     layout = dbc.Container(
         [
@@ -170,13 +266,14 @@ def layout_input_dataset() -> dash.Dash.layout:
 
 
 def create_lang_selector(lang: str):
-    lang_card = dbc.Card(
+    lang_card = html.Div(
         [
             dbc.Checklist(
                 options=[{"label": lang.capitalize(), "value": lang}],
                 value=[],
                 id=f"checkbox-{lang}",
                 switch=True,
+                className="custom-switch",
             ),
             dbc.Collapse(
                 dbc.Checklist(
@@ -227,6 +324,7 @@ def update_checklist(*args):
         Output("continue-button", "style"),
         Output("continue-button", "className"),
         Output("lang-options-carousel", "items"),
+        Output("hidden-div-carousel", "children"),
     ],
     [Input(f"checklist-{lang}", "value") for lang in langs_dict.keys()],
 )
@@ -248,6 +346,7 @@ def update_collapse(*school_selections):
             },
             "btn btn-secondary",
             carousel_items,
+            json.dumps(carousel_items),
         )
     else:
         return (
@@ -256,6 +355,7 @@ def update_collapse(*school_selections):
             },
             "btn btn-outline-dark",
             carousel_items,
+            json.dumps(carousel_items),
         )
 
 
@@ -285,7 +385,7 @@ def create_continue_button():
                     "Run Generator",
                     id="continue-button",
                 ),
-                width=2,
+                width=1,
                 style={"margin": "auto"},
             )
         ]
