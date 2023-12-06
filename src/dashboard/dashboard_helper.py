@@ -5,13 +5,11 @@ import os
 import json
 import copy
 
-
-REQS_PATH = os.path.join(
-    Path(dirname(abspath(__file__))).parent,
-    "replication_pipeline",
-    "assets",
-    "requirements_v2.json",
+ASSETS_PATH = os.path.join(
+    Path(dirname(abspath(__file__))).parent, "replication_pipeline", "assets"
 )
+
+REQS_PATH = os.path.join(ASSETS_PATH, "requirements_v2.json")
 
 
 def get_available_schools_per_language():
@@ -133,6 +131,38 @@ def get_langs_with_replicas():
                 break
 
     return langs_of_interest
+
+
+def get_available_origin_langs():
+    available_origin_langs = []
+
+    files_to_check = {}
+    files_to_check["familiy"] = False
+    files_to_check["female"] = False
+    files_to_check["male"] = False
+
+    for root, _, files in os.walk(ASSETS_PATH):
+        candidate = Path(root).parts[-2]
+        for file in files:
+            family_file = f"family_names_{candidate}.txt"
+            females_file = f"female_first_names_{candidate}.txt"
+            males_file = f"male_first_names_{candidate}.txt"
+
+            if file == family_file:
+                files_to_check["familiy"] = True
+            elif file == females_file:
+                files_to_check["female"] = True
+            elif file == males_file:
+                files_to_check["male"] = True
+
+        if all(files_to_check.values()):
+            available_origin_langs.append(candidate)
+            for key in files_to_check:
+                files_to_check[key] = False
+
+    available_origin_langs = sorted(list(set(available_origin_langs)))
+
+    return available_origin_langs
 
 
 if __name__ == "__main__":

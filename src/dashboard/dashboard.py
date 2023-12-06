@@ -1,4 +1,4 @@
-from dash import Dash, html, dcc, Input, Output, ALL, State
+from dash import Dash, html, dcc, Input, Output, ALL, MATCH, State
 import dash
 import pandas as pd
 import plotly.express as px
@@ -9,11 +9,14 @@ from dash.exceptions import PreventUpdate
 import dashboard_helper as dhelp
 import dash_bootstrap_components as dbc
 import json
+from typing import List
+import copy
 
 START_COLOR = "#ccffff"
 END_COLOR = "#009933"
 BACK_COLOR = "#000000"
 TEXT_COLOR = "#FFFFFF"
+NUM_MAX_ORIGINS = 3
 
 
 blueprint_name = "dataset_blueprint.csv"
@@ -27,6 +30,7 @@ app = dash.Dash(
 )
 
 langs_dict = dhelp.get_available_schools_per_language()
+origin_langs = dhelp.get_available_origin_langs()
 
 
 def create_prop_slider(
@@ -134,8 +138,6 @@ def create_lang_options_carousel():
 
 
 def create_student_origin_x():
-    lang = "portuguese"
-    iterable_dict = ["hola", "hola_1"]
     origin_layout = [html.H3("Select Students' Features", style={"marginTop": "1.5em"})]
     row = dbc.Row(
         [
@@ -189,6 +191,7 @@ def create_student_origin_x():
                     id="origin-marks-bias-card",
                 )
             ),
+            dcc.Store(id="checklist-selections-store", storage_type="memory"),
         ]
     )
     origin_layout.extend([row])
@@ -196,15 +199,42 @@ def create_student_origin_x():
 
 
 @app.callback(
-    Output("card-title", "children"),
-    Output("card-content", "children"),
-    Input("lang-options-carousel", "active_index"),
-    Input("hidden-div-carousel", "children"),
+    [
+        Output("card-title", "children"),
+        Output("card-content", "children"),
+        Output("checklist-selections-store", "data"),
+        Output({"type": "checklist-origin", "index": ALL}, "value"),
+    ],
+    [
+        Input("lang-options-carousel", "active_index"),
+        Input("hidden-div-carousel", "children"),
+        Input({"type": "checklist-origin", "index": ALL}, "value"),
+    ],
+    [State("checklist-selections-store", "data")],
 )
-def update_language_origin_selector(active_index, json_data):
-    print(json_data)
-    print(active_index)
+def update_language_origin_selector(*args):
+    # Check what input triggers the callback
+    ctx = dash.callback_context
+    triggered_input_id = ctx.triggered[0]["prop_id"].split(".")[0]
 
+    active_index, json_data, selections, stored_selections = args
+
+    # Inputs due to (upper) Language Selector and Language Carousel
+    if (
+        triggered_input_id == "lang-options-carousel"
+        or triggered_input_id == "hidden-div-carousel"
+    ):
+        if len(selections) == 1:
+            selections = [[]]
+        else:
+            selections = []
+        checklist_origin_flag = False
+
+    # Inputs due to the checklist
+    else:
+        checklist_origin_flag = True
+
+    # Logic beginning
     if isinstance(json_data, str):
         json_data = eval(json_data)
 
@@ -212,14 +242,84 @@ def update_language_origin_selector(active_index, json_data):
         title = "No language Option"
         body = "Select a school"
 
+        return title, body, stored_selections, selections
+
+    # Get the index of the element in the carousel
+    if active_index == None:
+        active_index = 0
+    elif active_index >= len(json_data):
+        active_index -= 1
+
+    # Get the title (name of the language showed in the carousel)
+    title = json_data[active_index]["header"]
+
+    if stored_selections is None:
+        stored_selections = {}
+
+    if title in stored_selections:
+        # if len(selections) == 1:
+        try:
+            stored_selections[title] += selections[0]
+
+            # Limit the max number of origins
+            if len(stored_selections[title]) > NUM_MAX_ORIGINS:
+                stored_selections[title] = stored_selections[title][-NUM_MAX_ORIGINS:]
+                selections[0] = stored_selections[title]
+
+            if checklist_origin_flag:
+                stored_selections[title] = selections[0]
+            else:
+                selections[0] = stored_selections[title]
+
+        except:
+            stored_selections[title] = selections[0]
+        # else:
+        #     try:
+        #         stored_selections[title] += selections
+        #         if checklist_origin_flag:
+        #             stored_selections[title] = selections[0]
+        #     except:
+        #         stored_selections[title] = selections
+
+        body = create_lang_origin_checklist(
+            lang=title, selected_values=stored_selections[title]
+        )
+
     else:
-        if active_index == None:
-            active_index = 0
-        elif active_index >= len(json_data):
-            active_index -= 1
-        title = json_data[active_index]["header"]
-        body = title
-    return title, body
+        body = create_lang_origin_checklist(lang=title, selected_values=[])
+        if len(selections) == 1:
+            stored_selections[title] = selections[0]
+        else:
+            stored_selections[title] = selections
+
+    # Remove duplicates
+    stored_selections[title] = list(dict.fromkeys(stored_selections[title]))
+
+    return title, body, stored_selections, selections
+
+
+def create_lang_origin_checklist(lang: str, selected_values: List):
+    lang = lang.lower()
+    adapted_origin_langs = copy.deepcopy(origin_langs)
+    adapted_origin_langs.remove(lang)
+    origin_checklist = (
+        html.Div(
+            [
+                html.H6(f"Choose {NUM_MAX_ORIGINS} max."),
+                dbc.Checklist(
+                    options=[
+                        {"label": element.capitalize(), "value": element}
+                        for element in adapted_origin_langs
+                    ],
+                    value=selected_values,
+                    id={"type": "checklist-origin", "index": lang},
+                    inline=False,
+                ),
+            ]
+        ),
+    )
+
+    return origin_checklist
 
 
 # Define the layout for the dataset input page
