@@ -1,4 +1,4 @@
-from dash import Dash, html, dcc, Input, Output, ALL, MATCH, State
+from dash import html, dcc, Input, Output, ALL, State
 import dash
 import pandas as pd
 import plotly.express as px
@@ -9,7 +9,7 @@ from dash.exceptions import PreventUpdate
 import dashboard_helper as dhelp
 import dash_bootstrap_components as dbc
 import json
-from typing import List
+from typing import List, Dict
 import copy
 
 START_COLOR = "#ccffff"
@@ -142,54 +142,34 @@ def create_student_origin_x():
     row = dbc.Row(
         [
             dbc.Col(
+                dbc.Card(
+                    [
+                        dbc.CardHeader(html.Div(id="origin-selection-card-title")),
+                        dbc.CardBody(
+                            html.Div(id="origin-selection-card-content"),
+                        ),
+                    ],
+                    id="origin-selection-card",
+                )
+            ),
+            dbc.Col(
                 [
                     dbc.Card(
                         [
-                            dbc.CardHeader(html.Div(id="card-title")),
-                            dbc.CardBody(
-                                html.Div(id="card-content"),
-                            ),
+                            dbc.CardHeader(html.Div(id="origin-proportion-card-title")),
+                            dbc.CardBody(html.Div(id="origin-proportion-card-content")),
                         ],
                         id="origin-proportion-card",
-                    )
-                    # dbc.Checklist(
-                    #     options=[{"label": lang.capitalize(), "value": lang}],
-                    #     value=[],
-                    #     id=f"origin-dropdown-{lang}",
-                    #     switch=True,
-                    #     className="custom-switch",
-                    # ),
-                    #     dbc.Collapse(
-                    #         dbc.Checklist(
-                    #             options=[
-                    #                 {"label": element.capitalize(), "value": element}
-                    #                 for element in iterable_dict
-                    #             ],
-                    #             value=["hola"],
-                    #             id=f"checklist-{lang}",
-                    #             inline=True,
-                    #         ),
-                    #         id=f"collapse-lang-{lang}",
-                    #     ),
+                    ),
+                    dbc.Card(
+                        [
+                            dbc.CardHeader(f"Option C"),
+                            dbc.CardBody("HELLO"),
+                        ],
+                        id="origin-marks-bias-card",
+                        style={"marginTop": "25px"},
+                    ),
                 ]
-            ),
-            dbc.Col(
-                dbc.Card(
-                    [
-                        dbc.CardHeader(f"Option B"),
-                        dbc.CardBody("HELLO"),
-                    ],
-                    id="origin-proportion-card",
-                )
-            ),
-            dbc.Col(
-                dbc.Card(
-                    [
-                        dbc.CardHeader(f"Option C"),
-                        dbc.CardBody("HELLO"),
-                    ],
-                    id="origin-marks-bias-card",
-                )
             ),
             dcc.Store(id="checklist-selections-store", storage_type="memory"),
         ]
@@ -200,8 +180,203 @@ def create_student_origin_x():
 
 @app.callback(
     [
-        Output("card-title", "children"),
-        Output("card-content", "children"),
+        Output("origin-proportion-card-title", "children"),
+        Output("origin-proportion-card-content", "children"),
+    ],
+    [
+        Input("lang-options-carousel", "active_index"),
+        Input("hidden-div-carousel", "children"),
+        Input({"type": "checklist-origin", "index": ALL}, "value"),
+    ],
+    [State("checklist-selections-store", "data")],
+)
+def create_origin_proportion_card(
+    active_index, json_data, _selections, stored_selections
+):
+    if isinstance(json_data, str):
+        json_data = eval(json_data)
+    active_index = remap_active_index(active_index, json_data)
+
+    if json_data[0]["key"] == "no_lang":
+        card_title = "No language Option"
+        card_body = create_origin_prop_slider(None, "", True)
+
+        return card_title, card_body
+
+    # Get the card title (based on the carousel)
+    language = json_data[active_index]["header"]
+    card_title = f"Select Origin Proportions in {language}"
+
+    if stored_selections == None:
+        card_body = create_origin_prop_slider(stored_selections, language, True)
+    # elif len(stored_selections[language]) == 0:
+    #     card_body = create_origin_prop_slider(stored_selections, language, True)
+    else:
+        card_body = create_origin_prop_slider(stored_selections, language)
+
+    return card_title, card_body
+
+
+def create_origin_prop_slider(
+    stored: None or Dict, lang: str, disabled: bool = False, values: List = None
+):
+    if stored == None and not disabled:
+        return html.Div()
+
+    else:
+        if not disabled and not values:
+            values = []
+            intermediate_values = [
+                round((100 * (i + 1) / (len(stored[lang]) + 1)), 0)
+                for i, _ in enumerate(stored[lang])
+            ]
+            values.extend(intermediate_values)
+        elif not values:
+            values = []
+
+        prov_values = dhelp.get_ethnic_origins_proportions(lang)
+        print(prov_values)
+        # dhelp.update_ethnic_origins_in_requirements(values, stored, lang)
+
+        return html.Div(
+            [
+                dcc.RangeSlider(
+                    id="origin-proportion-slider",
+                    marks={0: "0%", 100: "100%"},
+                    min=0,
+                    max=100,
+                    step=0.01,
+                    value=values,
+                    pushable=10,
+                    disabled=disabled,
+                    className="custom-slider",
+                ),
+                html.Div(
+                    [
+                        dcc.Markdown(id="slider-output"),
+                    ],
+                    style={"marginTop": "2em"},
+                ),
+            ]
+        )
+
+
+@app.callback(
+    Output("slider-output", "children"),
+    Output("origin-proportion-slider", "value"),
+    [
+        Input("lang-options-carousel", "active_index"),
+        Input("hidden-div-carousel", "children"),
+        Input("origin-proportion-slider", "value"),
+    ],
+    [State("checklist-selections-store", "data")],
+)
+def update_proportion_slider(active_index, json_data, values: List, stored_selections):
+    if isinstance(json_data, str):
+        json_data = eval(json_data)
+        active_index = remap_active_index(active_index, json_data)
+
+    language = json_data[active_index]["header"]
+
+    try:
+        if stored_selections == None:
+            selection_message = "Select any Language and School to unlock"
+            values = [0]
+
+            return selection_message, values
+
+        elif len(stored_selections[language]) == 0:
+            selection_message = f"100% of {language} names"
+            values = [100]
+            dhelp.update_ethnic_origins_in_requirements(
+                values, stored_selections, language
+            )
+            return selection_message, values
+
+        else:
+            main_lang_prop = values[0]
+            main_lang_prop_corrected = check_slider_limits(main_lang_prop)
+            if main_lang_prop != main_lang_prop_corrected:
+                values[0] = main_lang_prop_corrected
+            message_fragment = f"{language}: {main_lang_prop_corrected:.0f}%   \n"
+
+            props_fragments = [main_lang_prop_corrected]
+            for i, lang_prop in enumerate(values):
+                lang_prop_corrected = check_slider_limits(lang_prop)
+                if lang_prop != lang_prop_corrected:
+                    values[i] = lang_prop_corrected
+
+                try:
+                    next_value = values[i + 1]
+                    next_value_corrected = check_slider_limits(next_value)
+                except IndexError:
+                    next_value_corrected = 100
+
+                proportion = next_value_corrected - lang_prop_corrected
+                props_fragments.append(proportion)
+                try:
+                    message_fragment += (
+                        f"{stored_selections[language][i].capitalize()}: "
+                        f"{proportion:.0f}%   \n"
+                    )
+                except IndexError:
+                    message_fragment = "Loading"
+            dhelp.update_ethnic_origins_in_requirements(
+                props_fragments, stored_selections, language
+            )
+            return message_fragment, values
+
+    except KeyError:
+        return "Loading", [0]
+
+
+def check_slider_limits(value: float):
+    min_limit = 10
+    max_limit = 90
+
+    if value < min_limit:
+        value = min_limit
+    if value > max_limit:
+        value = max_limit
+
+    return value
+
+
+def remap_active_index(active_index: int or None, json_data: list):
+    if active_index == None:
+        active_index = 0
+    elif active_index >= len(json_data):
+        active_index -= 1
+
+    return active_index
+
+
+def update_stored_selections(stored_selections: Dict, json_data: List):
+    # Include every language active in the carousel in the stored_selections
+    stored_selections_languages = [
+        language.capitalize() for language in stored_selections.keys()
+    ]
+
+    for i, _ in enumerate(json_data):
+        if json_data[i]["key"].capitalize() not in stored_selections_languages:
+            stored_selections[json_data[i]["key"].capitalize()] = []
+
+    # Also remove those that are not in the carousel
+    stored_selections_helper = {}
+    carousel_languages = [data["key"].capitalize() for data in json_data]
+
+    for i, language in enumerate(stored_selections):
+        if language in carousel_languages:
+            stored_selections_helper[language] = stored_selections[language]
+    stored_selections = stored_selections_helper
+
+    return stored_selections
+
+
+@app.callback(
+    [
+        Output("origin-selection-card-title", "children"),
+        Output("origin-selection-card-content", "children"),
         Output("checklist-selections-store", "data"),
         Output({"type": "checklist-origin", "index": ALL}, "value"),
     ],
@@ -239,63 +414,59 @@ def update_language_origin_selector(*args):
         json_data = eval(json_data)
 
     if json_data[0]["key"] == "no_lang":
-        title = "No language Option"
-        body = "Select a school"
+        card_title = "No language Option"
+        card_body = "Select any Language and School to get a list of names origins"
 
-        return title, body, stored_selections, selections
+        return card_title, card_body, stored_selections, selections
 
     # Get the index of the element in the carousel
-    if active_index == None:
-        active_index = 0
-    elif active_index >= len(json_data):
-        active_index -= 1
+    active_index = remap_active_index(active_index, json_data)
 
-    # Get the title (name of the language showed in the carousel)
-    title = json_data[active_index]["header"]
+    # Make sure every language active in the carousel is in the stored_selections
+    if stored_selections != None:
+        stored_selections = update_stored_selections(stored_selections, json_data)
+
+    # Get the card title (based on the carousel)
+    language = json_data[active_index]["header"]
+    card_title = f"Names Ethnic-Origins in {language}"
 
     if stored_selections is None:
         stored_selections = {}
 
-    if title in stored_selections:
-        # if len(selections) == 1:
+    if language in stored_selections:
         try:
-            stored_selections[title] += selections[0]
+            stored_selections[language] += selections[0]
 
             # Limit the max number of origins
-            if len(stored_selections[title]) > NUM_MAX_ORIGINS:
-                stored_selections[title] = stored_selections[title][-NUM_MAX_ORIGINS:]
-                selections[0] = stored_selections[title]
+            if len(stored_selections[language]) > NUM_MAX_ORIGINS:
+                stored_selections[language] = stored_selections[language][
+                    -NUM_MAX_ORIGINS:
+                ]
+                selections[0] = stored_selections[language]
 
             if checklist_origin_flag:
-                stored_selections[title] = selections[0]
+                stored_selections[language] = selections[0]
             else:
-                selections[0] = stored_selections[title]
+                selections[0] = stored_selections[language]
 
         except:
-            stored_selections[title] = selections[0]
-        # else:
-        #     try:
-        #         stored_selections[title] += selections
-        #         if checklist_origin_flag:
-        #             stored_selections[title] = selections[0]
-        #     except:
-        #         stored_selections[title] = selections
+            stored_selections[language] = selections
 
-        body = create_lang_origin_checklist(
-            lang=title, selected_values=stored_selections[title]
+        card_body = create_lang_origin_checklist(
+            lang=language, selected_values=stored_selections[language]
         )
 
     else:
-        body = create_lang_origin_checklist(lang=title, selected_values=[])
+        card_body = create_lang_origin_checklist(lang=language, selected_values=[])
         if len(selections) == 1:
-            stored_selections[title] = selections[0]
+            stored_selections[language] = selections[0]
         else:
-            stored_selections[title] = selections
+            stored_selections[language] = selections
 
     # Remove duplicates
-    stored_selections[title] = list(dict.fromkeys(stored_selections[title]))
+    stored_selections[language] = list(dict.fromkeys(stored_selections[language]))
 
-    return title, body, stored_selections, selections
+    return card_title, card_body, stored_selections, selections
 
 
 def create_lang_origin_checklist(lang: str, selected_values: List):
@@ -486,7 +657,7 @@ def create_continue_button():
                     id="continue-button",
                 ),
                 width=1,
-                style={"margin": "auto"},
+                style={"margin": "auto", "marginTop": "10em", "marginBottom": "4em"},
             )
         ]
     )

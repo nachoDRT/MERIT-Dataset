@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import List
+from typing import List, Dict
 from os.path import dirname, abspath
 import os
 import json
@@ -109,6 +109,65 @@ def update_fe_male_proportion_requirements(team_a_percentage: int):
     updated_data["female_proportion"] = round(team_a_percentage / 100, 2)
     updated_data["male_proportion"] = round(1 - updated_data["female_proportion"], 2)
     save_json(REQS_PATH, updated_data)
+
+
+def update_ethnic_origins_in_requirements(
+    proportions: List, origins: Dict, language: str
+):
+    previous_data = read_json(REQS_PATH)
+    updated_data = copy.deepcopy(previous_data)
+    if previous_data != None:
+        previous_data_origins = previous_data["origins"]
+
+    print(proportions)
+    print(origins)
+    print(language)
+    print("")
+
+    if origins != None:
+        origins_for_given_language = origins[language]
+
+    mapped_info = {}
+
+    for i, proportion in enumerate(proportions):
+        if i == 0:
+            mapped_info[language] = proportion
+        else:
+            try:
+                mapped_info[origins_for_given_language[i - 1].capitalize()] = proportion
+            except IndexError:
+                pass
+
+    if origins != None:
+        for lang_i in origins:
+            # We do not want to loose previous data
+            if previous_data_origins != None:
+                try:
+                    if type(previous_data_origins[lang_i]) == dict:
+                        origins[lang_i] = previous_data_origins[lang_i]
+                except KeyError:
+                    pass
+        origins[language] = mapped_info
+
+    updated_data["origins"] = origins
+
+    save_json(REQS_PATH, updated_data)
+
+
+def get_ethnic_origins_proportions(lang: str):
+    data = read_json(REQS_PATH)
+
+    try:
+        proportions_dict = data["origins"][lang]
+
+        proportions = []
+        for element in proportions_dict:
+            proportions.append(proportions_dict[element])
+
+        return proportions
+
+    except (KeyError, TypeError) as e:
+        return [50, 55, 65, 76]
 
 
 def get_langs_with_replicas():
