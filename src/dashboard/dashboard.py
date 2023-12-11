@@ -190,9 +190,12 @@ def create_student_origin_x():
     ],
     [State("checklist-selections-store", "data")],
 )
-def create_origin_proportion_card(
-    active_index, json_data, _selections, stored_selections
-):
+def create_origin_proportion_card(*args):
+    ctx = dash.callback_context
+    triggered_input_id = ctx.triggered[0]["prop_id"].split(".")[0]
+
+    active_index, json_data, _selections, stored_selections = args
+
     if isinstance(json_data, str):
         json_data = eval(json_data)
     active_index = remap_active_index(active_index, json_data)
@@ -208,18 +211,36 @@ def create_origin_proportion_card(
     card_title = f"Select Origin Proportions in {language}"
 
     if stored_selections == None:
-        card_body = create_origin_prop_slider(stored_selections, language, True)
-    # elif len(stored_selections[language]) == 0:
-    #     card_body = create_origin_prop_slider(stored_selections, language, True)
+        if (
+            triggered_input_id == "lang-options-carousel"
+            or triggered_input_id == "hidden-div-carousel"
+        ):
+            card_body = create_origin_prop_slider(
+                stored_selections, language, True, change=True
+            )
+        else:
+            card_body = create_origin_prop_slider(stored_selections, language, True)
     else:
-        card_body = create_origin_prop_slider(stored_selections, language)
+        if (
+            triggered_input_id == "lang-options-carousel"
+            or triggered_input_id == "hidden-div-carousel"
+        ):
+            card_body = create_origin_prop_slider(
+                stored_selections, language, change=True
+            )
+        else:
+            card_body = create_origin_prop_slider(stored_selections, language)
 
     return card_title, card_body
 
 
 def create_origin_prop_slider(
-    stored: None or Dict, lang: str, disabled: bool = False, values: List = None
-):
+    stored: None or Dict,
+    lang: str,
+    disabled: bool = False,
+    values: List = None,
+    change: bool = False,
+) -> html.Div:
     if stored == None and not disabled:
         return html.Div()
 
@@ -235,7 +256,16 @@ def create_origin_prop_slider(
             values = []
 
         prov_values = dhelp.get_ethnic_origins_proportions(lang)
-        print(prov_values)
+
+        if change:
+            values = []
+            accumulated = 0
+            for i, value in enumerate(prov_values):
+                if i + 1 == len(prov_values):
+                    break
+
+                accumulated += value
+                values.append(accumulated)
         # dhelp.update_ethnic_origins_in_requirements(values, stored, lang)
 
         return html.Div(
@@ -272,11 +302,18 @@ def create_origin_prop_slider(
     [State("checklist-selections-store", "data")],
 )
 def update_proportion_slider(active_index, json_data, values: List, stored_selections):
+    ctx = dash.callback_context
+    triggered_input_id = ctx.triggered[0]["prop_id"].split(".")[0]
+
     if isinstance(json_data, str):
         json_data = eval(json_data)
         active_index = remap_active_index(active_index, json_data)
 
     language = json_data[active_index]["header"]
+
+    if triggered_input_id == "lang-options-carousel":
+        proportions = dhelp.get_ethnic_origins_proportions(lang=language)
+        values = dhelp.props_2_values(proportions)
 
     try:
         if stored_selections == None:

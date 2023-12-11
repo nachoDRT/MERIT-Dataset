@@ -119,10 +119,10 @@ def update_ethnic_origins_in_requirements(
     if previous_data != None:
         previous_data_origins = previous_data["origins"]
 
-    print(proportions)
-    print(origins)
-    print(language)
-    print("")
+    # print("Proportions", proportions)
+    # print(origins)
+    # print(language)
+    # print("")
 
     if origins != None:
         origins_for_given_language = origins[language]
@@ -131,10 +131,12 @@ def update_ethnic_origins_in_requirements(
 
     for i, proportion in enumerate(proportions):
         if i == 0:
-            mapped_info[language] = proportion
+            mapped_info[language] = round(proportion, 0)
         else:
             try:
-                mapped_info[origins_for_given_language[i - 1].capitalize()] = proportion
+                mapped_info[origins_for_given_language[i - 1].capitalize()] = round(
+                    proportion, 0
+                )
             except IndexError:
                 pass
 
@@ -157,17 +159,30 @@ def update_ethnic_origins_in_requirements(
 def get_ethnic_origins_proportions(lang: str):
     data = read_json(REQS_PATH)
 
+    proportions = []
     try:
         proportions_dict = data["origins"][lang]
 
-        proportions = []
         for element in proportions_dict:
             proportions.append(proportions_dict[element])
 
         return proportions
 
     except (KeyError, TypeError) as e:
-        return [50, 55, 65, 76]
+        return proportions
+
+
+def props_2_values(proportions):
+    values = []
+    accumulated = 0
+    for i, value in enumerate(proportions):
+        if i + 1 == len(proportions):
+            break
+
+        accumulated += value
+        values.append(accumulated)
+
+    return values
 
 
 def get_langs_with_replicas():
