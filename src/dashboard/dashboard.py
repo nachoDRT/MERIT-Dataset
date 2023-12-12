@@ -11,12 +11,17 @@ import dash_bootstrap_components as dbc
 import json
 from typing import List, Dict
 import copy
+import numpy as np
+import scipy.stats as stats
 
 START_COLOR = "#ccffff"
 END_COLOR = "#009933"
 BACK_COLOR = "#000000"
 TEXT_COLOR = "#FFFFFF"
 NUM_MAX_ORIGINS = 3
+
+MIN_GRADE = 0
+MAX_GRADE = 10
 
 
 blueprint_name = "dataset_blueprint.csv"
@@ -69,6 +74,256 @@ def create_prop_slider(
         ],
         style={"marginTop": "20px"},
     )
+
+
+def create_gender_bias_card(gender: str):
+    card = (
+        dbc.Card(
+            [
+                dbc.CardHeader(f"{gender.capitalize()} Input"),
+                dbc.CardBody(
+                    [
+                        dcc.Slider(
+                            id=f"{gender[0]}-average-slider",
+                            min=0,
+                            max=10,
+                            step=1,
+                            value=5,
+                        ),
+                        dcc.Slider(
+                            id=f"{gender[0]}-deviation-slider",
+                            min=0.01,
+                            max=5,
+                            step=None,
+                            value=2.5,
+                        ),
+                    ]
+                ),
+            ],
+        ),
+    )
+    return card
+
+
+def create_gender_bias_col_left():
+    female_card = create_gender_bias_card("female")
+    male_card = create_gender_bias_card("male")
+    gender_bias_first_col_layout = (
+        dbc.Col(
+            [
+                dbc.Row(female_card),
+                dbc.Row(
+                    male_card,
+                    style={"marginTop": "25px"},
+                ),
+            ],
+            width=4,
+        ),
+    )
+
+    return gender_bias_first_col_layout
+
+
+def create_gender_bias_col_right():
+    gender_bias_second_col_layout = (
+        dbc.Col(
+            [
+                dcc.Graph(id="distribution-plot"),
+                html.Div(
+                    [
+                        dcc.Markdown(id="clipping-warning"),
+                    ]
+                ),
+            ],
+            width=8,
+        ),
+    )
+    return gender_bias_second_col_layout
+
+
+def create_gender_bias_layout():
+    title = "Bias Selector"
+    gender_bias_col_left = create_gender_bias_col_left()
+    gender_bias_col_right = create_gender_bias_col_right()
+    bias_selector = html.Div(
+        [
+            html.H4(title, style={"marginTop": "1.5em"}),
+            dbc.Row([gender_bias_col_left[0], gender_bias_col_right[0]]),
+        ]
+    )
+
+    return [bias_selector]
+
+
+def check_ranges(data, min_value, max_value):
+    exceeded_lower_limit = data < min_value
+    exceeded_upper_limit = data > max_value
+
+    data[exceeded_lower_limit] = min_value
+    data[exceeded_upper_limit] = max_value
+
+    return data, exceeded_lower_limit, exceeded_upper_limit
+
+
+@app.callback(
+    Output("distribution-plot", "figure"),
+    Output("clipping-warning", "children"),
+    Input("f-average-slider", "value"),
+    Input("f-deviation-slider", "value"),
+    Input("m-average-slider", "value"),
+    Input("m-deviation-slider", "value"),
+)
+def update_distribution_plot(f_average, f_deviation, m_average, m_deviation):
+    fig = go.Figure()
+
+    f_data = np.random.normal(f_average, f_deviation, 2000)
+    m_data = np.random.normal(m_average, m_deviation, 2000)
+
+    f_data, f_lower_limit, f_upper_limit = check_ranges(f_data, MIN_GRADE, MAX_GRADE)
+    m_data, m_lower_limit, m_upper_limit = check_ranges(m_data, MIN_GRADE, MAX_GRADE)
+
+    f_hist, f_bin_edges = np.histogram(f_data, bins=np.arange(MIN_GRADE, MAX_GRADE + 1))
+    m_hist, m_bin_edges = np.histogram(m_data, bins=np.arange(MIN_GRADE, MAX_GRADE + 1))
+
+    fig.add_trace(
+        go.Bar(
+            x=f_bin_edges[:-1],
+            y=f_hist,
+            width=0.35,
+            name="Female",
+            marker=dict(
+                color="rgba(255, 255, 255, 0.25)",
+                line=dict(color="rgb(102, 16, 242)", width=1.15),
+            ),
+        )
+    )
+    fig.add_trace(
+        go.Bar(
+            x=m_bin_edges[:-1],
+            y=m_hist,
+            width=0.35,
+            name="Male",
+            marker=dict(
+                color="rgba(255, 255, 255, 0.25)",
+                line=dict(color="rgb(65, 215, 167)", width=1.15),
+            ),
+        )
+    )
+
+    # Compute distribution
+    x_values = np.linspace(MIN_GRADE, MAX_GRADE, 200)
+    f_pdf_values = stats.norm.pdf(x_values, f_average, f_deviation)
+    m_pdf_values = stats.norm.pdf(x_values, m_average, m_deviation)
+
+    fig.add_trace(
+        go.Scatter(
+            x=x_values,
+            y=f_pdf_values,
+            mode="lines",
+            name="Female Prob. Dist.",
+            yaxis="y2",
+            line=dict(color="rgb(102, 16, 242)"),
+        )
+    )
+
+    fig.add_trace(
+        go.Scatter(
+            x=x_values,
+            y=m_pdf_values,
+            mode="lines",
+            name="Male Prob. Dist.",
+            yaxis="y2",
+            line=dict(color="rgb(65, 215, 167)"),
+        )
+    )
+
+    pdf_values = np.concatenate((f_pdf_values, m_pdf_values))
+    # Configure axes
+    fig.update_layout(
+        xaxis_title="Grades",
+        xaxis=dict(
+            range=[MIN_GRADE - 0.5, MAX_GRADE + 0.5],
+            showgrid=True,
+            titlefont=dict(color="white"),
+            tickfont=dict(color="white"),
+            gridcolor="rgba(255, 255, 255, 0.25)",
+        ),
+        yaxis=dict(
+            title="Number of Students",
+            side="left",
+            titlefont=dict(color="white"),
+            tickfont=dict(color="white"),
+            gridcolor="rgba(255, 255, 255, 0.25)",
+        ),
+        yaxis2=dict(
+            title="Probability",
+            overlaying="y",
+            side="right",
+            range=[0, max(pdf_values) + 0.5],
+            showgrid=False,
+            titlefont=dict(color="white"),
+            tickfont=dict(color="white"),
+        ),
+        plot_bgcolor="rgba(0, 0, 0, 0)",
+        paper_bgcolor="rgba(0, 0, 0, 0)",
+        legend=dict(
+            font=dict(color="white"),
+            orientation="h",
+            x=0.5,
+            y=1.1,
+            xanchor="center",
+            yanchor="bottom",
+        ),
+    )
+
+    # Create annotations for the bins
+    bin_labels = [
+        f"[{int(f_bin_edges[i])} - {int(f_bin_edges[i+1])})"
+        if i != len(f_bin_edges) - 2
+        else f"[{int(f_bin_edges[i])} - {int(f_bin_edges[i+1])}]"
+        for i in range(len(f_bin_edges) - 1)
+    ]
+
+    for i, (f_value, m_value) in enumerate(zip(f_hist, m_hist)):
+        if f_value >= m_value:
+            value = f_value
+        else:
+            value = m_value
+
+        fig.add_annotation(
+            x=f_bin_edges[i],
+            y=value,
+            text=bin_labels[i],
+            showarrow=False,
+            yshift=10,
+            font=dict(color="white"),
+        )
+
+    if (
+        (any(f_lower_limit) and any(f_upper_limit))
+        or (any(m_lower_limit) and any(m_upper_limit))
+        or (any(m_lower_limit) and any(f_upper_limit))
+        or (any(f_lower_limit) and any(m_upper_limit))
+    ):
+        return (
+            fig,
+            (
+                f"Notice that grades lower than {MIN_GRADE} are computed as {MIN_GRADE}"
+                + f" and grades greater than {MAX_GRADE} are computed as {MAX_GRADE}"
+            ),
+        )
+    elif any(f_lower_limit) or any(m_lower_limit):
+        return (
+            fig,
+            f"Notice that grades lower than {MIN_GRADE} are computed as {MIN_GRADE}",
+        )
+    elif any(f_upper_limit) or any(m_upper_limit):
+        return (
+            fig,
+            f"Notice that grades greater than {MAX_GRADE} are computed as {MAX_GRADE}",
+        )
+    else:
+        return fig, ""
 
 
 @app.callback(
@@ -554,6 +809,7 @@ def layout_input_dataset() -> dash.Dash.layout:
     langs_selectors = [create_lang_selector(lang) for lang in langs_dict.keys()]
     in_layout.extend(generate_lang_card(langs, langs_selectors))
     in_layout.extend([create_prop_slider(team_a="Female", team_b="Male")])
+    in_layout.extend(create_gender_bias_layout())
     in_layout.extend(create_lang_options_carousel())
     in_layout.extend(create_student_origin_x())
 

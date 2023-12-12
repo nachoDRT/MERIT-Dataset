@@ -30,7 +30,7 @@
                         ]
                     }
                 },
-                "include": false
+                "include": true
             },
             "eng_2": {
                 "nickname": "eng_school_2",
@@ -125,7 +125,7 @@
                         ]
                     }
                 },
-                "include": false
+                "include": true
             }
         },
         "japanese": {
@@ -158,7 +158,7 @@
                         ]
                     }
                 },
-                "include": false
+                "include": true
             },
             "jap_2": {
                 "nickname": "jap_school_2",
@@ -201,21 +201,16 @@
     "font_path": "/home/msi/.config/Ultralytics/Arial.ttf",
     "origins": {
         "English": {
-            "English": 43,
-            "Arabic": 10,
-            "Hebrew": 10,
-            "Indian": 37
+            "English": 100
         },
         "Spanish": {
-            "Spanish": 10,
-            "Chinese": 12,
-            "English": 78
+            "Spanish": 100
         },
         "Japanese": {
-            "Japanese": 25,
-            "Arabic": 25,
-            "Chinese": 25,
-            "English": 25
+            "Japanese": 50.0,
+            "Chinese": 22.0,
+            "English": 18.0,
+            "Indian": 10
         }
     },
     "values": []
