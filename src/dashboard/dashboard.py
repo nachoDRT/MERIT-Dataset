@@ -176,6 +176,10 @@ def check_ranges(data, min_value, max_value):
 def update_distribution_plot(f_average, f_deviation, m_average, m_deviation):
     fig = go.Figure()
 
+    dhelp.update_fe_male_bias_distributions(
+        f_average, f_deviation, m_average, m_deviation
+    )
+
     f_data = np.random.normal(f_average, f_deviation, 2000)
     m_data = np.random.normal(m_average, m_deviation, 2000)
 

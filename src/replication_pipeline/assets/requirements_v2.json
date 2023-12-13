@@ -30,7 +30,7 @@
                         ]
                     }
                 },
-                "include": true
+                "include": false
             },
             "eng_2": {
                 "nickname": "eng_school_2",
@@ -125,7 +125,7 @@
                         ]
                     }
                 },
-                "include": true
+                "include": false
             }
         },
         "japanese": {
@@ -158,7 +158,7 @@
                         ]
                     }
                 },
-                "include": true
+                "include": false
             },
             "jap_2": {
                 "nickname": "jap_school_2",
@@ -202,16 +202,15 @@
     "origins": {
         "English": {
             "English": 100
-        },
-        "Spanish": {
-            "Spanish": 100
-        },
-        "Japanese": {
-            "Japanese": 50.0,
-            "Chinese": 22.0,
-            "English": 18.0,
-            "Indian": 10
         }
     },
-    "values": []
+    "values": [],
+    "female_bias_distribution": {
+        "average": 5,
+        "deviation": 2.5
+    },
+    "male_bias_distribution": {
+        "average": 5,
+        "deviation": 2.5
+    }
 }

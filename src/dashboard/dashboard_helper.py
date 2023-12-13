@@ -111,6 +111,25 @@ def update_fe_male_proportion_requirements(team_a_percentage: int):
     save_json(REQS_PATH, updated_data)
 
 
+def update_fe_male_bias_distributions(*args):
+    previous_data = read_json(REQS_PATH)
+    updated_data = copy.deepcopy(previous_data)
+
+    groups = ["female", "male"]
+
+    # Assuming a normal distribution
+    for group_i, index in enumerate(range(0, len(args), 2)):
+        avrg = args[index]
+        dev = args[index + 1]
+
+        bias_data = {}
+        bias_data["average"] = avrg
+        bias_data["deviation"] = dev
+        updated_data[f"{groups[group_i]}_bias_distribution"] = bias_data
+
+    save_json(REQS_PATH, updated_data)
+
+
 def update_ethnic_origins_in_requirements(
     proportions: List, origins: Dict, language: str
 ):
@@ -118,11 +137,6 @@ def update_ethnic_origins_in_requirements(
     updated_data = copy.deepcopy(previous_data)
     if previous_data != None:
         previous_data_origins = previous_data["origins"]
-
-    # print("Proportions", proportions)
-    # print(origins)
-    # print(language)
-    # print("")
 
     if origins != None:
         origins_for_given_language = origins[language]
