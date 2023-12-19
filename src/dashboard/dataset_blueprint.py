@@ -50,7 +50,7 @@ def set_database_headers() -> dict:
     attributes["student_index"] = []
     attributes["student_name"] = []
     attributes["student_gender"] = []
-    attributes["student_ethnicity"] = []
+    attributes["student_name_origin"] = []
     attributes["student_courses"] = []
     attributes["academic_years_in_sample"] = []
     attributes["num_subjects"] = []
@@ -88,6 +88,27 @@ def compute_num_samples(reqs: dict) -> int:
     return num_samples
 
 
+def compute_num_students(reqs: dict) -> int:
+    num_students = 0
+    for language in reqs["samples"].values():
+        for school in language.values():
+            if school["include"]:
+                students = school["students"]
+                num_students += students
+
+    return num_students
+
+
+def compute_num_students_for_lang(reqs: dict, lang: str) -> int:
+    num_students = 0
+
+    for school in reqs["samples"][lang.lower()].values():
+        if school["include"]:
+            num_students += school["students"]
+
+    return num_students
+
+
 def compute_mods_distribution(reqs: dict) -> list:
     """
     Compute a list of bools based on a given modification factor belonging to [0,1].
@@ -111,6 +132,54 @@ def compute_mods_distribution(reqs: dict) -> list:
         [True, False], cum_weights=(mod_factor, 1), k=compute_num_samples(reqs)
     )
     return mods_distribution
+
+
+def compute_gender_distribution(reqs: dict) -> list:
+    f_w = reqs["female_proportion"]
+    m_w = reqs["male_proportion"]
+
+    gender_distribution = random.choices(
+        ["female", "male"], cum_weights=(f_w, f_w + m_w), k=compute_num_students(reqs)
+    )
+
+    return gender_distribution
+
+
+def compute_origins_distributions(reqs: dict) -> list:
+    selected_languages = []
+
+    for lang, lang_values in reqs["samples"].items():
+        for school_values in lang_values.values():
+            if school_values["include"]:
+                selected_languages.append(lang.capitalize())
+
+    total_origins_distribution = []
+    for lang, origins in reqs["origins"].items():
+        available_origins = [origin.lower() for origin in origins]
+        weights = [origin / 100 for origin in origins.values()]
+        # cum_weights = [weight if i==0 else weight for i, weight in enumerate(weights)]
+        cum_weights = []
+        for i, weight in enumerate(weights):
+            if i == 0:
+                cum_weights.append(weight)
+                last_weight = weight
+            elif i + 1 == len(weights):
+                cum_weights.append(1)
+            else:
+                cum_weights.append(last_weight + weight)
+                last_weight = weight
+
+        cum_weights = [round(weight, 1) for weight in cum_weights]
+        # The distribtuion for the considered main language
+        total_origins_distribution.extend(
+            random.choices(
+                available_origins,
+                cum_weights=cum_weights,
+                k=compute_num_students_for_lang(reqs, lang),
+            )
+        )
+
+    return total_origins_distribution
 
 
 def get_tables_info(layout: dict):
@@ -161,79 +230,91 @@ def fill_blueprint(attributes: dict, reqs: dict, props: dict) -> dict:
     (by just reading the WORD)"""
 
     index = 0
-    attributes["blender_mod"] = compute_mods_distribution(reqs)
+    # General attributes
+    # TODO "blender_mod" should be a dashboard input in the future
+    blender_mod = compute_mods_distribution(reqs)
+    gender = compute_gender_distribution(reqs)
+    name_origins = compute_origins_distributions(reqs)
 
     general_student_index = 0
     for language, language_content in reqs["samples"].items():
         for school in language_content.values():
-            students = school["students"]
-            pages_per_student = len(school["template_layout"])
-            pages = students * pages_per_student
+            if school["include"]:
+                students = school["students"]
+                pages_per_student = len(school["template_layout"])
+                pages = students * pages_per_student
 
-            student_index = 0
-            student_page_index = 0
-            table_per_page, subjects_per_table = get_tables_info(
-                school["template_layout"]
-            )
-            student_courses = [course[0] for course in table_per_page]
-            for page in range(pages):
-                for key in attributes:
-                    if key == "file_name":
-                        file_name = "".join(
-                            [
-                                language,
-                                "_",
-                                school["nickname"],
-                                "_",
-                                str(student_index).zfill(props["doc_name_zeros_fill"]),
-                                "_",
-                                str(student_page_index),
-                            ]
-                        )
-                        attributes[key].append(file_name)
-                    elif key == "language":
-                        attributes[key].append(language)
-                    elif key == "school_name":
-                        attributes[key].append(school["nickname"])
-                    elif key == "head_name":
-                        attributes[key].append(str(None))
-                    elif key == "secretary_name":
-                        attributes[key].append(str(None))
-                    elif key == "student_index":
-                        attributes[key].append(str(general_student_index))
-                    elif key == "student_name":
-                        attributes[key].append(str(None))
-                    elif key == "student_gender":
-                        attributes[key].append("N/A")
-                    elif key == "student_ethnicity":
-                        attributes[key].append("N/A")
-                    elif key == "academic_years_in_sample":
-                        attributes[key].append(str(table_per_page[student_page_index]))
-                    elif key == "student_courses":
-                        attributes[key].append(student_courses)
-                    elif key == "num_subjects":
-                        attributes[key].append(
-                            str(subjects_per_table[student_page_index])
-                        )
-                    elif key == "average_grade":
-                        attributes[key].append(str(None))
-                    elif key == "replication_done":
-                        attributes[key].append(False)
-                    elif key == "modification_done":
-                        if attributes["blender_mod"][index] == True:
+                student_index = 0
+                student_page_index = 0
+                table_per_page, subjects_per_table = get_tables_info(
+                    school["template_layout"]
+                )
+                student_courses = [course[0] for course in table_per_page]
+                for page in range(pages):
+                    for key in attributes:
+                        if key == "file_name":
+                            file_name = "".join(
+                                [
+                                    language,
+                                    "_",
+                                    school["nickname"],
+                                    "_",
+                                    str(student_index).zfill(
+                                        props["doc_name_zeros_fill"]
+                                    ),
+                                    "_",
+                                    str(student_page_index),
+                                ]
+                            )
+                            attributes[key].append(file_name)
+                        elif key == "language":
+                            attributes[key].append(language)
+                        elif key == "school_name":
+                            attributes[key].append(school["nickname"])
+                        elif key == "head_name":
+                            attributes[key].append(str(None))
+                        elif key == "secretary_name":
+                            attributes[key].append(str(None))
+                        elif key == "student_index":
+                            attributes[key].append(str(general_student_index))
+                        elif key == "student_name":
+                            attributes[key].append(str(None))
+                        elif key == "student_gender":
+                            attributes[key].append(gender[general_student_index])
+                        elif key == "student_name_origin":
+                            # TODO
+                            attributes[key].append(name_origins[general_student_index])
+                        elif key == "academic_years_in_sample":
+                            attributes[key].append(
+                                str(table_per_page[student_page_index])
+                            )
+                        elif key == "student_courses":
+                            attributes[key].append(student_courses)
+                        elif key == "num_subjects":
+                            attributes[key].append(
+                                str(subjects_per_table[student_page_index])
+                            )
+                        elif key == "average_grade":
+                            attributes[key].append(str(None))
+                        elif key == "replication_done":
                             attributes[key].append(False)
+                        elif key == "blender_mod":
+                            attributes[key].append(blender_mod[index])
+                        elif key == "modification_done":
+                            if attributes["blender_mod"][index] == True:
+                                attributes[key].append(False)
+                            else:
+                                attributes[key].append("N/A")
                         else:
-                            attributes[key].append("N/A")
-                    else:
-                        pass
+                            pass
 
-                index += 1
-                student_page_index += 1
+                    index += 1
+                    student_page_index += 1
 
-                if (page + 1) % pages_per_student == 0:
-                    student_index += 1
-                    general_student_index += 1
-                    student_page_index = 0
+                    if (page + 1) % pages_per_student == 0:
+                        student_index += 1
+                        general_student_index += 1
+                        student_page_index = 0
 
     return attributes
 

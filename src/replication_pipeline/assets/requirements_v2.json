@@ -3,7 +3,7 @@
         "english": {
             "eng_1": {
                 "nickname": "eng_school_1",
-                "students": 5,
+                "students": 0,
                 "template_layout": {
                     "page_1": {
                         "num_subjects": [
@@ -30,11 +30,11 @@
                         ]
                     }
                 },
-                "include": false
+                "include": true
             },
             "eng_2": {
                 "nickname": "eng_school_2",
-                "students": 10,
+                "students": 0,
                 "template_layout": {
                     "page_1": {
                         "num_subjects": [
@@ -67,7 +67,7 @@
         "spanish": {
             "esp_1": {
                 "nickname": "esp_school_1",
-                "students": 2,
+                "students": 0,
                 "template_layout": {
                     "page_1": {
                         "num_subjects": [
@@ -98,7 +98,7 @@
             },
             "esp_2": {
                 "nickname": "esp_school_2",
-                "students": 3,
+                "students": 0,
                 "template_layout": {
                     "page_1": {
                         "num_subjects": [
@@ -131,7 +131,7 @@
         "japanese": {
             "jap_1": {
                 "nickname": "jap_school_1",
-                "students": 2,
+                "students": 0,
                 "template_layout": {
                     "page_1": {
                         "num_subjects": [
@@ -162,7 +162,7 @@
             },
             "jap_2": {
                 "nickname": "jap_school_2",
-                "students": 3,
+                "students": 0,
                 "template_layout": {
                     "page_1": {
                         "num_subjects": [
@@ -194,8 +194,8 @@
         }
     },
     "blender_modified": 0.5,
-    "female_proportion": 0.7,
-    "male_proportion": 0.3,
+    "female_proportion": 0.9,
+    "male_proportion": 0.1,
     "first_student": 0,
     "verbose_level": 0,
     "font_path": "/home/msi/.config/Ultralytics/Arial.ttf",

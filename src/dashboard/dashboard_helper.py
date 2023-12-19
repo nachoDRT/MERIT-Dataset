@@ -4,12 +4,49 @@ from os.path import dirname, abspath
 import os
 import json
 import copy
+import threading
 
 ASSETS_PATH = os.path.join(
     Path(dirname(abspath(__file__))).parent, "replication_pipeline", "assets"
 )
 
 REQS_PATH = os.path.join(ASSETS_PATH, "requirements_v2.json")
+
+
+class JsonManagement:
+    def __init__(self) -> None:
+        self.json_lock = threading.Lock()
+
+    def read_json(self, file_path: str) -> dict:
+        """
+        Read a JSON file from a given path.
+
+        Args:
+            name (str): The name of the JSON file (including the .json extension).
+
+        Returns:
+            dict: A dictionary containing the data from the JSON file.
+
+        """
+
+        with self.json_lock:
+            with open(file_path, "r") as file:
+                data = json.load(file)
+
+        return data
+
+    def save_json(self, path: str, data_content: dict):
+        """
+        Save a JSON file.
+
+        Args:
+            path (str): The path where to save the file (including the .json extension).
+
+        """
+
+        with self.json_lock:
+            with open(path, "w") as file:
+                json.dump(data_content, file, indent=4)
 
 
 def get_available_schools_per_language():
@@ -40,37 +77,9 @@ def get_available_schools_per_language():
     return available_langs
 
 
-def read_json(file_path: str) -> dict:
-    """
-    Read a JSON file from a given path.
-
-    Args:
-        name (str): The name of the JSON file (including the .json extension).
-
-    Returns:
-        dict: A dictionary containing the data from the JSON file.
-
-    """
-
-    with open(file_path, "r") as file:
-        data = json.load(file)
-
-    return data
-
-
-def save_json(path: str, data_content: dict):
-    """
-    Save a JSON file.
-
-    Args:
-        path (str): The path where to save the file (including the .json extension).
-
-    """
-    with open(path, "w") as file:
-        json.dump(data_content, file, indent=4)
-
-
-def update_schools_requirements(selected_schools: List):
+def update_schools_requirements(
+    json_management: JsonManagement, selected_schools: List
+):
     """
     Update the schools to replicate in the requirements JSON.
 
@@ -79,7 +88,7 @@ def update_schools_requirements(selected_schools: List):
                                  the user wants to replicate.
 
     """
-    previous_data = read_json(REQS_PATH)
+    previous_data = json_management.read_json(REQS_PATH)
     updated_data = copy.deepcopy(previous_data)
     languages_data = updated_data["samples"]
 
@@ -90,10 +99,12 @@ def update_schools_requirements(selected_schools: List):
                 if school_data["nickname"] == school:
                     school_data["include"] = True
 
-    save_json(REQS_PATH, updated_data)
+    json_management.save_json(REQS_PATH, updated_data)
 
 
-def update_fe_male_proportion_requirements(team_a_percentage: int):
+def update_fe_male_proportion_requirements(
+    json_management: JsonManagement, team_a_percentage: int
+):
     """
     Update the female/male students proportion in the requirements JSON.
 
@@ -104,15 +115,15 @@ def update_fe_male_proportion_requirements(team_a_percentage: int):
 
     """
 
-    previous_data = read_json(REQS_PATH)
+    previous_data = json_management.read_json(REQS_PATH)
     updated_data = copy.deepcopy(previous_data)
     updated_data["female_proportion"] = round(team_a_percentage / 100, 2)
     updated_data["male_proportion"] = round(1 - updated_data["female_proportion"], 2)
-    save_json(REQS_PATH, updated_data)
+    json_management.save_json(REQS_PATH, updated_data)
 
 
-def update_fe_male_bias_distributions(*args):
-    previous_data = read_json(REQS_PATH)
+def update_fe_male_bias_distributions(json_management: JsonManagement, *args):
+    previous_data = json_management.read_json(REQS_PATH)
     updated_data = copy.deepcopy(previous_data)
 
     groups = ["female", "male"]
@@ -127,13 +138,13 @@ def update_fe_male_bias_distributions(*args):
         bias_data["deviation"] = dev
         updated_data[f"{groups[group_i]}_bias_distribution"] = bias_data
 
-    save_json(REQS_PATH, updated_data)
+    json_management.save_json(REQS_PATH, updated_data)
 
 
 def update_ethnic_origins_in_requirements(
-    proportions: List, origins: Dict, language: str
+    json_management: JsonManagement, proportions: List, origins: Dict, language: str
 ):
-    previous_data = read_json(REQS_PATH)
+    previous_data = json_management.read_json(REQS_PATH)
     updated_data = copy.deepcopy(previous_data)
     if previous_data != None:
         previous_data_origins = previous_data["origins"]
@@ -167,11 +178,11 @@ def update_ethnic_origins_in_requirements(
 
     updated_data["origins"] = origins
 
-    save_json(REQS_PATH, updated_data)
+    json_management.save_json(REQS_PATH, updated_data)
 
 
-def get_ethnic_origins_proportions(lang: str):
-    data = read_json(REQS_PATH)
+def get_ethnic_origins_proportions(json_management: JsonManagement, lang: str):
+    data = json_management.read_json(REQS_PATH)
 
     proportions = []
     try:
@@ -184,6 +195,35 @@ def get_ethnic_origins_proportions(lang: str):
 
     except (KeyError, TypeError) as e:
         return proportions
+
+
+def update_num_students_per_school(
+    json_management: JsonManagement,
+    num_samples_schools: List,
+    selected_schools: List,
+    # total_schools: List,
+):
+    selected_schools = [school.lower() for school in selected_schools]
+
+    previous_data = json_management.read_json(REQS_PATH)
+    updated_data = copy.deepcopy(previous_data)
+
+    counter = 0
+    for lang, lang_values in updated_data["samples"].items():
+        for school, school_values in lang_values.items():
+            if school_values["nickname"] in selected_schools:
+                try:
+                    updated_data["samples"][lang][school][
+                        "students"
+                    ] = num_samples_schools[counter]
+                    counter += 1
+                except IndexError:
+                    pass
+
+            else:
+                updated_data["samples"][lang][school]["students"] = 0
+
+    json_management.save_json(REQS_PATH, updated_data)
 
 
 def props_2_values(proportions):
@@ -199,7 +239,7 @@ def props_2_values(proportions):
     return values
 
 
-def get_langs_with_replicas():
+def get_langs_with_replicas(json_management: JsonManagement):
     """
     Get those languages containing schools the user wants to replicate.
 
@@ -208,7 +248,7 @@ def get_langs_with_replicas():
     """
 
     langs_of_interest = []
-    data = read_json(REQS_PATH)
+    data = json_management.read_json(REQS_PATH)
 
     languages_data = data["samples"]
 

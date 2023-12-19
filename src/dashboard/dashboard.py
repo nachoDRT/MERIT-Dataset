@@ -13,6 +13,7 @@ from typing import List, Dict
 import copy
 import numpy as np
 import scipy.stats as stats
+from dashboard_helper import JsonManagement
 
 START_COLOR = "#ccffff"
 END_COLOR = "#009933"
@@ -23,14 +24,18 @@ NUM_MAX_ORIGINS = 3
 MIN_GRADE = 0
 MAX_GRADE = 10
 
-
+json_management = JsonManagement()
 blueprint_name = "dataset_blueprint.csv"
 blueprint_path = os.path.join(dirname(abspath(__file__)), blueprint_name)
 df = pd.read_csv(blueprint_path)
 css_path = os.path.join(dirname(abspath(__file__)), "assets", "styles.css")
 app = dash.Dash(
     __name__,
-    external_stylesheets=[dbc.themes.QUARTZ, css_path],
+    external_stylesheets=[
+        "https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css",
+        dbc.themes.QUARTZ,
+        css_path,
+    ],
     suppress_callback_exceptions=True,
 )
 
@@ -147,7 +152,7 @@ def create_gender_bias_layout():
     gender_bias_col_right = create_gender_bias_col_right()
     bias_selector = html.Div(
         [
-            html.H4(title, style={"marginTop": "1.5em"}),
+            html.H3(title, style={"marginTop": "1.5em"}),
             dbc.Row([gender_bias_col_left[0], gender_bias_col_right[0]]),
         ]
     )
@@ -177,7 +182,7 @@ def update_distribution_plot(f_average, f_deviation, m_average, m_deviation):
     fig = go.Figure()
 
     dhelp.update_fe_male_bias_distributions(
-        f_average, f_deviation, m_average, m_deviation
+        json_management, f_average, f_deviation, m_average, m_deviation
     )
 
     f_data = np.random.normal(f_average, f_deviation, 2000)
@@ -346,7 +351,7 @@ def update_slider_output(values, ids):
     _, team_a, team_b = slider_id.split("-")
     response = f"Selection: {value}% {team_a}, {100 - value}% {team_b}"
 
-    dhelp.update_fe_male_proportion_requirements(value)
+    dhelp.update_fe_male_proportion_requirements(json_management, value)
 
     return [response]
 
@@ -514,7 +519,7 @@ def create_origin_prop_slider(
         elif not values:
             values = []
 
-        prov_values = dhelp.get_ethnic_origins_proportions(lang)
+        prov_values = dhelp.get_ethnic_origins_proportions(json_management, lang)
 
         if change:
             values = []
@@ -525,7 +530,6 @@ def create_origin_prop_slider(
 
                 accumulated += value
                 values.append(accumulated)
-        # dhelp.update_ethnic_origins_in_requirements(values, stored, lang)
 
         return html.Div(
             [
@@ -571,7 +575,9 @@ def update_proportion_slider(active_index, json_data, values: List, stored_selec
     language = json_data[active_index]["header"]
 
     if triggered_input_id == "lang-options-carousel":
-        proportions = dhelp.get_ethnic_origins_proportions(lang=language)
+        proportions = dhelp.get_ethnic_origins_proportions(
+            json_management, lang=language
+        )
         values = dhelp.props_2_values(proportions)
 
     try:
@@ -585,7 +591,7 @@ def update_proportion_slider(active_index, json_data, values: List, stored_selec
             selection_message = f"100% of {language} names"
             values = [100]
             dhelp.update_ethnic_origins_in_requirements(
-                values, stored_selections, language
+                json_management, values, stored_selections, language
             )
             return selection_message, values
 
@@ -618,7 +624,7 @@ def update_proportion_slider(active_index, json_data, values: List, stored_selec
                 except IndexError:
                     message_fragment = "Loading"
             dhelp.update_ethnic_origins_in_requirements(
-                props_fragments, stored_selections, language
+                json_management, props_fragments, stored_selections, language
             )
             return message_fragment, values
 
@@ -789,6 +795,228 @@ def create_lang_origin_checklist(lang: str, selected_values: List):
     return origin_checklist
 
 
+def create_contact_info():
+    url_github = "https://github.com/nachoDRT"
+    github_link = html.Div(
+        [
+            html.A(
+                [
+                    html.Div([html.I(className="bi bi-github"), " nachoDRT"]),
+                ],
+                href=url_github,
+                target="_blank",
+            )
+        ]
+    )
+
+    contact = dbc.Row(
+        [
+            dbc.Col(
+                github_link,
+                width=1,
+                style={"margin": "auto", "marginTop": "10em", "marginBottom": "4em"},
+            )
+        ]
+    )
+
+    return contact
+
+
+def create_num_students_selector_card():
+    selector = dbc.Card(
+        [
+            dbc.CardHeader(
+                html.Div("No Schools Selected"),
+                id="num-students-selector-card-title",
+            ),
+            dbc.CardBody(
+                html.Div("Select any School"),
+                id="num-students-selector-card-content",
+            ),
+        ]
+    )
+    return selector
+
+
+def create_school_num_students_selector(school: str, prev_num: int = 0):
+    return dbc.Row(
+        [
+            dbc.Col(html.Div(school.capitalize()), width=6, align="center"),
+            dbc.Col(
+                dbc.Input(
+                    type="number",
+                    min=0,
+                    max=10000,
+                    step=100,
+                    value=prev_num,
+                    style={"width": "120px"},
+                    id={"type": "num-students-selection", "index": school},
+                ),
+                width=5,
+                align="center",
+            ),
+        ],
+        style={"marginTop": "0.5em"},
+    )
+
+
+@app.callback(
+    [
+        Output("num-students-selector-card-title", "children"),
+        Output("num-students-selector-card-content", "children"),
+    ],
+    [Input(f"checklist-{lang}", "value") for lang in langs_dict.keys()]
+    + [Input(f"collapse-lang-{lang}", "is_open") for lang in langs_dict.keys()],
+    [State({"type": "num-students-selection", "index": ALL}, "value")],
+)
+def update_num_students_selector(*args):
+    args = list(args)
+    state = args.pop(-1)
+
+    """ Select only the relevant argument since the "collapse-lang-{lang}" input is just 
+    to trigger the callbak"""
+    args = args[: -len(langs_dict.keys())]
+
+    # Recover info from previous selection in the Language/School selector
+    previous_selections_flag = any(state)
+
+    mapped_data = {}
+
+    if previous_selections_flag:
+        index = 0
+        for lang_schools in args:
+            for school in lang_schools:
+                try:
+                    mapped_data[school] = state[index]
+                    index += 1
+                except IndexError:
+                    pass
+
+    if any(args):
+        numerical_input = []
+
+        for lang_schools in args:
+            for school in lang_schools:
+                if school in mapped_data:
+                    prev_num = mapped_data[school]
+                    numerical_input.append(
+                        create_school_num_students_selector(school, prev_num)
+                    )
+                else:
+                    numerical_input.append(create_school_num_students_selector(school))
+
+        title = "Number of Students"
+        content = html.Div(numerical_input)
+
+    else:
+        title = "No Schools Selected"
+        content = "Select any School"
+
+    return title, content
+
+
+def create_num_students_plot(hist_values: List = None, hist_classes: List = None):
+    fig = go.Figure()
+
+    if not hist_classes:
+        hist_classes = [
+            school.capitalize()
+            for lang_schools in langs_dict.values()
+            for school in lang_schools
+        ]
+
+    if not hist_values:
+        hist_values = [0 for _ in hist_classes]
+
+    fig.add_trace(
+        go.Bar(
+            x=hist_classes,
+            y=hist_values,
+            width=0.35,
+            marker=dict(
+                color="rgba(255, 255, 255, 0.25)",
+                line=dict(color="rgb(255, 255, 255)", width=1.15),
+            ),
+        )
+    )
+
+    # Configure axes
+    fig.update_layout(
+        xaxis_title="Schools",
+        xaxis=dict(
+            showgrid=True,
+            titlefont=dict(color="white"),
+            tickfont=dict(color="white"),
+            gridcolor="rgba(255, 255, 255, 0.25)",
+            tickangle=-45,
+        ),
+        yaxis=dict(
+            title="Number of Students",
+            side="left",
+            titlefont=dict(color="white"),
+            tickfont=dict(color="white"),
+            range=[0, 10000],
+            gridcolor="rgba(255, 255, 255, 0.25)",
+        ),
+        plot_bgcolor="rgba(0, 0, 0, 0)",
+        paper_bgcolor="rgba(0, 0, 0, 0)",
+        legend=dict(
+            font=dict(color="white"),
+            orientation="h",
+            x=0.5,
+            y=1.1,
+            xanchor="center",
+            yanchor="bottom",
+        ),
+    )
+
+    return dcc.Graph(figure=fig)
+
+
+@app.callback(
+    [Output("num-students-plot-col", "children")],
+    [Input(f"checklist-{lang}", "value") for lang in langs_dict.keys()]
+    + [Input({"type": "num-students-selection", "index": ALL}, "value")],
+)
+def update_num_students_plot(*args):
+    num_students_school = args[-1]
+    language_schools = args[: len(args) - 1]
+
+    hist_classes = [
+        school.capitalize() for language in language_schools for school in language
+    ]
+
+    hist_values = [
+        num_students if num_students != None else 0
+        for num_students in num_students_school
+    ]
+
+    total_schools = [
+        school for lang_schools in langs_dict.values() for school in lang_schools
+    ]
+
+    dhelp.update_num_students_per_school(json_management, hist_values, hist_classes)
+
+    return [create_num_students_plot(hist_values, hist_classes)]
+
+
+def generate_num_students_layout():
+    num_students_selector = html.Div(
+        [
+            html.H3("Number of students selector", style={"marginTop": "1.5em"}),
+            dbc.Row(
+                [
+                    dbc.Col(create_num_students_selector_card(), width=4),
+                    dbc.Col(
+                        create_num_students_plot(), width=8, id="num-students-plot-col"
+                    ),
+                ],
+            ),
+        ]
+    )
+    return [num_students_selector]
+
+
 # Define the layout for the dataset input page
 def layout_input_dataset() -> dash.Dash.layout:
     in_layout = [
@@ -812,6 +1040,7 @@ def layout_input_dataset() -> dash.Dash.layout:
     langs = [lang for lang in langs_dict.keys()]
     langs_selectors = [create_lang_selector(lang) for lang in langs_dict.keys()]
     in_layout.extend(generate_lang_card(langs, langs_selectors))
+    in_layout.extend(generate_num_students_layout())
     in_layout.extend([create_prop_slider(team_a="Female", team_b="Male")])
     in_layout.extend(create_gender_bias_layout())
     in_layout.extend(create_lang_options_carousel())
@@ -827,6 +1056,7 @@ def layout_input_dataset() -> dash.Dash.layout:
                 ]
             ),
             create_continue_button(),
+            create_contact_info(),
         ],
         fluid=True,
     )
@@ -899,8 +1129,8 @@ def update_checklist(*args):
 def update_collapse(*school_selections):
     selected_schools = [school for language in school_selections for school in language]
 
-    dhelp.update_schools_requirements(selected_schools)
-    selected_languages = dhelp.get_langs_with_replicas()
+    dhelp.update_schools_requirements(json_management, selected_schools)
+    selected_languages = dhelp.get_langs_with_replicas(json_management)
     if len(selected_languages) == 0:
         selected_languages.append("no_lang")
     carousel_items = [generate_carousel_item(str(i)) for i in selected_languages]
