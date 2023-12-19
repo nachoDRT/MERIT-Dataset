@@ -1,4 +1,4 @@
-from dash import html, dcc, Input, Output, ALL, State
+from dash import html, dcc, Input, Output, ALL, MATCH, State
 import dash
 import pandas as pd
 import plotly.express as px
@@ -43,6 +43,7 @@ langs_dict = dhelp.get_available_schools_per_language()
 origin_langs = dhelp.get_available_origin_langs()
 
 
+# TODO Unable a certain team reaches 0 representation (similar to the origins slider)
 def create_prop_slider(
     team_a: str, team_b: str, step: int = 10, min: int = 0, max: int = 100
 ):
@@ -50,6 +51,8 @@ def create_prop_slider(
     mean = (max - min) / 2
     slider_id = f"slider-{team_a}-{team_b}"
     output_id = f"output-{team_a}-{team_b}"
+
+    dhelp.update_fe_male_proportion_requirements(json_management, mean)
 
     return html.Div(
         [
@@ -149,6 +152,7 @@ def create_gender_bias_col_right():
 def create_gender_bias_layout():
     title = "Bias Selector"
     gender_bias_col_left = create_gender_bias_col_left()
+    # TODO Create a default empty figure so it doesn't replicate the last execution plot
     gender_bias_col_right = create_gender_bias_col_right()
     bias_selector = html.Div(
         [
@@ -177,16 +181,24 @@ def check_ranges(data, min_value, max_value):
     Input("f-deviation-slider", "value"),
     Input("m-average-slider", "value"),
     Input("m-deviation-slider", "value"),
+    Input({"type": "num_students_selection", "index": ALL}, "value"),
+    Input({"type": "slider", "index": ALL}, "value"),
 )
-def update_distribution_plot(f_average, f_deviation, m_average, m_deviation):
+def update_distribution_plot(f_average, f_deviation, m_average, m_deviation, _, __):
     fig = go.Figure()
 
     dhelp.update_fe_male_bias_distributions(
         json_management, f_average, f_deviation, m_average, m_deviation
     )
 
-    f_data = np.random.normal(f_average, f_deviation, 2000)
-    m_data = np.random.normal(m_average, m_deviation, 2000)
+    total_students = dhelp.get_total_num_of_students(json_management)
+    f_prop, m_prop = dhelp.get_fe_male_proportions(json_management)
+
+    num_f_students = int(total_students * f_prop)
+    num_m_students = int(total_students * m_prop)
+
+    f_data = np.random.normal(f_average, f_deviation, num_f_students)
+    m_data = np.random.normal(m_average, m_deviation, num_m_students)
 
     f_data, f_lower_limit, f_upper_limit = check_ranges(f_data, MIN_GRADE, MAX_GRADE)
     m_data, m_lower_limit, m_upper_limit = check_ranges(m_data, MIN_GRADE, MAX_GRADE)
@@ -847,10 +859,11 @@ def create_school_num_students_selector(school: str, prev_num: int = 0):
                     type="number",
                     min=0,
                     max=10000,
-                    step=100,
+                    step="any",
                     value=prev_num,
                     style={"width": "120px"},
-                    id={"type": "num-students-selection", "index": school},
+                    id={"type": "num_students_selection", "index": school},
+                    className="num_students_selection",
                 ),
                 width=5,
                 align="center",
@@ -867,7 +880,7 @@ def create_school_num_students_selector(school: str, prev_num: int = 0):
     ],
     [Input(f"checklist-{lang}", "value") for lang in langs_dict.keys()]
     + [Input(f"collapse-lang-{lang}", "is_open") for lang in langs_dict.keys()],
-    [State({"type": "num-students-selection", "index": ALL}, "value")],
+    [State({"type": "num_students_selection", "index": ALL}, "value")],
 )
 def update_num_students_selector(*args):
     args = list(args)
@@ -976,7 +989,7 @@ def create_num_students_plot(hist_values: List = None, hist_classes: List = None
 @app.callback(
     [Output("num-students-plot-col", "children")],
     [Input(f"checklist-{lang}", "value") for lang in langs_dict.keys()]
-    + [Input({"type": "num-students-selection", "index": ALL}, "value")],
+    + [Input({"type": "num_students_selection", "index": ALL}, "value")],
 )
 def update_num_students_plot(*args):
     num_students_school = args[-1]

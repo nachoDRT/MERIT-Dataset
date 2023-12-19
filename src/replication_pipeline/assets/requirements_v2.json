@@ -30,7 +30,7 @@
                         ]
                     }
                 },
-                "include": true
+                "include": false
             },
             "eng_2": {
                 "nickname": "eng_school_2",
@@ -194,8 +194,8 @@
         }
     },
     "blender_modified": 0.5,
-    "female_proportion": 0.9,
-    "male_proportion": 0.1,
+    "female_proportion": 0.5,
+    "male_proportion": 0.5,
     "first_student": 0,
     "verbose_level": 0,
     "font_path": "/home/msi/.config/Ultralytics/Arial.ttf",

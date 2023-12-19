@@ -122,6 +122,14 @@ def update_fe_male_proportion_requirements(
     json_management.save_json(REQS_PATH, updated_data)
 
 
+def get_fe_male_proportions(json_management: JsonManagement):
+    data = json_management.read_json(REQS_PATH)
+    f_prop = data["female_proportion"]
+    m_prop = data["male_proportion"]
+
+    return f_prop, m_prop
+
+
 def update_fe_male_bias_distributions(json_management: JsonManagement, *args):
     previous_data = json_management.read_json(REQS_PATH)
     updated_data = copy.deepcopy(previous_data)
@@ -224,6 +232,17 @@ def update_num_students_per_school(
                 updated_data["samples"][lang][school]["students"] = 0
 
     json_management.save_json(REQS_PATH, updated_data)
+
+
+def get_total_num_of_students(json_management: JsonManagement):
+    data = json_management.read_json(REQS_PATH)
+
+    num_students = 0
+    for lang, lang_values in data["samples"].items():
+        for school, _ in lang_values.items():
+            num_students += data["samples"][lang][school]["students"]
+
+    return num_students
 
 
 def props_2_values(proportions):
