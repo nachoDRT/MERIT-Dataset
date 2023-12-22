@@ -49,6 +49,20 @@ class JsonManagement:
                 json.dump(data_content, file, indent=4)
 
 
+def reset_key_values(json_management: JsonManagement):
+    previous_data = json_management.read_json(REQS_PATH)
+    updated_data = copy.deepcopy(previous_data)
+    languages_data = updated_data["samples"]
+
+    for language_data in languages_data.values():
+        for school_data in language_data.values():
+            school_data["include"] = False
+
+    updated_data["origins"] = {}
+
+    json_management.save_json(REQS_PATH, updated_data)
+
+
 def get_available_schools_per_language():
     """
     Get the name of every school with a template available in src/replication_pipeline/
@@ -91,15 +105,19 @@ def update_schools_requirements(
     previous_data = json_management.read_json(REQS_PATH)
     updated_data = copy.deepcopy(previous_data)
     languages_data = updated_data["samples"]
+    selected_languages = []
 
-    for language_data in languages_data.values():
+    for lang, language_data in languages_data.items():
         for school_data in language_data.values():
             school_data["include"] = False
             for school in selected_schools:
                 if school_data["nickname"] == school:
                     school_data["include"] = True
+                    selected_languages.append(lang)
 
     json_management.save_json(REQS_PATH, updated_data)
+
+    return selected_languages
 
 
 def update_fe_male_proportion_requirements(

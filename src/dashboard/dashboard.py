@@ -39,6 +39,7 @@ app = dash.Dash(
     suppress_callback_exceptions=True,
 )
 
+dhelp.reset_key_values(json_management)
 langs_dict = dhelp.get_available_schools_per_language()
 origin_langs = dhelp.get_available_origin_langs()
 
@@ -1142,8 +1143,11 @@ def update_checklist(*args):
 def update_collapse(*school_selections):
     selected_schools = [school for language in school_selections for school in language]
 
-    dhelp.update_schools_requirements(json_management, selected_schools)
-    selected_languages = dhelp.get_langs_with_replicas(json_management)
+    selected_languages = dhelp.update_schools_requirements(
+        json_management, selected_schools
+    )
+    selected_languages = list(dict.fromkeys(selected_languages))
+
     if len(selected_languages) == 0:
         selected_languages.append("no_lang")
     carousel_items = [generate_carousel_item(str(i)) for i in selected_languages]
