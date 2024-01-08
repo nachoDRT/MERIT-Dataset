@@ -11,6 +11,8 @@ import ast
 import records_creator
 import annotations_creator
 
+import cv2
+
 OUTPUT_ANNOTATIONS_PDF = False
 
 
@@ -58,9 +60,9 @@ def define_paths(language: str, school: str) -> dict:
 
     paths = {}
 
-    paths["root_assets"] = os.path.join(
-        os.path.join(Path(__file__).resolve().parents[1]), language
-    )
+    # paths["root_assets"] = os.path.join(
+    #     os.path.join(Path(__file__).resolve().parents[1]), language
+    # )
     paths["root_output"] = os.path.join(
         Path(__file__).resolve().parents[3], "data", "original"
     )
@@ -261,6 +263,25 @@ def compute_average_grades(indices: list, record: records_creator.SchoolRecord):
     return averages
 
 
+def load_assets(
+    school_name: str,
+    res_path: str,
+    assets_to_load: List = ["signatures", "signature_maps", "stamps", "stamp_maps"],
+):
+    assets = {}
+    for asset_to_load in assets_to_load:
+        file_name = "".join([asset_to_load[:-1], "_", school_name, ".png"])
+        asset_path = os.path.join(res_path, asset_to_load, file_name)
+        assets[asset_to_load[:-1]] = load_asset_img(asset_path)
+
+    return assets
+
+
+def load_asset_img(path: str):
+    img = cv2.imread(path, cv2.IMREAD_UNCHANGED)
+    return img
+
+
 def create_documents(df: pd.DataFrame, blueprint_path: str):
     """
     Generates synthetic student records and related documents (PDF and PNG), along with
@@ -345,18 +366,22 @@ def create_documents(df: pd.DataFrame, blueprint_path: str):
                 new_student = True
 
         # Create synthetic student records
-        record = records_creator.SchoolRecord(
-            sample_name,
-            paths,
-            props,
-            reqs,
-            lang,
-            courses,
-            n_subjects,
-            retrieved_info=retrieved_info,
-            new_school=new_school,
-            new_student=new_student,
-        )
+        if new_student:
+            record = records_creator.SchoolRecord(
+                sample_name,
+                paths,
+                props,
+                reqs,
+                lang,
+                courses,
+                n_subjects,
+                retrieved_info=retrieved_info,
+                new_school=new_school,
+                new_student=new_student,
+            )
+
+            png_assets = load_assets(school, paths["res_path"])
+            pdf_file_path = record.create_pdf()
 
         if crash_data["happened"]:
             # TODO make sure you recover every student piece of data
@@ -365,8 +390,7 @@ def create_documents(df: pd.DataFrame, blueprint_path: str):
             record.student._second_surname = crash_data["student_name"].split()[2]
 
         # Create pdf and png documents
-        pdf_file_path = record.create_pdf()
-        png_paths = record.create_pngs()
+        png_paths = record.create_pngs(png_assets)
 
         # Create annotations
         annotations_class = annotations_creator.AnnotationsCreator(

@@ -2,7 +2,38 @@
     "samples": {
         "english": {
             "eng_1": {
-                "nickname": "eng_school_1",
+                "nickname": "greenfields",
+                "students": 0,
+                "template_layout": {
+                    "page_1": {
+                        "num_subjects": [
+                            11
+                        ],
+                        "academic_years": [
+                            "3_de_la_eso"
+                        ]
+                    },
+                    "page_2": {
+                        "num_subjects": [
+                            10
+                        ],
+                        "academic_years": [
+                            "4_de_la_eso"
+                        ]
+                    },
+                    "page_3": {
+                        "num_subjects": [
+                            9
+                        ],
+                        "academic_years": [
+                            "1_de_bachillerato"
+                        ]
+                    }
+                },
+                "include": false
+            },
+            "eng_2": {
+                "nickname": "eng_school_2",
                 "students": 0,
                 "template_layout": {
                     "page_1": {
@@ -31,37 +62,6 @@
                     }
                 },
                 "include": false
-            },
-            "eng_2": {
-                "nickname": "eng_school_2",
-                "students": 1000,
-                "template_layout": {
-                    "page_1": {
-                        "num_subjects": [
-                            11
-                        ],
-                        "academic_years": [
-                            "3_de_la_eso"
-                        ]
-                    },
-                    "page_2": {
-                        "num_subjects": [
-                            10
-                        ],
-                        "academic_years": [
-                            "4_de_la_eso"
-                        ]
-                    },
-                    "page_3": {
-                        "num_subjects": [
-                            11
-                        ],
-                        "academic_years": [
-                            "1_de_bachillerato"
-                        ]
-                    }
-                },
-                "include": true
             }
         },
         "spanish": {
@@ -158,7 +158,7 @@
                         ]
                     }
                 },
-                "include": true
+                "include": false
             },
             "jap_2": {
                 "nickname": "jap_school_2",
@@ -199,22 +199,13 @@
     "first_student": 0,
     "verbose_level": 0,
     "font_path": "/home/msi/.config/Ultralytics/Arial.ttf",
-    "origins": {
-        "Japanese": {
-            "Japanese": 74,
-            "Arabic": 26
-        },
-        "English": {
-            "English": 19.0,
-            "Italian": 81.0
-        }
-    },
+    "origins": {},
     "female_bias_distribution": {
-        "average": 9,
-        "deviation": 1.11
+        "average": 5,
+        "deviation": 2.5
     },
     "male_bias_distribution": {
-        "average": 8,
-        "deviation": 1.51
+        "average": 5,
+        "deviation": 2.5
     }
 }
