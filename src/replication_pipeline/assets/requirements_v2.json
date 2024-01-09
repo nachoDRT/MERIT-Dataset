@@ -3,14 +3,14 @@
         "english": {
             "eng_1": {
                 "nickname": "greenfields",
-                "students": 0,
+                "students": 6,
                 "template_layout": {
                     "page_1": {
                         "num_subjects": [
                             11
                         ],
                         "academic_years": [
-                            "3_de_la_eso"
+                            "year_10"
                         ]
                     },
                     "page_2": {
@@ -18,7 +18,7 @@
                             10
                         ],
                         "academic_years": [
-                            "4_de_la_eso"
+                            "year_11"
                         ]
                     },
                     "page_3": {
@@ -26,11 +26,11 @@
                             9
                         ],
                         "academic_years": [
-                            "1_de_bachillerato"
+                            "year_12"
                         ]
                     }
                 },
-                "include": false
+                "include": true
             },
             "eng_2": {
                 "nickname": "eng_school_2",
@@ -128,9 +128,9 @@
                 "include": false
             }
         },
-        "japanese": {
-            "jap_1": {
-                "nickname": "jap_school_1",
+        "portuguese": {
+            "por_1": {
+                "nickname": "por_school_1",
                 "students": 0,
                 "template_layout": {
                     "page_1": {
@@ -160,8 +160,8 @@
                 },
                 "include": false
             },
-            "jap_2": {
-                "nickname": "jap_school_2",
+            "por_2": {
+                "nickname": "por_school_2",
                 "students": 0,
                 "template_layout": {
                     "page_1": {
@@ -199,13 +199,17 @@
     "first_student": 0,
     "verbose_level": 0,
     "font_path": "/home/msi/.config/Ultralytics/Arial.ttf",
-    "origins": {},
+    "origins": {
+        "English": {
+            "English": 100
+        }
+    },
     "female_bias_distribution": {
-        "average": 5,
-        "deviation": 2.5
+        "average": 7,
+        "deviation": 0.5
     },
     "male_bias_distribution": {
-        "average": 5,
+        "average": 2,
         "deviation": 2.5
     }
 }

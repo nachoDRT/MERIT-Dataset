@@ -182,6 +182,30 @@ def compute_origins_distributions(reqs: dict) -> list:
     return total_origins_distribution
 
 
+def compute_grades_distributions(reqs: dict, gender: list, origin: list) -> list:
+    grades_dist = []
+    num_students = compute_num_students(reqs)
+
+    for index in range(num_students):
+        dist = {}
+
+        student_gender = gender[index]
+
+        gender_bias_key = "".join([student_gender, "_bias_distribution"])
+        mean_g = reqs[gender_bias_key]["average"]
+        dev_g = reqs[gender_bias_key]["deviation"]
+
+        # TODO Compose 3D distribution
+        # student_name_origin = origin[index]
+
+        dist["mean"] = mean_g
+        dist["dev"] = dev_g
+
+        grades_dist.append(dist)
+
+    return grades_dist
+
+
 def get_tables_info(layout: dict):
     """
     Get the list of academic years per page from the layout info and the number of
@@ -235,6 +259,7 @@ def fill_blueprint(attributes: dict, reqs: dict, props: dict) -> dict:
     blender_mod = compute_mods_distribution(reqs)
     gender = compute_gender_distribution(reqs)
     name_origins = compute_origins_distributions(reqs)
+    grades_dists = compute_grades_distributions(reqs, gender, name_origins)
 
     general_student_index = 0
     for language, language_content in reqs["samples"].items():
@@ -282,7 +307,6 @@ def fill_blueprint(attributes: dict, reqs: dict, props: dict) -> dict:
                         elif key == "student_gender":
                             attributes[key].append(gender[general_student_index])
                         elif key == "student_name_origin":
-                            # TODO
                             attributes[key].append(name_origins[general_student_index])
                         elif key == "academic_years_in_sample":
                             attributes[key].append(
@@ -295,7 +319,7 @@ def fill_blueprint(attributes: dict, reqs: dict, props: dict) -> dict:
                                 str(subjects_per_table[student_page_index])
                             )
                         elif key == "average_grade":
-                            attributes[key].append(str(None))
+                            attributes[key].append(grades_dists[general_student_index])
                         elif key == "replication_done":
                             attributes[key].append(False)
                         elif key == "blender_mod":

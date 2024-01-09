@@ -1,0 +1,146 @@
+{
+    "subjects": {
+        "anglais": [
+            "Langue Étrangère : Anglais",
+            "Anglais",
+            "Deuxième Langue Étrangère : Anglais",
+            "Langue Anglaise"
+        ],
+        "arts_visuels": [
+            "Art",
+            "Art et Culture",
+            "Arts Plastiques",
+            "Arts Visuels",
+            "Arts Visuels et Audiovisuels",
+            "Arts Visuels et Plastiques"
+        ],
+        "biologie": [
+            "Biologie"
+        ],
+        "biologie_et_geologie": [
+            "Biologie et Géologie",
+            "Géologie"
+        ],
+        "dessin_artistique": [
+            "Dessin Artistique"
+        ],
+        "dessin_technique": [
+            "Dessin Technique",
+            "Dessin Technique et Design"
+        ],
+        "economie": [
+            "Économie",
+            "Économie d'Entreprise",
+            "Sciences Économiques"
+        ],
+        "education_civique_et_ethique": [
+            "Citoyenneté",
+            "Éducation Civique",
+            "Éthique",
+            "Développement Personnel et Civique",
+            "Valeurs"
+        ],
+        "education_physique": [
+            "Éducation Physique"
+        ],
+        "espagnol": [
+            "Espagnol comme Langue Étrangère",
+            "Langue Espagnole",
+            "Espagnol"
+        ],
+        "francais": [
+            "Littérature",
+            "Langue et Littérature"
+        ],
+        "generique": [
+            "Culture Espagnole",
+            "Drame",
+            "Littérature Anglaise",
+            "Littérature Mondiale",
+            "Psychologie",
+            "Fondements de l'Administration et de la Gestion",
+            "Administration et Gestion",
+            "Culture Scientifique",
+            "Éducation Scientifique",
+            "Italien",
+            "Langue Étrangère Italien",
+            "Espagnol",
+            "Espagnol comme Langue Seconde",
+            "Tutorat",
+            "Science Politique",
+            "Éducation pour le Travail",
+            "Communication",
+            "Technologies de l'Information et de la Communication",
+            "Comportement",
+            "Chinois",
+            "Chinois Mandarin",
+            "Tourisme"
+        ],
+        "geographie_et_histoire": [
+            "Géographie",
+            "Géographie et Histoire",
+            "Histoire"
+        ],
+        "grec": [
+            "Grec"
+        ],
+        "histoire": [
+            "Histoire Française",
+            "Histoire",
+            "Histoire Mondiale"
+        ],
+        "informatique": [
+            "Informatique"
+        ],
+        "latin": [
+            "Latin"
+        ],
+        "mathematiques": [
+            "Mathématiques",
+            "Calcul",
+            "Mathématiques Appliquées",
+            "Algèbre",
+            "Mathématiques pour l'Enseignement Académique",
+            "Mathématiques Appliquées aux Sciences Sociales"
+        ],
+        "musique": [
+            "Musique"
+        ],
+        "philosophie": [
+            "Histoire de la Philosophie",
+            "Philosophie"
+        ],
+        "physique_et_chimie": [
+            "Chimie",
+            "Physique",
+            "Physique et Chimie"
+        ],
+        "religion": [
+            "Études Religieuses",
+            "Christianisme"
+        ],
+        "sciences_du_monde": [
+            "Culture Classique",
+            "Histoire du Monde Contemporain",
+            "Sciences Sociales",
+            "Études Sociales",
+            "Sciences du Monde"
+        ],
+        "sciences_naturelles": [
+            "Sciences Naturelles"
+        ],
+        "technologie": [
+            "Programmation",
+            "Programmation et Robotique",
+            "Robotique",
+            "Science et Technologie",
+            "Technologie"
+        ]
+    },
+    "academic_years_tags": [
+        "_y10",
+        "_y11",
+        "_y12",
+        "_y13"
+    ]
+}

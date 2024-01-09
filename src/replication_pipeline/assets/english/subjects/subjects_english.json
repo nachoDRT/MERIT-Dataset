@@ -1,176 +1,144 @@
 {
     "subjects": {
-        "aleman": [
-            "Alemán",
-            "Segunda Lengua Extranjera: Alemán",
-            "Lengua Extranjera: Alemán"
+        "artistic_drawing": [
+            "Artistic Drawing"
         ],
-        "biologia": [
-            "Biología"
+        "biology": [
+            "Biology"
         ],
-        "biologia_y_geologia": [
-            "Biología y Geología",
-            "Biología",
-            "Geología"
+        "biology_and_geology": [
+            "Biology and Geology",
+            "Geology"
         ],
-        "ciencias_del_mundo": [
-            "Ciencias del Mundo",
-            "Cultura Clásica",
-            "Historia del Mundo Contemporáneo",
-            "Sociales",
-            "Ciencias Sociales"
+        "civic_and_ethical_education": [
+            "Civic Education",
+            "Ethics",
+            "Personal Development and Civics",
+            "Values"
         ],
-        "ciencias_naturales": [
-            "Ciencias Naturales"
+        "computer_science": [
+            "Computer Science",
+            "Programming"
         ],
-        "dibujo_artistico": [
-            "Dibujo Artístico"
+        "economics": [
+            "Business Economics",
+            "Economic Sciences",
+            "Economics"
         ],
-        "dibujo_tecnico": [
-            "Dibujo Técnico",
-            "Dibujo Técnico y Diseño"
+        "english": [
+            "English Language",
+            "Language and Literature",
+            "Literature",
+            "Grammar"
         ],
-        "economia": [
-            "Economía",
-            "Economía de la Empresa",
-            "Ciencias Económicas"
-        ],
-        "educacion_etico_civica": [
-            "Ética",
-            "Valores",
-            "Educación Cívica",
-            "Ciudadanía",
-            "Desarrollo Personal, Ciudadanía y Cívica"
-        ],
-        "educacion_fisica": [
-            "Educación Física"
-        ],
-        "educacion_plastica": [
-            "Educación Plástica",
-            "Educación Plástica Visual",
-            "Educación Plástica, Visual y Audiovisual",
-            "Arte",
-            "Artes Plásticas",
-            "Arte y Cultura"
-        ],
-        "filosofia": [
-            "Filosofía",
-            "Filosofia",
-            "Historia de la Filosofía"
-        ],
-        "fisica_y_quimica": [
-            "Física y Química",
-            "Física",
-            "Química"
-        ],
-        "frances": [
-            "Francés",
-            "Segunda Lengua Extranjera: Francés",
-            "Lengua Extranjera: Francés"
+        "french": [
+            "Foreign Language: French",
+            "French",
+            "Second Foreign Language: French"
         ],
         "generic": [
-            "Cultura española",
+            "Administration and Management",
+            "Chinese",
+            "Communication",
             "Drama",
-            "Lengua Inglesa",
-            "Literatura Universal",
-            "Literatura Inglesa",
-            "Psicología",
-            "Fundamentos de Administración y Gestión",
-            "Administración y Gestión",
-            "Cultura Científica",
-            "Enseñanza Científica",
-            "Italiano",
-            "Lengua Extranjera Italiano",
-            "Español",
-            "Castellano como segunda lengua",
-            "Tutoría",
-            "Ciencias Políticas",
-            "Educación para el Trabajo",
-            "Comunicación",
-            "Tecnologías de la Información y la Comunicación",
-            "Comportamiento",
-            "Chino",
-            "Chino Mandarín",
-            "Turismo",
-            "Lengua y Literatura Catalana",
-            "Catalán",
-            "Vasco"
+            "Education for Work",
+            "Foreign Language Italian",
+            "Fundamentals of Administration and Management",
+            "Communication Technologies",
+            "Italian",
+            "Mandarin Chinese",
+            "Political Science",
+            "Psychology",
+            "Scientific Culture",
+            "Scientific Education",
+            "Spanish Culture",
+            "Tourism",
+            "Tutoring",
+            "World Literature"
         ],
-        "geografia_e_historia": [
-            "Geografía e Historia",
-            "Geografía",
-            "Historia"
+        "geography_and_history": [
+            "Geography",
+            "Geography and History",
+            "History"
         ],
-        "griego": [
-            "Griego"
+        "greek": [
+            "Greek"
         ],
-        "historia": [
-            "Historia",
-            "Historia Española",
-            "Historia de España",
-            "Historia Universal"
-        ],
-        "informatica": [
-            "Informática"
-        ],
-        "ingles": [
-            "Inglés",
-            "Primera Lengua Extranjera: Inglés",
-            "Lengua Extranjera: Inglés"
+        "history": [
+            "British History",
+            "History",
+            "World History"
         ],
         "latin": [
-            "Latín"
+            "Latin"
         ],
-        "lengua_castellana": [
-            "Lengua",
-            "Lengua Castellana",
-            "Literatura",
-            "Lengua y Literatura",
-            "Lengua Española",
-            "Lengua Castellana y Literatura",
-            "Lengua y Literatura Españolas"
+        "mathematics": [
+            "Academic Mathematics",
+            "Algebra",
+            "Applied Mathematics",
+            "Calculus",
+            "Mathematics",
+            "Mathematics Applied to Social Sciences",
+            "Mathematics for Academic Teaching"
         ],
-        "matematicas": [
-            "Matemáticas",
-            "Cálculo",
-            "Matemáticas Aplicadas",
-            "Álgebra",
-            "Matemáticas para las Enseñanzas Académicas",
-            "Matemáticas Aplicadas a las Ciencias Sociales",
-            "Matemáticas Aplicadas a las CC SS",
-            "Matemáticas Académicas",
-            "Matemáticas (en español)",
-            "Matemáticas (en inglés)"
+        "music": [
+            "Music"
         ],
-        "musica": [
-            "Música"
+        "natural_sciences": [
+            "Natural Sciences"
         ],
-        "media": [
-            "Media",
-            "Nota Media",
-            "Nota Media (con Religión)",
-            "Nota Media (sin optativas)",
-            "Media Curso",
-            "Nota Media del Curso"
+        "philosophy": [
+            "History of Philosophy",
+            "Philosophy"
+        ],
+        "physics_and_chemistry": [
+            "Chemistry",
+            "Physics",
+            "Physics and Chemistry"
         ],
         "religion": [
-            "Religión",
-            "Formación Religiosa",
-            "Educación Religiosa",
-            "Cristianismo"
+            "Christianity",
+            "Religious Studies",
+            "Religion"
         ],
-        "tecnologia": [
-            "Tecnología",
-            "Tecnología, Programación y Robótica",
-            "Robótica",
-            "Programación",
-            "Ciencia y Tecnología"
+        "spanish_language": [
+            "Spanish as a Foreign Language",
+            "Second Foreign Language: Spanish",
+            "Spanish"
+        ],
+        "sports": [
+            "Sports"
+        ],
+        "technical_drawing": [
+            "Technical Drawing",
+            "Technical Drawing and Design"
+        ],
+        "technology": [
+            "Programming and Robotics",
+            "Robotics",
+            "Science and Technology",
+            "Technology"
+        ],
+        "visual_arts": [
+            "Art",
+            "Art and Culture",
+            "Plastic Arts",
+            "Visual Arts",
+            "Visual and Audiovisual Arts",
+            "Visual and Plastic Arts"
+        ],
+        "world_sciences": [
+            "Classical Culture",
+            "Contemporary World History",
+            "Social Sciences",
+            "Social Studies",
+            "World Sciences"
         ]
     },
     "academic_years_tags": [
-        "_3_de_la_eso",
-        "_4_de_la_eso",
-        "_1_de_bachillerato",
-        "_2_de_bachillerato"
+        "_y10",
+        "_y11",
+        "_y12",
+        "_y13"
     ]
 }

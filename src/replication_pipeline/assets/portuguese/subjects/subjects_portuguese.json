@@ -1,0 +1,149 @@
+{
+    "subjects": {
+        "artes_visuales": [
+            "Arte",
+            "Arte e Cultura",
+            "Artes Plásticas",
+            "Artes Visuales",
+            "Artes Visuales e Audiovisuales",
+            "Artes Visuales e Plásticas"
+        ],
+        "biologia": [
+            "Biologia"
+        ],
+        "biologia_e_geologia": [
+            "Biologia e Geologia",
+            "Geologia"
+        ],
+        "ciencias_do_mundo": [
+            "Cultura Clássica",
+            "História do Mundo Contemporâneo",
+            "Ciências Sociais",
+            "Estudos Sociais",
+            "Ciências do Mundo"
+        ],
+        "ciencias_naturais": [
+            "Ciências Naturais"
+        ],
+        "desenho_artistico": [
+            "Desenho Artístico"
+        ],
+        "desenho_tecnico": [
+            "Desenho Técnico",
+            "Desenho Técnico e Design"
+        ],
+        "economia": [
+            "Economia",
+            "Economia de Empresas",
+            "Ciências Econômicas"
+        ],
+        "educacao_civica_e_etica": [
+            "Cidadania",
+            "Educação Cívica",
+            "Ética",
+            "Desenvolvimento Pessoal, Cidadania e Cívica",
+            "Valores"
+        ],
+        "educacao_fisica": [
+            "Educação Física",
+            "Esporte"
+        ],
+        "filosofia": [
+            "História da Filosofia",
+            "Filosofia"
+        ],
+        "fisica_e_quimica": [
+            "Química",
+            "Física",
+            "Física e Química"
+        ],
+        "frances": [
+            "Língua Estrangeira: Francês",
+            "Francês",
+            "Segunda Língua Estrangeira: Francês"
+        ],
+        "geografia_e_historia": [
+            "Geografia",
+            "Geografia e História",
+            "História"
+        ],
+        "geral": [
+            "Cultura Espanhola",
+            "Drama",
+            "Literatura Inglesa",
+            "Literatura Mundial",
+            "Psicologia",
+            "Fundamentos da Administração e Gestão",
+            "Administração e Gestão",
+            "Cultura Científica",
+            "Educação Científica",
+            "Italiano",
+            "Língua Estrangeira Italiano",
+            "Tutoria",
+            "Ciência Política",
+            "Educação para o Trabalho",
+            "Comunicação",
+            "Tecnologias da Informação e Comunicação",
+            "Comportamento",
+            "Chinês",
+            "Mandarim",
+            "Turismo"
+        ],
+        "grego": [
+            "Grego"
+        ],
+        "historia": [
+            "História Britânica",
+            "História",
+            "História Mundial"
+        ],
+        "ingles": [
+            "Língua Inglesa",
+            "Inglês"
+        ],
+        "informatica": [
+            "Informática"
+        ],
+        "latim": [
+            "Latim"
+        ],
+        "espanhol": [
+            "Espanhol como Língua Estrangeira",
+            "Espanhol",
+            "Lingua Espanhola"
+        ],
+        "matematica": [
+            "Matemática",
+            "Cálculo",
+            "Matemática Aplicada",
+            "Álgebra",
+            "Matemática para Ensino Acadêmico",
+            "Matemática Aplicada às Ciências Sociais"
+        ],
+        "musica": [
+            "Música"
+        ],
+        "português": [
+            "Gramática",
+            "Literatura",
+            "Sintaxe"
+        ],
+        "religiao": [
+            "Estudos Religiosos",
+            "Cristianismo"
+        ],
+        "tecnologia": [
+            "Programação",
+            "Programação e Robótica",
+            "Robótica",
+            "Ciência e Tecnologia",
+            "Tecnologia"
+        ]
+    },
+    "academic_years_tags": [
+        "_y10",
+        "_y11",
+        "_y12",
+        "_y13"
+    ]
+}

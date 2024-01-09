@@ -196,6 +196,9 @@ class SchoolRecord:
         props: dict,
         reqs: dict,
         lang: str,
+        gender: str,
+        origin: str,
+        grades_seeds: dict,
         courses: list,
         n_subjects: int,
         retrieved_info: dict,
@@ -210,11 +213,27 @@ class SchoolRecord:
         self.new_student = new_student
 
         if self.new_school:
+            genders = ["female", "male"]
+            secre_gender = random.choice(genders)
+            head_gender = random.choice(genders)
+
+            student_gender = gender
+            student_origin = origin
+            student_grades_seeds = grades_seeds
+
             self.secre = person_generator.Person(
-                res_path=self.paths["res_path"], language=lang, student=False
+                res_path=self.paths["res_path"],
+                language=lang,
+                student=False,
+                gender=secre_gender,
+                origin=lang,
             )
             self.director = person_generator.Person(
-                res_path=paths["res_path"], language=lang, student=False
+                res_path=paths["res_path"],
+                language=lang,
+                student=False,
+                gender=head_gender,
+                origin=lang,
             )
             self.student = person_generator.Person(
                 res_path=self.paths["res_path"],
@@ -222,18 +241,33 @@ class SchoolRecord:
                 courses=courses,
                 student=True,
                 n_subjects=n_subjects,
+                gender=student_gender,
+                origin=student_origin,
+                student_grades_seeds=student_grades_seeds,
             )
 
         else:
             self.secre = retrieved_info["secretary"]
             self.director = retrieved_info["director"]
             if self.new_student or retrieved_info["re_spawn_student"]:
+                if retrieved_info["re_spawn_student"]:
+                    student_gender = retrieved_info["student_gender"]
+                    student_origin = retrieved_info["student_name_origin"]
+                    student_grades_seeds = retrieved_info["average_grade"]
+                else:
+                    student_gender = gender
+                    student_origin = origin
+                    student_grades_seeds = grades_seeds
+
                 self.student = person_generator.Person(
                     res_path=self.paths["res_path"],
                     language=lang,
                     courses=courses,
                     student=True,
                     n_subjects=n_subjects,
+                    gender=student_gender,
+                    origin=student_origin,
+                    student_grades_seeds=student_grades_seeds,
                 )
             else:
                 self.student = retrieved_info["student_object"]

@@ -1,0 +1,146 @@
+{
+    "subjects": {
+        "arti_visive": [
+            "Arte",
+            "Arte e Cultura",
+            "Arti Plastiche",
+            "Arti Visive",
+            "Arti Visive e Audiovisive",
+            "Arti Visive e Plastiche"
+        ],
+        "biologia": [
+            "Biologia"
+        ],
+        "biologia_e_geologia": [
+            "Biologia e Geologia",
+            "Geologia"
+        ],
+        "disegno_artistico": [
+            "Disegno Artistico"
+        ],
+        "disegno_tecnico": [
+            "Disegno Tecnico",
+            "Disegno Tecnico e Design"
+        ],
+        "economia": [
+            "Economia",
+            "Economia Aziendale",
+            "Scienze Economiche"
+        ],
+        "educazione_civica_ed_etica": [
+            "Cittadinanza",
+            "Educazione Civica",
+            "Etica",
+            "Sviluppo Personale, Cittadinanza e Civica",
+            "Valori"
+        ],
+        "educazione_fisica": [
+            "Educazione Fisica",
+            "Sport"
+        ],
+        "filosofia": [
+            "Storia della Filosofia",
+            "Filosofia"
+        ],
+        "fisica_e_chimica": [
+            "Chimica",
+            "Fisica",
+            "Fisica e Chimica"
+        ],
+        "francese": [
+            "Lingua Straniera: Francese",
+            "Francese",
+            "Seconda Lingua Straniera: Francese"
+        ],
+        "generale": [
+            "Cultura Spagnola",
+            "Dramma",
+            "Letteratura Inglese",
+            "Letteratura Mondiale",
+            "Psicologia",
+            "Fondamenti di Amministrazione e Gestione",
+            "Amministrazione e Gestione",
+            "Cultura Scientifica",
+            "Educazione Scientifica",
+            "Tutoraggio",
+            "Scienze Politiche",
+            "Educazione al Lavoro",
+            "Comunicazione",
+            "Tecnologie dell'Informazione e della Comunicazione",
+            "Comportamento",
+            "Cinese",
+            "Mandarino",
+            "Turismo"
+        ],
+        "geografia_e_storia": [
+            "Geografia",
+            "Geografia e Storia",
+            "Storia"
+        ],
+        "geologia": [
+            "Geologia"
+        ],
+        "greco": [
+            "Greco"
+        ],
+        "inglese": [
+            "Lingua Inglese",
+            "Inglese"
+        ],
+        "italiano": [
+            "Letteratura",
+            "Grammatica"
+        ],
+        "latino": [
+            "Latino"
+        ],
+        "spagnol": [
+            "Spagnolo come Lingua Straniera",
+            "Spagnolo",
+            "Lingua Spagnola"
+        ],
+        "matematica": [
+            "Matematica",
+            "Calcolo",
+            "Matematica Applicata",
+            "Algebra",
+            "Matematica per l'Insegnamento Accademico",
+            "Matematica Applicata alle Scienze Sociali"
+        ],
+        "musica": [
+            "Musica"
+        ],
+        "religione": [
+            "Studi Religiosi",
+            "Cristianesimo"
+        ],
+        "scienze_del_mondo": [
+            "Cultura Classica",
+            "Storia del Mondo Contemporaneo",
+            "Scienze Sociali",
+            "Studi Sociali",
+            "Scienze del Mondo"
+        ],
+        "scienze_naturali": [
+            "Scienze Naturali"
+        ],
+        "storia": [
+            "Storia d'Italia",
+            "Storia",
+            "Storia Mondiale"
+        ],
+        "tecnologia": [
+            "Programmazione",
+            "Programmazione e Robotica",
+            "Robotica",
+            "Scienza e Tecnologia",
+            "Tecnologia"
+        ]
+    },
+    "academic_years_tags": [
+        "_y10",
+        "_y11",
+        "_y12",
+        "_y13"
+    ]
+}

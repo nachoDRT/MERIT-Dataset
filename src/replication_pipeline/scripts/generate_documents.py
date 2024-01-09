@@ -172,6 +172,12 @@ def check_chaotic_crash(
         crash["secretary"] = df.at[index - 1, "secretary_name"]
         crash["student_name"] = df.at[index - 1, "student_name"]
         crash["school_name"] = df.at[index - 1, "school_name"]
+        crash["student_gender"] = df.at[index - 1, "student_gender"]
+        crash["student_name_origin"] = df.at[index - 1, "student_name_origin"]
+
+        # Notice how we need the grades seeds and they are not on the "index - 1" row,
+        # but in the actual row.
+        crash["average_grade"] = df.at[index, "average_grade"]
         crash["student_sample_index"] = -len(n_subjects)
 
     return crash
@@ -346,11 +352,20 @@ def create_documents(df: pd.DataFrame, blueprint_path: str):
             retrieved_info["re_spawn_student"] = True
             school = crash_data["school_name"]
             lang = crash_data["language"]
+            retrieved_info["student_gender"] = crash_data["student_gender"]
+            retrieved_info["student_name_origin"] = crash_data["student_name_origin"]
+            retrieved_info["average_grade"] = eval(crash_data["average_grade"])
             # student_sample_index = crash_data["student_sample_index"]
             paths = define_paths(language=lang, school=school)
+            gender = ""
+            origin = ""
+            grades_seeds = {}
 
         else:
             lang = df.at[index, "language"]
+            gender = df.at[index, "student_gender"]
+            origin = df.at[index, "student_name_origin"]
+            grades_seeds = eval(df.at[index, "average_grade"])
 
             if index in language_change_indices.tolist():
                 school = df.at[index, "school_name"]
@@ -366,13 +381,16 @@ def create_documents(df: pd.DataFrame, blueprint_path: str):
                 new_student = True
 
         # Create synthetic student records
-        if new_student:
+        if new_student or crash_data["happened"]:
             record = records_creator.SchoolRecord(
                 sample_name,
                 paths,
                 props,
                 reqs,
                 lang,
+                gender,
+                origin,
+                grades_seeds,
                 courses,
                 n_subjects,
                 retrieved_info=retrieved_info,

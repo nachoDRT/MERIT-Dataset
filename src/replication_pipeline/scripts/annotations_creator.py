@@ -158,8 +158,6 @@ def update_course_tags(
             segment_text = segment["text"]
             segment_tag = segment["label"]
 
-            # print(unidecode(verbose_name) + " " + unidecode(segment_text))
-
             check1 = unidecode(verbose_name) == unidecode(segment_text)
             # check3 = unidecode(verbose_name) in unidecode(segment_text)
             check2 = segment_tag == "other"
@@ -234,13 +232,15 @@ class AnnotationsCreator:
 
     def new_update_subject_grades_tags(self, curriculum: list, n_subjects: int):
         success = 1
-        s = update_course_tags(
-            curriculum[0],
-            self.annotations[0]["form"],
-            self.reqs["verbose_level"],
-            max_subjects=n_subjects,
-        )
-        success = success * s
+        for i, course_curriculum in enumerate(curriculum):
+            s = update_course_tags(
+                course_curriculum,
+                self.annotations[i]["form"],
+                self.reqs["verbose_level"],
+                max_subjects=n_subjects[i],
+            )
+            success *= s
+
         return success
 
     # TODO The following method might be deprecated
