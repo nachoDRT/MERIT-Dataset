@@ -12,9 +12,11 @@ import cv2
 import copy
 import random
 from tqdm import tqdm
+import xml.etree.ElementTree as ET
 
 ASSET_ROT = 20
 MAPS_THRESHOLD = 15
+DEBUG_XML_OUT = False
 
 
 def check_directories(paths: dict):
@@ -172,6 +174,7 @@ def add_transparent_image(
 
     # separate alpha and color channels from the foreground image
     foreground_colors = foreground[:, :, :3]
+    foreground_colors = cv2.cvtColor(foreground_colors, cv2.COLOR_BGR2RGB)
     alpha_channel = foreground[:, :, 3] / 255 * alpha_factor  # 0-255 => 0.0-1.0
 
     # construct an alpha_mask that matches the image shape
@@ -184,6 +187,22 @@ def add_transparent_image(
 
     # overwrite the section of the background image that has been updated
     background[bg_y : bg_y + h, bg_x : bg_x + w] = composite
+
+
+def debug_xml_out(path: str):
+    # Namespace generalmente utilizado en documentos DOCX
+    namespace = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
+
+    with zipfile.ZipFile(path, "r") as zin:
+        # Leer el contenido del archivo document.xml
+        xml_content = zin.read("word/document.xml").decode("utf-8")
+
+        # Parsear el contenido XML
+        root = ET.ElementTree(ET.fromstring(xml_content)).getroot()
+
+        # Extraer y mostrar el texto plano por segmento
+        for elem in root.iter(namespace + "t"):
+            print("Segmento de texto:", elem.text)
 
 
 class SchoolRecord:
@@ -328,9 +347,14 @@ class SchoolRecord:
                         # For all other cases replace all instances
                         res = res.replace(r, rep[r])
                 buffer = res.encode("utf-8")
+                words = res.split()
             zout.writestr(item, buffer)
+
         zout.close()
         zin.close()
+
+        if DEBUG_XML_OUT:
+            debug_xml_out(new_file)
 
     def create_pdf(self):
         """Works over temporary output.docx file and outputs pdf"""
@@ -386,7 +410,7 @@ class SchoolRecord:
             image = sign_document(assets["signature"], assets["signature_map"], image)
 
             if type(image) is np.ndarray:
-                image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+                # image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
                 image = PIL.Image.fromarray(image)
 
             png_filename = (

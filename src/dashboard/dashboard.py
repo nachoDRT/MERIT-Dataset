@@ -1243,31 +1243,16 @@ def layout_statistics_dataset() -> dash.Dash.layout:
     languages_bar_plot_title = "Samples Distribution per Language"
     capitalized_languages = [lang.capitalize() for lang in df["language"].unique()]
 
-    object = html.Div(
+    progress_body = html.Div(
         [
             html.Div(
                 [
                     html.H1(
                         "Data Visualization Page",
                     ),
-                    dcc.Link(
-                        "Go Back",
-                        href="/",
-                        style={
-                            "backgroundColor": BACK_COLOR,
-                            "color": TEXT_COLOR,
-                            "textDecoration": "none",
-                            "fontFamily": "Arial",
-                        },
-                    ),
-                ],
-                style={
-                    "backgroundColor": BACK_COLOR,
-                    "color": TEXT_COLOR,
-                    "fontFamily": "Arial",
-                },
+                    dcc.Link("Go Back", href="/"),
+                ]
             ),
-            # First Bar Plot
             dcc.Graph(
                 id="language-bar-plot",
                 figure=config_fig(
@@ -1278,52 +1263,52 @@ def layout_statistics_dataset() -> dash.Dash.layout:
                     "Language",
                 ),
             ),
-            # Language Selector Dropdown
             dcc.Dropdown(
                 id="language-selector",
                 options=[
                     {"label": i.title(), "value": i} for i in df["language"].unique()
                 ],
                 value=df["language"].unique()[0],
-                style={
-                    "fontFamily": "Arial",
-                    "fontSize": "16px",
-                    "backgroundColor": BACK_COLOR,
-                    "fontColor": START_COLOR,
-                },
             ),
-            html.Div(
+            dbc.Row(
                 [
                     # School Bar Plot Placeholder
-                    dcc.Graph(
-                        id="school-bar-plot",
-                        style={
-                            "display": "inline-block",
-                            "width": "33.33%",
-                        },
+                    dbc.Col(
+                        dcc.Graph(
+                            id="school-bar-plot",
+                        ),
                     ),
-                    # Replication Gauge Placeholder
-                    dcc.Graph(
-                        id="replication-gauge",
-                        style={
-                            "display": "inline-block",
-                            "width": "33.33%",
-                        },
-                    ),
-                    # Modification Gauge Placeholder
-                    dcc.Graph(
-                        id="modification-gauge",
-                        style={
-                            "display": "inline-block",
-                            "width": "33.33%",
-                        },
+                    dbc.Col(
+                        [
+                            # Replication Gauge Placeholder
+                            dcc.Graph(
+                                id="replication-gauge",
+                            ),
+                            # Modification Gauge Placeholder
+                            dcc.Graph(
+                                id="modification-gauge",
+                            ),
+                        ]
                     ),
                 ],
             ),
         ],
     )
 
-    return object
+    progress_layout = dbc.Container(
+        [
+            dbc.Row(
+                [
+                    dbc.Col(width=2),
+                    dbc.Col(progress_body, width=8, style={"margin": "0 auto"}),
+                    dbc.Col(width=2),
+                ]
+            ),
+        ],
+        fluid=True,
+    )
+
+    return progress_layout
 
 
 @app.callback(
@@ -1402,7 +1387,7 @@ def update_replicas_gauge(selected_language: str, _: int = None) -> go.Figure:
     blueprint_name = "dataset_blueprint.csv"
     blueprint_path = os.path.join(dirname(abspath(__file__)), blueprint_name)
     df = pd.read_csv(blueprint_path)
-    gauge_title = f"Replicas in {selected_language.capitalize()} Completion"
+    gauge_title = f"Replicas in {selected_language.capitalize()}"
     filtered_df = df[df["language"] == selected_language]
     true_count = filtered_df["replication_done"].sum()
     total_count = len(filtered_df)
@@ -1443,7 +1428,7 @@ def update_mods_gauge(selected_language: str, _: int = None) -> go.Figure:
     blueprint_name = "dataset_blueprint.csv"
     blueprint_path = os.path.join(dirname(abspath(__file__)), blueprint_name)
     df = pd.read_csv(blueprint_path)
-    gauge_title = f"Modifications in {selected_language.capitalize()} Completion"
+    gauge_title = f"Modifications in {selected_language.capitalize()}"
     filtered_df = df[df["language"] == selected_language]
     true_count = filtered_df["modification_done"].sum()
     total_count = (~filtered_df["modification_done"].astype(bool)).sum()
@@ -1494,8 +1479,7 @@ def update_gauge(gauge_title: str, fraction: float) -> go.Figure:
             number={"suffix": "%", "font": {"size": 36}},
         ),
         layout=go.Layout(
-            paper_bgcolor=BACK_COLOR,
-            plot_bgcolor=BACK_COLOR,
+            paper_bgcolor="rgba(0,0,0,0)",
             font=dict(color=TEXT_COLOR),
         ),
     )
@@ -1573,8 +1557,8 @@ def config_fig(
     figure = px.bar(df[key].value_counts())
     figure.update_layout(
         # Colors
-        paper_bgcolor="black",
-        plot_bgcolor="black",
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
         legend=dict(font=dict(color="white")),
         title={
             "text": title_text,

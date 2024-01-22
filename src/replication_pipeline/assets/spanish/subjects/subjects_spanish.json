@@ -40,7 +40,7 @@
             "Valores",
             "Educación Cívica",
             "Ciudadanía",
-            "Desarrollo Personal, Ciudadanía y Cívica"
+            "Desarrollo Personal y Ciudadanía"
         ],
         "educacion_fisica": [
             "Educación Física"
@@ -48,7 +48,7 @@
         "educacion_plastica": [
             "Educación Plástica",
             "Educación Plástica Visual",
-            "Educación Plástica, Visual y Audiovisual",
+            "Educación Plástica Audiovisual",
             "Arte",
             "Artes Plásticas",
             "Arte y Cultura"
@@ -75,7 +75,6 @@
             "Literatura Universal",
             "Literatura Inglesa",
             "Psicología",
-            "Fundamentos de Administración y Gestión",
             "Administración y Gestión",
             "Cultura Científica",
             "Enseñanza Científica",
@@ -87,7 +86,7 @@
             "Ciencias Políticas",
             "Educación para el Trabajo",
             "Comunicación",
-            "Tecnologías de la Información y la Comunicación",
+            "Información y  Comunicación",
             "Comportamiento",
             "Chino",
             "Chino Mandarín",
@@ -135,23 +134,13 @@
             "Cálculo",
             "Matemáticas Aplicadas",
             "Álgebra",
-            "Matemáticas para las Enseñanzas Académicas",
-            "Matemáticas Aplicadas a las Ciencias Sociales",
-            "Matemáticas Aplicadas a las CC SS",
+            "Matemáticas para las CC SS",
             "Matemáticas Académicas",
             "Matemáticas (en español)",
             "Matemáticas (en inglés)"
         ],
         "musica": [
             "Música"
-        ],
-        "media": [
-            "Media",
-            "Nota Media",
-            "Nota Media (con Religión)",
-            "Nota Media (sin optativas)",
-            "Media Curso",
-            "Nota Media del Curso"
         ],
         "religion": [
             "Religión",

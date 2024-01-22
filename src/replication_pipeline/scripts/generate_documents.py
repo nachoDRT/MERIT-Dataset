@@ -126,8 +126,10 @@ def get_students_num_subjects(indices: List, df: pd.DataFrame):
         start_index = indices[i]
         end_index = indices[i + 1]
         items = df.loc[start_index : end_index - 1, "num_subjects"].tolist()
-        items = [ast.literal_eval(item)[0] for item in items]
-        selected_items.append(items)
+        items_selected = [
+            element for item_str in items for element in ast.literal_eval(item_str)
+        ]
+        selected_items.append(items_selected)
 
     return selected_items
 
@@ -412,7 +414,7 @@ def create_documents(df: pd.DataFrame, blueprint_path: str):
 
         # Create annotations
         annotations_class = annotations_creator.AnnotationsCreator(
-            pdf_file_path, paths, props=props, reqs=reqs
+            pdf_file_path, paths, props=props, reqs=reqs, lang=lang, school=school
         )
         annotations_class.create_annotations(pdf_file_path)
 
@@ -423,7 +425,10 @@ def create_documents(df: pd.DataFrame, blueprint_path: str):
 
         # Tag subjects and grades
         annotations_class.new_update_subject_grades_tags(
-            record.student.curriculum, n_subjects
+            record.student.curriculum,
+            n_subjects,
+            lang,
+            school,
         )
 
         # Tag courses

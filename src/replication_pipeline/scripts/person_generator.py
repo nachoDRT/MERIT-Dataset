@@ -128,10 +128,10 @@ class Person:
 
                 for subject in subjects:
                     subject_dict = {}
-                    # subject_dict["grade"] = random.randint(0, 10)
-                    subject_dict["grade"] = np.random.normal(
+                    grade = np.random.normal(
                         student_grades_seeds["mean"], student_grades_seeds["dev"], 1
-                    )
+                    )[0]
+                    subject_dict["grade"] = round(np.clip(grade, 0, 10))
                     verbose_name = random.choice(
                         list(self.dataLoader.subjects[subject])
                     )

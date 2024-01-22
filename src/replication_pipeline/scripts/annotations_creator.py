@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Iterable, Any
 from pdfminer.high_level import extract_pages
 from person_generator import return_verbose_grade
+from itertools import chain
 
 global_annotations = {}
 
@@ -142,7 +143,12 @@ def create_annotations_recursively(o: Any, depth=0):
 
 
 def update_course_tags(
-    course_curriculum, annotations_page, verbose_level: int, max_subjects=15
+    course_curriculum,
+    annotations_page,
+    verbose_level: int,
+    sample_name: str = None,
+    page: int = None,
+    max_subjects: int = 15,
 ):
     success = 1
 
@@ -159,7 +165,6 @@ def update_course_tags(
             segment_tag = segment["label"]
 
             check1 = unidecode(verbose_name) == unidecode(segment_text)
-            # check3 = unidecode(verbose_name) in unidecode(segment_text)
             check2 = segment_tag == "other"
 
             if check1 and check2:
@@ -173,7 +178,16 @@ def update_course_tags(
             continue
 
         if not found:
-            print("Not found: " + unidecode(verbose_name) + " " + tag)
+            print(
+                "Not found: "
+                + unidecode(verbose_name)
+                + " "
+                + tag
+                + " "
+                + sample_name
+                + " "
+                + str(page)
+            )
             success = 0
     return success
 
@@ -199,14 +213,53 @@ def update_answer_tag(annotations_page, tag, subject_grade, verbose_level: int):
     return found
 
 
+def school_nickname_to_key(langs_schools: dict, nickname: str):
+    for school_key, school_nickname in langs_schools.items():
+        if nickname == school_nickname["nickname"]:
+            return school_key
+
+    return None
+
+
+def get_courses_names(template_layout: dict):
+    courses_names = []
+    for page_features in template_layout.values():
+        courses_names.extend(page_features["academic_years"])
+
+    return courses_names
+
+
+def get_num_courses_in_page(template_layout: dict) -> int:
+    num_courses_in_page = []
+
+    for page_info in template_layout.values():
+        num_courses_in_page.append(len(page_info["academic_years"]))
+
+    return num_courses_in_page
+
+
 class AnnotationsCreator:
-    def __init__(self, pdf_path: str, paths: dict, props: dict, reqs: dict):
+    def __init__(
+        self,
+        pdf_path: str,
+        paths: dict,
+        props: dict,
+        reqs: dict,
+        lang: str,
+        school: str,
+    ):
         self.paths = paths
         self.pdf_file_path = pdf_path
         self.props = props
-        self.possible_courses = self.props["possible_courses_global"]
-        self.courses_names = self.props["courses_names"]
+        # self.courses_names = self.props["courses_names"]
         self.reqs = reqs
+        self.school_i = school_nickname_to_key(self.reqs["samples"][lang], school)
+        self.possible_courses = self.reqs["samples"][lang][self.school_i][
+            "possible_courses_global"
+        ]
+        self.courses_names = get_courses_names(
+            self.reqs["samples"][lang][self.school_i]["template_layout"]
+        )
         self.annotations = []
 
     def create_annotations(self, pdf_path: str):
@@ -230,13 +283,75 @@ class AnnotationsCreator:
             with open(annotations_full_path, "w") as outfile:
                 json.dump(self.annotations[i], outfile, indent=4)
 
-    def new_update_subject_grades_tags(self, curriculum: list, n_subjects: int):
+    def old_new_update_subject_grades_tags(
+        self, curriculum: list, n_subjects: int, lang: str, school: str
+    ):
         success = 1
         for i, course_curriculum in enumerate(curriculum):
+            school_i = school_nickname_to_key(self.reqs["samples"][lang], school)
             s = update_course_tags(
                 course_curriculum,
                 self.annotations[i]["form"],
-                self.reqs["verbose_level"],
+                self.reqs["samples"][lang][school_i]["verbose_level"],
+                max_subjects=n_subjects[i],
+            )
+            success *= s
+
+        return success
+
+    def new_update_subject_grades_tags(
+        self, curriculum: list, n_subjects: int, lang: str, school: str
+    ):
+        school_i = school_nickname_to_key(self.reqs["samples"][lang], school)
+        num_courses_in_page = get_num_courses_in_page(
+            self.reqs["samples"][lang][school_i]["template_layout"]
+        )
+        success = 1
+
+        curriculum_index = 0
+        result = []
+
+        for i in range(len(num_courses_in_page)):
+            # Extend the curriculum if needed
+            aux = []
+            course_curriculum = curriculum[
+                curriculum_index : curriculum_index + num_courses_in_page[i]
+            ]
+            # result.extend(chain(*course_curriculum))
+            aux.extend(chain(*course_curriculum))
+            result.append(aux)
+            curriculum_index += num_courses_in_page[i]
+
+        # for i in range(len(num_courses_in_page)):
+        #     print("Hola", i)
+        #     # Extend the curriculum if needed
+        #     course_curriculum = curriculum[
+        #         curriculum_index : curriculum_index + num_courses_in_page[i]
+        #     ]
+        #     course_curriculum.extend(chain(*course_curriculum))
+        #     curriculum_index += num_courses_in_page[i]
+
+        #     what_we_send = course_curriculum[0]
+
+        #     s = update_course_tags(
+        #         what_we_send,
+        #         self.annotations[i]["form"],
+        #         self.reqs["samples"][lang][school_i]["verbose_level"],
+        #         self.pdf_file_path,
+        #         i,
+        #         max_subjects=n_subjects[i],
+        #     )
+        #     success *= s
+
+        for i in range(len(num_courses_in_page)):
+            what_we_send = result[i]
+
+            s = update_course_tags(
+                what_we_send,
+                self.annotations[i]["form"],
+                self.reqs["samples"][lang][school_i]["verbose_level"],
+                self.pdf_file_path,
+                i,
                 max_subjects=n_subjects[i],
             )
             success *= s

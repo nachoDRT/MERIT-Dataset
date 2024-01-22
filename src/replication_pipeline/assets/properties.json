@@ -1,13 +1,3 @@
 {
-    "doc_name_zeros_fill": 4,
-    "courses_names": [
-        "year_10",
-        "year_11",
-        "year_12"
-    ],
-    "possible_courses_global": [
-        "Year 10",
-        "Year 11",
-        "Year 12"
-    ]
+    "doc_name_zeros_fill": 4
 }

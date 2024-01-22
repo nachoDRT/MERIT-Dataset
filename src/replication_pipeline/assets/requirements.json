@@ -1,7 +1,360 @@
 {
-    "school_nickname": "default",
-    "first_student": 0,
-    "students": 10,
-    "verbose_level": 0,
-    "font_path": "/home/msi/.config/Ultralytics/Arial.ttf"
+    "samples": {
+        "english": {
+            "eng_1": {
+                "nickname": "greenfields",
+                "students": 0,
+                "verbose_level": 0,
+                "possible_courses_global": [
+                    "Year 10",
+                    "Year 11",
+                    "Year 12"
+                ],
+                "template_layout": {
+                    "page_1": {
+                        "num_subjects": [
+                            11
+                        ],
+                        "academic_years": [
+                            "year_10"
+                        ]
+                    },
+                    "page_2": {
+                        "num_subjects": [
+                            10
+                        ],
+                        "academic_years": [
+                            "year_11"
+                        ]
+                    },
+                    "page_3": {
+                        "num_subjects": [
+                            9
+                        ],
+                        "academic_years": [
+                            "year_12"
+                        ]
+                    }
+                },
+                "include": false
+            },
+            "eng_2": {
+                "nickname": "eng_school_2",
+                "students": 0,
+                "verbose_level": 0,
+                "template_layout": {
+                    "page_1": {
+                        "num_subjects": [
+                            11
+                        ],
+                        "academic_years": [
+                            "3_de_la_eso"
+                        ]
+                    },
+                    "page_2": {
+                        "num_subjects": [
+                            10
+                        ],
+                        "academic_years": [
+                            "4_de_la_eso"
+                        ]
+                    },
+                    "page_3": {
+                        "num_subjects": [
+                            11
+                        ],
+                        "academic_years": [
+                            "1_de_bachillerato"
+                        ]
+                    }
+                },
+                "include": false
+            }
+        },
+        "spanish": {
+            "esp_1": {
+                "nickname": "liceo",
+                "students": 1,
+                "verbose_level": 0,
+                "possible_courses_global": [
+                    "Tercer curso",
+                    "Cuarto curso",
+                    "Curso"
+                ],
+                "template_layout": {
+                    "page_1": {
+                        "num_subjects": [
+                            11
+                        ],
+                        "academic_years": [
+                            "3_de_la_eso"
+                        ]
+                    },
+                    "page_2": {
+                        "num_subjects": [
+                            10
+                        ],
+                        "academic_years": [
+                            "4_de_la_eso"
+                        ]
+                    },
+                    "page_3": {
+                        "num_subjects": [
+                            10
+                        ],
+                        "academic_years": [
+                            "1_de_bachillerato"
+                        ]
+                    }
+                },
+                "include": true
+            },
+            "esp_2": {
+                "nickname": "britanico",
+                "students": 1,
+                "verbose_level": 0,
+                "possible_courses_global": [
+                    "3º ESO",
+                    "4º ESO",
+                    "1º Bachillerato"
+                ],
+                "template_layout": {
+                    "page_1": {
+                        "num_subjects": [
+                            13
+                        ],
+                        "academic_years": [
+                            "3_de_la_eso"
+                        ]
+                    },
+                    "page_2": {
+                        "num_subjects": [
+                            10
+                        ],
+                        "academic_years": [
+                            "4_de_la_eso"
+                        ]
+                    },
+                    "page_3": {
+                        "num_subjects": [
+                            10
+                        ],
+                        "academic_years": [
+                            "1_de_bachillerato"
+                        ]
+                    }
+                },
+                "include": true
+            },
+            "esp_3": {
+                "nickname": "deus",
+                "students": 1,
+                "verbose_level": 0,
+                "possible_courses_global": [
+                    "Tercero de ESO",
+                    "Cuarto de ESO",
+                    "Curso 1º"
+                ],
+                "template_layout": {
+                    "page_1": {
+                        "num_subjects": [
+                            11,
+                            10
+                        ],
+                        "academic_years": [
+                            "3_de_la_eso",
+                            "4_de_la_eso"
+                        ]
+                    },
+                    "page_2": {
+                        "num_subjects": [
+                            9
+                        ],
+                        "academic_years": [
+                            "1_de_bachillerato"
+                        ]
+                    }
+                },
+                "include": true
+            },
+            "esp_4": {
+                "nickname": "monterraso",
+                "students": 1,
+                "verbose_level": 0,
+                "possible_courses_global": [
+                    "TERCER CURSO ESO",
+                    "CUARTO CURSO ESO",
+                    "PRIMER CURSO"
+                ],
+                "template_layout": {
+                    "page_1": {
+                        "num_subjects": [
+                            12,
+                            11
+                        ],
+                        "academic_years": [
+                            "3_de_la_eso",
+                            "4_de_la_eso"
+                        ]
+                    },
+                    "page_2": {
+                        "num_subjects": [
+                            11
+                        ],
+                        "academic_years": [
+                            "1_de_bachillerato"
+                        ]
+                    }
+                },
+                "include": true
+            },
+            "esp_5": {
+                "nickname": "aletamar",
+                "students": 1,
+                "verbose_level": 0,
+                "possible_courses_global": [
+                    "TERCER CURSO",
+                    "CUARTO CURSO",
+                    "Curso 1"
+                ],
+                "template_layout": {
+                    "page_1": {
+                        "num_subjects": [
+                            12,
+                            11
+                        ],
+                        "academic_years": [
+                            "3_de_la_eso",
+                            "4_de_la_eso"
+                        ]
+                    },
+                    "page_2": {
+                        "num_subjects": [
+                            11
+                        ],
+                        "academic_years": [
+                            "1_de_bachillerato"
+                        ]
+                    }
+                },
+                "include": true
+            },
+            "esp_6": {
+                "nickname": "lusitano",
+                "students": 1,
+                "verbose_level": 0,
+                "possible_courses_global": [
+                    "TERCERO DE ESO",
+                    "CUARTO DE ESO",
+                    "PRIMERO DE BACHILLERATO"
+                ],
+                "template_layout": {
+                    "page_1": {
+                        "num_subjects": [
+                            11,
+                            9
+                        ],
+                        "academic_years": [
+                            "3_de_la_eso",
+                            "4_de_la_eso"
+                        ]
+                    },
+                    "page_2": {
+                        "num_subjects": [
+                            10
+                        ],
+                        "academic_years": [
+                            "1_de_bachillerato"
+                        ]
+                    }
+                },
+                "include": true
+            },
+            "esp_7": {
+                "nickname": "patria",
+                "students": 1,
+                "verbose_level": 0,
+                "possible_courses_global": [
+                    "TERCER CURSO",
+                    "CUARTO CURSO",
+                    "Curso PRIMERO"
+                ],
+                "template_layout": {
+                    "page_1": {
+                        "num_subjects": [
+                            12
+                        ],
+                        "academic_years": [
+                            "3_de_la_eso"
+                        ]
+                    },
+                    "page_2": {
+                        "num_subjects": [
+                            11
+                        ],
+                        "academic_years": [
+                            "4_de_la_eso"
+                        ]
+                    },
+                    "page_3": {
+                        "num_subjects": [
+                            11
+                        ],
+                        "academic_years": [
+                            "1_de_bachillerato"
+                        ]
+                    }
+                },
+                "include": true
+            }
+        }
+    },
+    "blender_modified": 0.5,
+    "female_proportion": 0.5,
+    "male_proportion": 0.5,
+    "font_path": "/home/msi/.config/Ultralytics/Arial.ttf",
+    "origins": {
+        "English": {
+            "English": {
+                "proportion": 70.0,
+                "average": 5,
+                "deviation": 0.1
+            },
+            "Spanish": {
+                "proportion": 10.0,
+                "average": 5,
+                "deviation": 0.1
+            },
+            "Chinese": {
+                "proportion": 10.0,
+                "average": 5,
+                "deviation": 0.1
+            },
+            "Indian": {
+                "proportion": 10.0,
+                "average": 5,
+                "deviation": 0.1
+            }
+        },
+        "Spanish": {
+            "Spanish": {
+                "proportion": 77.0,
+                "average": 5,
+                "deviation": 0.1
+            },
+            "Arabic": {
+                "proportion": 23.0,
+                "average": 5,
+                "deviation": 0.1
+            }
+        }
+    },
+    "female_bias_distribution": {
+        "average": 9,
+        "deviation": 0.61
+    },
+    "male_bias_distribution": {
+        "average": 1,
+        "deviation": 0.61
+    }
 }

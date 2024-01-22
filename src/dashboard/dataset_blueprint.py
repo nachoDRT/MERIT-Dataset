@@ -155,8 +155,9 @@ def compute_origins_distributions(reqs: dict) -> list:
 
     total_origins_distribution = []
     for lang, origins in reqs["origins"].items():
+        weights = [origin["proportion"] / 100 for origin in origins.values()]
         available_origins = [origin.lower() for origin in origins]
-        weights = [origin / 100 for origin in origins.values()]
+        # weights = [origin / 100 for origin in origins.values()]
         # cum_weights = [weight if i==0 else weight for i, weight in enumerate(weights)]
         cum_weights = []
         for i, weight in enumerate(weights):
@@ -274,7 +275,9 @@ def fill_blueprint(attributes: dict, reqs: dict, props: dict) -> dict:
                 table_per_page, subjects_per_table = get_tables_info(
                     school["template_layout"]
                 )
-                student_courses = [course[0] for course in table_per_page]
+                student_courses = [
+                    course for courses in table_per_page for course in courses
+                ]
                 for page in range(pages):
                     for key in attributes:
                         if key == "file_name":
@@ -382,7 +385,7 @@ if __name__ == "__main__":
     root = os.path.join(
         Path(__file__).resolve().parents[1], "replication_pipeline", "assets"
     )
-    reqs_path = os.path.join(root, "requirements_v2.json")
+    reqs_path = os.path.join(root, "requirements.json")
     props_path = os.path.join(root, "properties.json")
     reqs = read_json(name=reqs_path)
     props = read_json(name=props_path)

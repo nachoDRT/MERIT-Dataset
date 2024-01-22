@@ -10,7 +10,7 @@ ASSETS_PATH = os.path.join(
     Path(dirname(abspath(__file__))).parent, "replication_pipeline", "assets"
 )
 
-REQS_PATH = os.path.join(ASSETS_PATH, "requirements_v2.json")
+REQS_PATH = os.path.join(ASSETS_PATH, "requirements.json")
 
 
 class JsonManagement:

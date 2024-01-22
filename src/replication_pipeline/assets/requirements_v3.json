@@ -3,7 +3,7 @@
         "english": {
             "eng_1": {
                 "nickname": "greenfields",
-                "students": 6,
+                "students": 0,
                 "template_layout": {
                     "page_1": {
                         "num_subjects": [
@@ -30,11 +30,11 @@
                         ]
                     }
                 },
-                "include": true
+                "include": false
             },
             "eng_2": {
                 "nickname": "eng_school_2",
-                "students": 0,
+                "students": 6,
                 "template_layout": {
                     "page_1": {
                         "num_subjects": [
@@ -61,7 +61,7 @@
                         ]
                     }
                 },
-                "include": false
+                "include": true
             }
         },
         "spanish": {
@@ -98,6 +98,70 @@
             },
             "esp_2": {
                 "nickname": "esp_school_2",
+                "students": 6,
+                "template_layout": {
+                    "page_1": {
+                        "num_subjects": [
+                            11
+                        ],
+                        "academic_years": [
+                            "3_de_la_eso"
+                        ]
+                    },
+                    "page_2": {
+                        "num_subjects": [
+                            10
+                        ],
+                        "academic_years": [
+                            "4_de_la_eso"
+                        ]
+                    },
+                    "page_3": {
+                        "num_subjects": [
+                            11
+                        ],
+                        "academic_years": [
+                            "1_de_bachillerato"
+                        ]
+                    }
+                },
+                "include": true
+            }
+        },
+        "portuguese": {
+            "por_1": {
+                "nickname": "por_school_1",
+                "students": 6,
+                "template_layout": {
+                    "page_1": {
+                        "num_subjects": [
+                            11
+                        ],
+                        "academic_years": [
+                            "3_de_la_eso"
+                        ]
+                    },
+                    "page_2": {
+                        "num_subjects": [
+                            10
+                        ],
+                        "academic_years": [
+                            "4_de_la_eso"
+                        ]
+                    },
+                    "page_3": {
+                        "num_subjects": [
+                            11
+                        ],
+                        "academic_years": [
+                            "1_de_bachillerato"
+                        ]
+                    }
+                },
+                "include": true
+            },
+            "por_2": {
+                "nickname": "por_school_2",
                 "students": 0,
                 "template_layout": {
                     "page_1": {
@@ -128,9 +192,40 @@
                 "include": false
             }
         },
-        "portuguese": {
-            "por_1": {
-                "nickname": "por_school_1",
+        "italian": {
+            "ita_1": {
+                "nickname": "ita_school_1",
+                "students": 8,
+                "template_layout": {
+                    "page_1": {
+                        "num_subjects": [
+                            11
+                        ],
+                        "academic_years": [
+                            "3_de_la_eso"
+                        ]
+                    },
+                    "page_2": {
+                        "num_subjects": [
+                            10
+                        ],
+                        "academic_years": [
+                            "4_de_la_eso"
+                        ]
+                    },
+                    "page_3": {
+                        "num_subjects": [
+                            11
+                        ],
+                        "academic_years": [
+                            "1_de_bachillerato"
+                        ]
+                    }
+                },
+                "include": true
+            },
+            "ita_2": {
+                "nickname": "ita_school_2",
                 "students": 0,
                 "template_layout": {
                     "page_1": {
@@ -159,9 +254,42 @@
                     }
                 },
                 "include": false
+            }
+        },
+        "french": {
+            "fre_1": {
+                "nickname": "fre_school_1",
+                "students": 7,
+                "template_layout": {
+                    "page_1": {
+                        "num_subjects": [
+                            11
+                        ],
+                        "academic_years": [
+                            "3_de_la_eso"
+                        ]
+                    },
+                    "page_2": {
+                        "num_subjects": [
+                            10
+                        ],
+                        "academic_years": [
+                            "4_de_la_eso"
+                        ]
+                    },
+                    "page_3": {
+                        "num_subjects": [
+                            11
+                        ],
+                        "academic_years": [
+                            "1_de_bachillerato"
+                        ]
+                    }
+                },
+                "include": true
             },
-            "por_2": {
-                "nickname": "por_school_2",
+            "fre_2": {
+                "nickname": "fre_school_2",
                 "students": 0,
                 "template_layout": {
                     "page_1": {
@@ -200,16 +328,38 @@
     "verbose_level": 0,
     "font_path": "/home/msi/.config/Ultralytics/Arial.ttf",
     "origins": {
+        "Portuguese": {
+            "Portuguese": 79.0,
+            "Subsaharian_africa": 21.0
+        },
+        "French": {
+            "French": 50.0,
+            "Arabic": 15.0,
+            "Turkish": 17.0,
+            "Subsaharian_africa": 18.0
+        },
         "English": {
-            "English": 100
+            "English": 64.0,
+            "Spanish": 11.0,
+            "Chinese": 11.0,
+            "Indian": 14.0
+        },
+        "Italian": {
+            "Italian": 64.0,
+            "Arabic": 18.0,
+            "Turkish": 17.0
+        },
+        "Spanish": {
+            "Spanish": 82.0,
+            "Arabic": 18.0
         }
     },
     "female_bias_distribution": {
-        "average": 7,
-        "deviation": 0.5
+        "average": 9,
+        "deviation": 0.81
     },
     "male_bias_distribution": {
-        "average": 2,
-        "deviation": 2.5
+        "average": 7,
+        "deviation": 1.31
     }
 }
