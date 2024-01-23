@@ -416,7 +416,7 @@ def create_documents(df: pd.DataFrame, blueprint_path: str):
         annotations_class = annotations_creator.AnnotationsCreator(
             pdf_file_path, paths, props=props, reqs=reqs, lang=lang, school=school
         )
-        annotations_class.create_annotations(pdf_file_path)
+        annotations_class.create_annotations(pdf_file_path, png_paths)
 
         # For this sample, get the indices of the academic years present
         student_sample_indices = get_courses_indices_in_sample(df, index, courses)

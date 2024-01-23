@@ -9,10 +9,13 @@ from typing import Iterable, Any
 from pdfminer.high_level import extract_pages
 from person_generator import return_verbose_grade
 from itertools import chain
+import cv2
+import numpy as np
 
 global_annotations = {}
 
 SEGMENT_DEPTH_LEVEL = 2
+CHECK_BBOXES = True
 
 
 def transform_bbox(bbox: list, w1, w2, h1, h2, invertY: False) -> list:
@@ -79,6 +82,13 @@ def get_individual_words(segment):
 
         for c in segment:
             if c.__class__.__name__ in ["LTAnno"]:
+                if len(word) > 0:
+                    word_box = [x1, y1, x2, y2]
+
+                    word_dict["box"] = word_box
+                    word_dict["text"] = word
+                    words.append(copy.deepcopy(word_dict))
+
                 end_of_segment = True
                 break
 
@@ -89,7 +99,21 @@ def get_individual_words(segment):
                     bbox = get_bbox(c)
                     x1 = bbox[0]
                     y1 = bbox[1]
+                    x2 = bbox[2]
+                    y2 = bbox[3]
 
+                elif len(word) > 1:
+                    # try:
+                    bbox = get_bbox(c)
+                    x2 = bbox[2]
+                    y2 = bbox[3]
+
+                    # except UnboundLocalError:
+                    #     bbox = get_bbox(c)
+                    #     x1 = bbox[0]
+                    #     y1 = bbox[1]
+                    #     x2 = bbox[2]
+                    #     y2 = bbox[3]
             else:
                 bbox = get_bbox(c)
                 x2 = bbox[2]
@@ -238,6 +262,36 @@ def get_num_courses_in_page(template_layout: dict) -> int:
     return num_courses_in_page
 
 
+def draw_sample_bboxes(page_annotations: dict, page_img: np.array, saving_path: str):
+    overlay = np.zeros_like(page_img)
+
+    for segment in page_annotations["form"]:
+        for word in segment["words"]:
+            rectangle = []
+            bbox = word["box"]
+            rectangle.extend(bbox[0:2])
+            rectangle.append(bbox[2])
+            rectangle.append(bbox[1])
+            rectangle.extend(bbox[2:4])
+            rectangle.append(bbox[0])
+            rectangle.append(bbox[3])
+            rectangle.extend(bbox[0:2])
+
+            rectangle = np.array(rectangle, dtype=np.int32).reshape((-1, 2))
+
+            cv2.fillPoly(overlay, [rectangle], color=(255, 0, 0))
+
+    # Blend images
+    alpha = 0.5
+    beta = 1 - alpha
+    output_img = cv2.addWeighted(overlay, alpha, page_img, beta, 0)
+
+    cv2.imwrite(saving_path, output_img)
+    # cv2.imshow("bboxes", output_img)
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
+
+
 class AnnotationsCreator:
     def __init__(
         self,
@@ -262,12 +316,33 @@ class AnnotationsCreator:
         )
         self.annotations = []
 
-    def create_annotations(self, pdf_path: str):
+    def create_annotations(self, pdf_path: str, png_paths: list):
         """Create annotations for a given pdf file"""
         pages = extract_pages(pdf_path)
         self.annotations = []
-        for page in pages:
-            self.annotations.append(create_annotations_recursively(page))
+        for page, png_path in zip(pages, png_paths):
+            page_annotations = create_annotations_recursively(page)
+            self.annotations.append(page_annotations)
+
+            if CHECK_BBOXES:
+                sample_img = cv2.imread(png_path)
+
+                check_bboxes_dir = os.path.dirname(os.path.dirname(png_path))
+                check_bboxes_dir = os.path.join(check_bboxes_dir, "debug_bboxes")
+
+                if not os.path.isdir(check_bboxes_dir):
+                    os.makedirs(check_bboxes_dir)
+
+                sample_file_name = os.path.basename(png_path).split(".")[0]
+                sample_file_name = "".join([sample_file_name, "_bbox_debug.png"])
+                sample_bboxes_file_path = os.path.join(
+                    check_bboxes_dir, sample_file_name
+                )
+
+                draw_sample_bboxes(
+                    page_annotations, sample_img, sample_bboxes_file_path
+                )
+
         return self.annotations
 
     def dump_annotations_json(self, png_paths: list):
