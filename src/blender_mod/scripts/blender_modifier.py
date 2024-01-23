@@ -10,6 +10,8 @@ import random
 import bpy_extras
 import cv2
 import copy
+import pandas as pd
+import tqdm
 
 file_dir = os.path.join(bpy.path.abspath("//"), "scripts")
 
@@ -602,6 +604,173 @@ def retrieve_bboxes_pixel_points(img: np.array):
     return rectangles, img
 
 
+def get_blueprint():
+    """
+    Retrieves the dataset blueprint from a CSV file.
+
+    This method builds the path to the CSV blueprint ('dataset_blueprint.csv'),
+    located in the 'dashboard' directory. It then reads the CSV file into a pandas
+    DataFrame.
+
+    Returns:
+        tuple: A tuple containing two elements:
+            - pandas.DataFrame: The DataFrame created from the CSV file.
+            - str: The file path to the CSV file.
+    """
+
+    blueprint_path = os.path.join(
+        Path(__file__).resolve().parents[2], "dashboard", "dataset_blueprint.csv"
+    )
+    blueprint_df = pd.read_csv(blueprint_path)
+
+    return blueprint_df, blueprint_path
+
+
+def get_sample_paths_and_names(sample_name: str):
+    language = sample_name.split("_")[0]
+    school = sample_name.split("_")[1]
+
+    root = os.path.join(
+        Path(bpy.path.abspath("//")).parent.parent,
+        "data",
+        "original",
+        language,
+        school,
+        "dataset_output",
+    )
+
+    sample_img_path = os.path.join(root, "images", "".join([sample_name, ".png"]))
+    sample_labels_path = os.path.join(
+        root, "annotations", "".join([sample_name, ".json"])
+    )
+
+    dst_folder = os.path.join(
+        Path(bpy.path.abspath("//")).parent.parent,
+        "data",
+        "modified",
+        language,
+        school,
+        "dataset_output",
+    )
+
+    mod_sample_name = "".join([sample_name, "_blender_mod.png"])
+    mod_labels_name = "".join([sample_name, "_blender_mod.json"])
+    bboxes_sample_name = "".join([sample_name, "_blender_mod_bbox_debug.png"])
+    segments_sample_name = "".join([sample_name, "_blender_mod_segment_debug.png"])
+
+    return (
+        sample_img_path,
+        sample_labels_path,
+        dst_folder,
+        mod_sample_name,
+        mod_labels_name,
+        bboxes_sample_name,
+        segments_sample_name,
+    )
+
+
+def modify_samples(
+    samples_to_mod_df: pd.DataFrame,
+    blueprint_df: pd.DataFrame,
+    paper_texture: str,
+    background_texture: str,
+    background_normal: str,
+):
+    for sample in tqdm.tqdm(samples_to_mod_df["file_name"].items()):
+        (
+            img_path,
+            labels_path,
+            dst_folder,
+            mod_sample_name,
+            mod_labels_name,
+            bboxes_sample_name,
+            segments_sample_name,
+        ) = get_sample_paths_and_names(sample[1])
+
+        n_bboxes_vertices, all_vertices, delaunay_mesh = compute_mesh(
+            sample_path=labels_path, properties=properties
+        )
+        create_mesh_object(
+            n_bboxes_vertices=n_bboxes_vertices,
+            vertices=all_vertices,
+            mesh=delaunay_mesh,
+            properties=properties,
+        )
+
+        # Textures
+        apply_texture(document=img_path, paper=paper_texture)
+
+        # Modify mesh
+        mesh_data = properties["blender"]["document_mesh_mod"]
+        # modify_mesh(mesh_data=mesh_data)
+
+        # Set background
+        background_data = properties["blender"]["common"]["background"]
+        create_background(
+            texture_path=background_texture,
+            normals_path=background_normal,
+            back_data=background_data,
+        )
+
+        # Set light
+        lights_data = properties["blender"][requirements["styles"][0]]["lights"]
+        config_lights(lights_data=lights_data)
+
+        # Set camera
+        camera_data = properties["blender"][requirements["styles"][0]]["camera"]
+        config_camera(camera_data=camera_data)
+
+        # Render scene
+        rendered_img = render_scene(
+            dst_folder=os.path.join(dst_folder, "images"),
+            name=mod_sample_name,
+            img_dims=requirements["img_output"],
+        )
+
+        # Obtain new bbox pixel coordinates and write the output
+        bboxes_px_points, img = retrieve_bboxes_pixel_points(
+            img=copy.deepcopy(rendered_img)
+        )
+        bboxes_sample_path = os.path.join(
+            dst_folder, "debug_bboxes", bboxes_sample_name
+        )
+        os.makedirs(os.path.dirname(bboxes_sample_path), exist_ok=True)
+        cv2.imwrite(bboxes_sample_path, img)
+
+        # Modify original labels with the new bboxes layout
+        modified_labels, segment_rectangles = ghelp.edit_json_labels(
+            json_path=labels_path, points=bboxes_px_points
+        )
+
+        # Draw the segments bboxes and write the output
+        segments_img = ghelp.draw_bboxes(
+            img=copy.deepcopy(rendered_img),
+            rectangles=segment_rectangles,
+            color=(0, 0, 255),
+        )
+        segments_sample_path = os.path.join(
+            dst_folder, "debug_bboxes", segments_sample_name
+        )
+        os.makedirs(os.path.dirname(segments_sample_path), exist_ok=True)
+        cv2.imwrite(segments_sample_path, segments_img)
+
+        # Write a JSON with the bboxes modified according to the Blender scene modifications
+        ghelp.write_json(
+            data=modified_labels,
+            file_path=os.path.join(dst_folder, "annotations", mod_labels_name),
+        )
+
+        # Delete every object in the scene
+        bpy.ops.object.select_all(action="SELECT")
+        bpy.ops.object.delete()
+
+        # Update blueprint
+        blueprint_df.loc[
+            blueprint_df["file_name"] == sample[1], "modification_done"
+        ] = True
+        blueprint_df.to_csv(blueprint_path, index=False)
+
+
 if __name__ == "__main__":
     # Config
     define_units()
@@ -612,13 +781,14 @@ if __name__ == "__main__":
     # Load properties
     properties = dhelp.load_properties(root=bpy.path.abspath("//"))
 
-    # Load assets
-    sample_name = os.path.join(
-        Path(bpy.path.abspath("//")).parent.parent, "data", "original", "sample.json"
-    )
-    document_texture = os.path.join(
-        Path(bpy.path.abspath("//")).parent.parent, "data", "original", "sample.png"
-    )
+    # Load blueprint
+    blueprint_df, blueprint_path = get_blueprint()
+
+    # Select only those samples still to be generated
+    mask = blueprint_df["modification_done"] == False
+    filtered_df = blueprint_df[mask]
+
+    # Load Assets
     paper_texture = os.path.join(
         bpy.path.abspath("//"), "assets", "textures", "papers", "paper.png"
     )
@@ -639,68 +809,6 @@ if __name__ == "__main__":
         "normals.png",
     )
 
-    # Mesh and object
-    n_bboxes_vertices, all_vertices, delaunay_mesh = compute_mesh(
-        sample_path=sample_name, properties=properties
-    )
-    create_mesh_object(
-        n_bboxes_vertices=n_bboxes_vertices,
-        vertices=all_vertices,
-        mesh=delaunay_mesh,
-        properties=properties,
-    )
-
-    # Textures
-    apply_texture(document=document_texture, paper=paper_texture)
-
-    # Modify mesh
-    mesh_data = properties["blender"]["document_mesh_mod"]
-    # modify_mesh(mesh_data=mesh_data)
-
-    # Set background
-    background_data = properties["blender"]["common"]["background"]
-    create_background(
-        texture_path=background_texture,
-        normals_path=background_normal,
-        back_data=background_data,
-    )
-
-    # Set light
-    lights_data = properties["blender"][requirements["styles"][0]]["lights"]
-    config_lights(lights_data=lights_data)
-
-    # Set camera
-    camera_data = properties["blender"][requirements["styles"][0]]["camera"]
-    config_camera(camera_data=camera_data)
-
-    # Render scene
-    dst_folder = os.path.join(
-        Path(bpy.path.abspath("//")).parent.parent, "data", "modified"
-    )
-    rendered_img = render_scene(
-        dst_folder=dst_folder, name="test.png", img_dims=requirements["img_output"]
-    )
-
-    # Obtain new bbox pixel coordinates
-    bboxes_px_points, img = retrieve_bboxes_pixel_points(
-        img=copy.deepcopy(rendered_img)
-    )
-    cv2.imwrite(os.path.join(dst_folder, "bboxes.png"), img)
-
-    # Modify original labels with the new bboxes layout
-    modified_labels, segment_rectangles = ghelp.edit_json_labels(
-        json_path=sample_name, points=bboxes_px_points
-    )
-
-    # Draw the segments bboxes and write the output
-    segments_img = ghelp.draw_bboxes(
-        img=copy.deepcopy(rendered_img),
-        rectangles=segment_rectangles,
-        color=(0, 0, 255),
-    )
-    cv2.imwrite(os.path.join(dst_folder, "segments.png"), segments_img)
-
-    # Write a JSON with the bboxes modified according to the Blender scene modifications
-    ghelp.write_json(
-        data=modified_labels, file_path=os.path.join(dst_folder, "modified_labels.json")
+    modify_samples(
+        filtered_df, blueprint_df, paper_texture, background_texture, background_normal
     )

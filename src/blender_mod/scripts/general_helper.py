@@ -5,7 +5,7 @@ import cv2
 import copy
 from typing import List, Tuple
 
-SHOW_RESULTS = True
+SHOW_RESULTS = False
 
 
 def read_json(name: str):
@@ -171,6 +171,7 @@ def write_json(data: dict, file_path: str) -> None:
         data (dict): The data to be written to the file.
         file_path (str): The path of the file to write to.
     """
+    os.makedirs(os.path.dirname(file_path), exist_ok=True)
 
     with open(file_path, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=4)

@@ -1,12 +1,8 @@
 terminal_commands.txt
 data/original/spanish
 data/original/english
-data/original/sample.json
-data/original/sample.png
-data/modified/test.png
-data/modified/bboxes.png
-data/modified/modified_labels.json
-data/modified/segments.png
+data/modified/spanish
+data/modified/english
 src/dashboard/__pycache__
 src/dashboard/dataset_blueprint.csv
 src/dashboard/.~lock.dataset_blueprint.csv#
@@ -14,6 +10,7 @@ src/blender_mod/mod.blend
 src/blender_mod/mod.blend1
 src/blender_mod/scripts/__pycache__
 src/blender_mod/assets/textures/backgrounds/white_oak
+src/blender_mod/assets/blender_executable_path.json
 src/replication_pipeline/default
 src/replication_pipeline/templates
 src/replication_pipeline/scripts/__pycache__
