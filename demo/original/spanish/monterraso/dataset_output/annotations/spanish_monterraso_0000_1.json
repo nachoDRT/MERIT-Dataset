@@ -1,0 +1,2255 @@
+{
+    "form": [
+        {
+            "box": [
+                673,
+                127,
+                1016,
+                171
+            ],
+            "text": "EL VALOR DE",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        673,
+                        127,
+                        748,
+                        171
+                    ],
+                    "text": "EL"
+                },
+                {
+                    "box": [
+                        748,
+                        127,
+                        932,
+                        171
+                    ],
+                    "text": "VALOR"
+                },
+                {
+                    "box": [
+                        932,
+                        127,
+                        1016,
+                        171
+                    ],
+                    "text": "DE"
+                }
+            ],
+            "linking": [],
+            "id": 0
+        },
+        {
+            "box": [
+                645,
+                179,
+                1029,
+                224
+            ],
+            "text": "LA EXCELENCIA",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        645,
+                        179,
+                        723,
+                        224
+                    ],
+                    "text": "LA"
+                },
+                {
+                    "box": [
+                        723,
+                        179,
+                        1029,
+                        224
+                    ],
+                    "text": "EXCELENCIA"
+                }
+            ],
+            "linking": [],
+            "id": 1
+        },
+        {
+            "box": [
+                1269,
+                101,
+                1497,
+                135
+            ],
+            "text": "P\u00e1gina 2 de 2",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        1269,
+                        101,
+                        1391,
+                        135
+                    ],
+                    "text": "P\u00e1gina"
+                },
+                {
+                    "box": [
+                        1391,
+                        101,
+                        1425,
+                        135
+                    ],
+                    "text": "2"
+                },
+                {
+                    "box": [
+                        1425,
+                        101,
+                        1478,
+                        135
+                    ],
+                    "text": "de"
+                },
+                {
+                    "box": [
+                        1478,
+                        101,
+                        1497,
+                        135
+                    ],
+                    "text": "2"
+                }
+            ],
+            "linking": [],
+            "id": 2
+        },
+        {
+            "box": [
+                155,
+                405,
+                1169,
+                433
+            ],
+            "text": "Don/Do\u00f1a Marta Prieto Arenas, secretario/a del centro escolar Montealto",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        155,
+                        405,
+                        303,
+                        433
+                    ],
+                    "text": "Don/Do\u00f1a"
+                },
+                {
+                    "box": [
+                        303,
+                        405,
+                        392,
+                        433
+                    ],
+                    "text": "Marta"
+                },
+                {
+                    "box": [
+                        392,
+                        405,
+                        484,
+                        433
+                    ],
+                    "text": "Prieto"
+                },
+                {
+                    "box": [
+                        484,
+                        405,
+                        598,
+                        433
+                    ],
+                    "text": "Arenas,"
+                },
+                {
+                    "box": [
+                        598,
+                        405,
+                        773,
+                        433
+                    ],
+                    "text": "secretario/a"
+                },
+                {
+                    "box": [
+                        771,
+                        405,
+                        823,
+                        433
+                    ],
+                    "text": "del"
+                },
+                {
+                    "box": [
+                        823,
+                        405,
+                        921,
+                        433
+                    ],
+                    "text": "centro"
+                },
+                {
+                    "box": [
+                        921,
+                        405,
+                        1029,
+                        433
+                    ],
+                    "text": "escolar"
+                },
+                {
+                    "box": [
+                        1029,
+                        405,
+                        1169,
+                        433
+                    ],
+                    "text": "Montealto"
+                }
+            ],
+            "linking": [],
+            "id": 3
+        },
+        {
+            "box": [
+                567,
+                335,
+                1088,
+                369
+            ],
+            "text": "CERTIFICACI\u00d3N ACAD\u00c9MICA",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        567,
+                        335,
+                        865,
+                        369
+                    ],
+                    "text": "CERTIFICACI\u00d3N"
+                },
+                {
+                    "box": [
+                        865,
+                        335,
+                        1088,
+                        369
+                    ],
+                    "text": "ACAD\u00c9MICA"
+                }
+            ],
+            "linking": [],
+            "id": 4
+        },
+        {
+            "box": [
+                155,
+                472,
+                1494,
+                500
+            ],
+            "text": "CERTIFICO: Que Oliver Rojas Bravo ha cursado, con las calificaciones y en los a\u00f1os acad\u00e9micos",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        155,
+                        472,
+                        322,
+                        500
+                    ],
+                    "text": "CERTIFICO:"
+                },
+                {
+                    "box": [
+                        322,
+                        472,
+                        386,
+                        500
+                    ],
+                    "text": "Que"
+                },
+                {
+                    "box": [
+                        386,
+                        472,
+                        478,
+                        500
+                    ],
+                    "text": "Oliver"
+                },
+                {
+                    "box": [
+                        478,
+                        472,
+                        562,
+                        500
+                    ],
+                    "text": "Rojas"
+                },
+                {
+                    "box": [
+                        562,
+                        472,
+                        654,
+                        500
+                    ],
+                    "text": "Bravo"
+                },
+                {
+                    "box": [
+                        654,
+                        472,
+                        695,
+                        500
+                    ],
+                    "text": "ha"
+                },
+                {
+                    "box": [
+                        695,
+                        472,
+                        823,
+                        500
+                    ],
+                    "text": "cursado,"
+                },
+                {
+                    "box": [
+                        823,
+                        472,
+                        882,
+                        500
+                    ],
+                    "text": "con"
+                },
+                {
+                    "box": [
+                        882,
+                        472,
+                        932,
+                        500
+                    ],
+                    "text": "las"
+                },
+                {
+                    "box": [
+                        932,
+                        472,
+                        1127,
+                        500
+                    ],
+                    "text": "calificaciones"
+                },
+                {
+                    "box": [
+                        1127,
+                        472,
+                        1152,
+                        500
+                    ],
+                    "text": "y"
+                },
+                {
+                    "box": [
+                        1152,
+                        472,
+                        1196,
+                        500
+                    ],
+                    "text": "en"
+                },
+                {
+                    "box": [
+                        1196,
+                        472,
+                        1244,
+                        500
+                    ],
+                    "text": "los"
+                },
+                {
+                    "box": [
+                        1244,
+                        472,
+                        1319,
+                        500
+                    ],
+                    "text": "a\u00f1os"
+                },
+                {
+                    "box": [
+                        1319,
+                        472,
+                        1494,
+                        500
+                    ],
+                    "text": "acad\u00e9micos"
+                }
+            ],
+            "linking": [],
+            "id": 5
+        },
+        {
+            "box": [
+                155,
+                502,
+                1416,
+                530
+            ],
+            "text": "que a continuaci\u00f3n es expresan, los estudios de la Bchillerato, modalidad Humanidades y",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        155,
+                        502,
+                        217,
+                        530
+                    ],
+                    "text": "que"
+                },
+                {
+                    "box": [
+                        217,
+                        502,
+                        244,
+                        530
+                    ],
+                    "text": "a"
+                },
+                {
+                    "box": [
+                        244,
+                        502,
+                        431,
+                        530
+                    ],
+                    "text": "continuaci\u00f3n"
+                },
+                {
+                    "box": [
+                        431,
+                        502,
+                        470,
+                        530
+                    ],
+                    "text": "es"
+                },
+                {
+                    "box": [
+                        470,
+                        502,
+                        617,
+                        530
+                    ],
+                    "text": "expresan,"
+                },
+                {
+                    "box": [
+                        617,
+                        502,
+                        665,
+                        530
+                    ],
+                    "text": "los"
+                },
+                {
+                    "box": [
+                        665,
+                        502,
+                        793,
+                        530
+                    ],
+                    "text": "estudios"
+                },
+                {
+                    "box": [
+                        793,
+                        502,
+                        835,
+                        530
+                    ],
+                    "text": "de"
+                },
+                {
+                    "box": [
+                        835,
+                        502,
+                        868,
+                        530
+                    ],
+                    "text": "la"
+                },
+                {
+                    "box": [
+                        868,
+                        502,
+                        1035,
+                        530
+                    ],
+                    "text": "Bchillerato,"
+                },
+                {
+                    "box": [
+                        1035,
+                        502,
+                        1191,
+                        530
+                    ],
+                    "text": "modalidad"
+                },
+                {
+                    "box": [
+                        1191,
+                        502,
+                        1391,
+                        530
+                    ],
+                    "text": "Humanidades"
+                },
+                {
+                    "box": [
+                        1391,
+                        502,
+                        1416,
+                        530
+                    ],
+                    "text": "y"
+                }
+            ],
+            "linking": [],
+            "id": 6
+        },
+        {
+            "box": [
+                155,
+                536,
+                414,
+                564
+            ],
+            "text": "Ciencias Sociales.",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        155,
+                        536,
+                        281,
+                        564
+                    ],
+                    "text": "Ciencias"
+                },
+                {
+                    "box": [
+                        281,
+                        536,
+                        414,
+                        564
+                    ],
+                    "text": "Sociales."
+                }
+            ],
+            "linking": [],
+            "id": 7
+        },
+        {
+            "box": [
+                189,
+                664,
+                283,
+                692
+            ],
+            "text": "Centro",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        189,
+                        664,
+                        283,
+                        692
+                    ],
+                    "text": "Centro"
+                }
+            ],
+            "linking": [],
+            "id": 8
+        },
+        {
+            "box": [
+                175,
+                708,
+                300,
+                731
+            ],
+            "text": "Monterraso",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        175,
+                        708,
+                        300,
+                        731
+                    ],
+                    "text": "Monterraso"
+                }
+            ],
+            "linking": [],
+            "id": 9
+        },
+        {
+            "box": [
+                231,
+                747,
+                242,
+                770
+            ],
+            "text": "\"",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        231,
+                        747,
+                        242,
+                        770
+                    ],
+                    "text": "\""
+                }
+            ],
+            "linking": [],
+            "id": 10
+        },
+        {
+            "box": [
+                231,
+                786,
+                242,
+                809
+            ],
+            "text": "\"",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        231,
+                        786,
+                        242,
+                        809
+                    ],
+                    "text": "\""
+                }
+            ],
+            "linking": [],
+            "id": 11
+        },
+        {
+            "box": [
+                231,
+                828,
+                242,
+                850
+            ],
+            "text": "\"",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        231,
+                        828,
+                        242,
+                        850
+                    ],
+                    "text": "\""
+                }
+            ],
+            "linking": [],
+            "id": 12
+        },
+        {
+            "box": [
+                231,
+                867,
+                242,
+                889
+            ],
+            "text": "\"",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        231,
+                        867,
+                        242,
+                        889
+                    ],
+                    "text": "\""
+                }
+            ],
+            "linking": [],
+            "id": 13
+        },
+        {
+            "box": [
+                231,
+                906,
+                242,
+                928
+            ],
+            "text": "\"",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        231,
+                        906,
+                        242,
+                        928
+                    ],
+                    "text": "\""
+                }
+            ],
+            "linking": [],
+            "id": 14
+        },
+        {
+            "box": [
+                231,
+                945,
+                242,
+                967
+            ],
+            "text": "\"",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        231,
+                        945,
+                        242,
+                        967
+                    ],
+                    "text": "\""
+                }
+            ],
+            "linking": [],
+            "id": 15
+        },
+        {
+            "box": [
+                231,
+                984,
+                242,
+                1006
+            ],
+            "text": "\"",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        231,
+                        984,
+                        242,
+                        1006
+                    ],
+                    "text": "\""
+                }
+            ],
+            "linking": [],
+            "id": 16
+        },
+        {
+            "box": [
+                231,
+                1023,
+                242,
+                1045
+            ],
+            "text": "\"",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        231,
+                        1023,
+                        242,
+                        1045
+                    ],
+                    "text": "\""
+                }
+            ],
+            "linking": [],
+            "id": 17
+        },
+        {
+            "box": [
+                231,
+                1062,
+                242,
+                1084
+            ],
+            "text": "\"",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        231,
+                        1062,
+                        242,
+                        1084
+                    ],
+                    "text": "\""
+                }
+            ],
+            "linking": [],
+            "id": 18
+        },
+        {
+            "box": [
+                231,
+                1104,
+                242,
+                1126
+            ],
+            "text": "\"",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        231,
+                        1104,
+                        242,
+                        1126
+                    ],
+                    "text": "\""
+                }
+            ],
+            "linking": [],
+            "id": 19
+        },
+        {
+            "box": [
+                503,
+                619,
+                715,
+                647
+            ],
+            "text": "PRIMER CURSO",
+            "label": "1_de_bachillerato",
+            "words": [
+                {
+                    "box": [
+                        503,
+                        619,
+                        617,
+                        647
+                    ],
+                    "text": "PRIMER"
+                },
+                {
+                    "box": [
+                        617,
+                        619,
+                        715,
+                        647
+                    ],
+                    "text": "CURSO"
+                }
+            ],
+            "linking": [],
+            "id": 20
+        },
+        {
+            "box": [
+                732,
+                664,
+                851,
+                692
+            ],
+            "text": "Materias",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        732,
+                        664,
+                        851,
+                        692
+                    ],
+                    "text": "Materias"
+                }
+            ],
+            "linking": [],
+            "id": 21
+        },
+        {
+            "box": [
+                537,
+                703,
+                662,
+                725
+            ],
+            "text": "Inform\u00e1tica",
+            "label": "informatica_1_de_bachillerato",
+            "words": [
+                {
+                    "box": [
+                        537,
+                        703,
+                        662,
+                        725
+                    ],
+                    "text": "Inform\u00e1tica"
+                }
+            ],
+            "linking": [],
+            "id": 22
+        },
+        {
+            "box": [
+                1202,
+                703,
+                1216,
+                725
+            ],
+            "text": "1",
+            "label": "informatica_1_de_bachillerato_answer",
+            "words": [
+                {
+                    "box": [
+                        1202,
+                        703,
+                        1216,
+                        725
+                    ],
+                    "text": "1"
+                }
+            ],
+            "linking": [],
+            "id": 23
+        },
+        {
+            "box": [
+                537,
+                742,
+                743,
+                764
+            ],
+            "text": "Lengua Castellana",
+            "label": "lengua_castellana_1_de_bachillerato",
+            "words": [
+                {
+                    "box": [
+                        537,
+                        742,
+                        626,
+                        764
+                    ],
+                    "text": "Lengua"
+                },
+                {
+                    "box": [
+                        626,
+                        742,
+                        743,
+                        764
+                    ],
+                    "text": "Castellana"
+                }
+            ],
+            "linking": [],
+            "id": 24
+        },
+        {
+            "box": [
+                1202,
+                742,
+                1216,
+                764
+            ],
+            "text": "1",
+            "label": "lengua_castellana_1_de_bachillerato_answer",
+            "words": [
+                {
+                    "box": [
+                        1202,
+                        742,
+                        1216,
+                        764
+                    ],
+                    "text": "1"
+                }
+            ],
+            "linking": [],
+            "id": 25
+        },
+        {
+            "box": [
+                537,
+                781,
+                620,
+                803
+            ],
+            "text": "Historia",
+            "label": "geografia_e_historia_1_de_bachillerato",
+            "words": [
+                {
+                    "box": [
+                        537,
+                        781,
+                        620,
+                        803
+                    ],
+                    "text": "Historia"
+                }
+            ],
+            "linking": [],
+            "id": 26
+        },
+        {
+            "box": [
+                1202,
+                781,
+                1216,
+                803
+            ],
+            "text": "2",
+            "label": "geografia_e_historia_1_de_bachillerato_answer",
+            "words": [
+                {
+                    "box": [
+                        1202,
+                        781,
+                        1216,
+                        803
+                    ],
+                    "text": "2"
+                }
+            ],
+            "linking": [],
+            "id": 27
+        },
+        {
+            "box": [
+                537,
+                820,
+                821,
+                842
+            ],
+            "text": "Lengua Extranjera: Ingl\u00e9s",
+            "label": "ingles_1_de_bachillerato",
+            "words": [
+                {
+                    "box": [
+                        537,
+                        820,
+                        626,
+                        842
+                    ],
+                    "text": "Lengua"
+                },
+                {
+                    "box": [
+                        626,
+                        820,
+                        754,
+                        842
+                    ],
+                    "text": "Extranjera:"
+                },
+                {
+                    "box": [
+                        754,
+                        820,
+                        821,
+                        842
+                    ],
+                    "text": "Ingl\u00e9s"
+                }
+            ],
+            "linking": [],
+            "id": 28
+        },
+        {
+            "box": [
+                1202,
+                820,
+                1216,
+                842
+            ],
+            "text": "0",
+            "label": "ingles_1_de_bachillerato_answer",
+            "words": [
+                {
+                    "box": [
+                        1202,
+                        820,
+                        1216,
+                        842
+                    ],
+                    "text": "0"
+                }
+            ],
+            "linking": [],
+            "id": 29
+        },
+        {
+            "box": [
+                537,
+                859,
+                843,
+                881
+            ],
+            "text": "Lengua Extranjera: Franc\u00e9s",
+            "label": "frances_1_de_bachillerato",
+            "words": [
+                {
+                    "box": [
+                        537,
+                        859,
+                        626,
+                        881
+                    ],
+                    "text": "Lengua"
+                },
+                {
+                    "box": [
+                        626,
+                        859,
+                        754,
+                        881
+                    ],
+                    "text": "Extranjera:"
+                },
+                {
+                    "box": [
+                        754,
+                        859,
+                        843,
+                        881
+                    ],
+                    "text": "Franc\u00e9s"
+                }
+            ],
+            "linking": [],
+            "id": 30
+        },
+        {
+            "box": [
+                1202,
+                859,
+                1216,
+                881
+            ],
+            "text": "1",
+            "label": "frances_1_de_bachillerato_answer",
+            "words": [
+                {
+                    "box": [
+                        1202,
+                        859,
+                        1216,
+                        881
+                    ],
+                    "text": "1"
+                }
+            ],
+            "linking": [],
+            "id": 31
+        },
+        {
+            "box": [
+                537,
+                898,
+                720,
+                920
+            ],
+            "text": "Educaci\u00f3n F\u00edsica",
+            "label": "educacion_fisica_1_de_bachillerato",
+            "words": [
+                {
+                    "box": [
+                        537,
+                        898,
+                        656,
+                        920
+                    ],
+                    "text": "Educaci\u00f3n"
+                },
+                {
+                    "box": [
+                        656,
+                        898,
+                        720,
+                        920
+                    ],
+                    "text": "F\u00edsica"
+                }
+            ],
+            "linking": [],
+            "id": 32
+        },
+        {
+            "box": [
+                1202,
+                898,
+                1216,
+                920
+            ],
+            "text": "2",
+            "label": "educacion_fisica_1_de_bachillerato_answer",
+            "words": [
+                {
+                    "box": [
+                        1202,
+                        898,
+                        1216,
+                        920
+                    ],
+                    "text": "2"
+                }
+            ],
+            "linking": [],
+            "id": 33
+        },
+        {
+            "box": [
+                537,
+                939,
+                609,
+                962
+            ],
+            "text": "Griego",
+            "label": "griego_1_de_bachillerato",
+            "words": [
+                {
+                    "box": [
+                        537,
+                        939,
+                        609,
+                        962
+                    ],
+                    "text": "Griego"
+                }
+            ],
+            "linking": [],
+            "id": 34
+        },
+        {
+            "box": [
+                1202,
+                939,
+                1216,
+                962
+            ],
+            "text": "0",
+            "label": "griego_1_de_bachillerato_answer",
+            "words": [
+                {
+                    "box": [
+                        1202,
+                        939,
+                        1216,
+                        962
+                    ],
+                    "text": "0"
+                }
+            ],
+            "linking": [],
+            "id": 35
+        },
+        {
+            "box": [
+                537,
+                978,
+                729,
+                1001
+            ],
+            "text": "Historia Espa\u00f1ola",
+            "label": "historia_1_de_bachillerato",
+            "words": [
+                {
+                    "box": [
+                        537,
+                        978,
+                        629,
+                        1001
+                    ],
+                    "text": "Historia"
+                },
+                {
+                    "box": [
+                        629,
+                        978,
+                        729,
+                        1001
+                    ],
+                    "text": "Espa\u00f1ola"
+                }
+            ],
+            "linking": [],
+            "id": 36
+        },
+        {
+            "box": [
+                1202,
+                978,
+                1216,
+                1001
+            ],
+            "text": "0",
+            "label": "historia_1_de_bachillerato_answer",
+            "words": [
+                {
+                    "box": [
+                        1202,
+                        978,
+                        1216,
+                        1001
+                    ],
+                    "text": "0"
+                }
+            ],
+            "linking": [],
+            "id": 37
+        },
+        {
+            "box": [
+                537,
+                1017,
+                757,
+                1040
+            ],
+            "text": "Educaci\u00f3n Religiosa",
+            "label": "religion_1_de_bachillerato",
+            "words": [
+                {
+                    "box": [
+                        537,
+                        1017,
+                        656,
+                        1040
+                    ],
+                    "text": "Educaci\u00f3n"
+                },
+                {
+                    "box": [
+                        656,
+                        1017,
+                        757,
+                        1040
+                    ],
+                    "text": "Religiosa"
+                }
+            ],
+            "linking": [],
+            "id": 38
+        },
+        {
+            "box": [
+                1202,
+                1017,
+                1216,
+                1040
+            ],
+            "text": "1",
+            "label": "religion_1_de_bachillerato_answer",
+            "words": [
+                {
+                    "box": [
+                        1202,
+                        1017,
+                        1216,
+                        1040
+                    ],
+                    "text": "1"
+                }
+            ],
+            "linking": [],
+            "id": 39
+        },
+        {
+            "box": [
+                537,
+                1056,
+                626,
+                1079
+            ],
+            "text": "Biolog\u00eda",
+            "label": "biologia_1_de_bachillerato",
+            "words": [
+                {
+                    "box": [
+                        537,
+                        1056,
+                        626,
+                        1079
+                    ],
+                    "text": "Biolog\u00eda"
+                }
+            ],
+            "linking": [],
+            "id": 40
+        },
+        {
+            "box": [
+                1202,
+                1056,
+                1216,
+                1079
+            ],
+            "text": "1",
+            "label": "biologia_1_de_bachillerato_answer",
+            "words": [
+                {
+                    "box": [
+                        1202,
+                        1056,
+                        1216,
+                        1079
+                    ],
+                    "text": "1"
+                }
+            ],
+            "linking": [],
+            "id": 41
+        },
+        {
+            "box": [
+                537,
+                1095,
+                818,
+                1118
+            ],
+            "text": "Educaci\u00f3n Pl\u00e1stica Visual",
+            "label": "educacion_plastica_1_de_bachillerato",
+            "words": [
+                {
+                    "box": [
+                        537,
+                        1095,
+                        656,
+                        1118
+                    ],
+                    "text": "Educaci\u00f3n"
+                },
+                {
+                    "box": [
+                        656,
+                        1095,
+                        751,
+                        1118
+                    ],
+                    "text": "Pl\u00e1stica"
+                },
+                {
+                    "box": [
+                        751,
+                        1095,
+                        818,
+                        1118
+                    ],
+                    "text": "Visual"
+                }
+            ],
+            "linking": [],
+            "id": 42
+        },
+        {
+            "box": [
+                1202,
+                1095,
+                1216,
+                1118
+            ],
+            "text": "1",
+            "label": "educacion_plastica_1_de_bachillerato_answer",
+            "words": [
+                {
+                    "box": [
+                        1202,
+                        1095,
+                        1216,
+                        1118
+                    ],
+                    "text": "1"
+                }
+            ],
+            "linking": [],
+            "id": 43
+        },
+        {
+            "box": [
+                392,
+                664,
+                453,
+                692
+            ],
+            "text": "A\u00f1o",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        392,
+                        664,
+                        453,
+                        692
+                    ],
+                    "text": "A\u00f1o"
+                }
+            ],
+            "linking": [],
+            "id": 44
+        },
+        {
+            "box": [
+                373,
+                708,
+                464,
+                731
+            ],
+            "text": "2021/22",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        373,
+                        708,
+                        464,
+                        731
+                    ],
+                    "text": "2021/22"
+                }
+            ],
+            "linking": [],
+            "id": 45
+        },
+        {
+            "box": [
+                373,
+                747,
+                464,
+                770
+            ],
+            "text": "2021/22",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        373,
+                        747,
+                        464,
+                        770
+                    ],
+                    "text": "2021/22"
+                }
+            ],
+            "linking": [],
+            "id": 46
+        },
+        {
+            "box": [
+                373,
+                786,
+                464,
+                809
+            ],
+            "text": "2021/22",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        373,
+                        786,
+                        464,
+                        809
+                    ],
+                    "text": "2021/22"
+                }
+            ],
+            "linking": [],
+            "id": 47
+        },
+        {
+            "box": [
+                373,
+                828,
+                464,
+                850
+            ],
+            "text": "2021/22",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        373,
+                        828,
+                        464,
+                        850
+                    ],
+                    "text": "2021/22"
+                }
+            ],
+            "linking": [],
+            "id": 48
+        },
+        {
+            "box": [
+                373,
+                867,
+                464,
+                889
+            ],
+            "text": "2021/22",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        373,
+                        867,
+                        464,
+                        889
+                    ],
+                    "text": "2021/22"
+                }
+            ],
+            "linking": [],
+            "id": 49
+        },
+        {
+            "box": [
+                373,
+                906,
+                464,
+                928
+            ],
+            "text": "2021/22",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        373,
+                        906,
+                        464,
+                        928
+                    ],
+                    "text": "2021/22"
+                }
+            ],
+            "linking": [],
+            "id": 50
+        },
+        {
+            "box": [
+                373,
+                945,
+                464,
+                967
+            ],
+            "text": "2021/22",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        373,
+                        945,
+                        464,
+                        967
+                    ],
+                    "text": "2021/22"
+                }
+            ],
+            "linking": [],
+            "id": 51
+        },
+        {
+            "box": [
+                373,
+                984,
+                464,
+                1006
+            ],
+            "text": "2021/22",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        373,
+                        984,
+                        464,
+                        1006
+                    ],
+                    "text": "2021/22"
+                }
+            ],
+            "linking": [],
+            "id": 52
+        },
+        {
+            "box": [
+                373,
+                1023,
+                464,
+                1045
+            ],
+            "text": "2021/22",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        373,
+                        1023,
+                        464,
+                        1045
+                    ],
+                    "text": "2021/22"
+                }
+            ],
+            "linking": [],
+            "id": 53
+        },
+        {
+            "box": [
+                373,
+                1062,
+                464,
+                1084
+            ],
+            "text": "2021/22",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        373,
+                        1062,
+                        464,
+                        1084
+                    ],
+                    "text": "2021/22"
+                }
+            ],
+            "linking": [],
+            "id": 54
+        },
+        {
+            "box": [
+                373,
+                1104,
+                464,
+                1126
+            ],
+            "text": "2021/22",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        373,
+                        1104,
+                        464,
+                        1126
+                    ],
+                    "text": "2021/22"
+                }
+            ],
+            "linking": [],
+            "id": 55
+        },
+        {
+            "box": [
+                1177,
+                619,
+                1383,
+                647
+            ],
+            "text": "Convocatorias:",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        1177,
+                        619,
+                        1383,
+                        647
+                    ],
+                    "text": "Convocatorias:"
+                }
+            ],
+            "linking": [],
+            "id": 56
+        },
+        {
+            "box": [
+                1146,
+                664,
+                1274,
+                692
+            ],
+            "text": "Ordinaria",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        1146,
+                        664,
+                        1274,
+                        692
+                    ],
+                    "text": "Ordinaria"
+                }
+            ],
+            "linking": [],
+            "id": 57
+        },
+        {
+            "box": [
+                1386,
+                664,
+                1466,
+                692
+            ],
+            "text": "Extra.",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        1386,
+                        664,
+                        1466,
+                        692
+                    ],
+                    "text": "Extra."
+                }
+            ],
+            "linking": [],
+            "id": 58
+        },
+        {
+            "box": [
+                155,
+                1209,
+                1478,
+                1237
+            ],
+            "text": "Y para que as\u00ed conste y surta los efectos oportunos, firmo y sello el presente en Madrid a 4 de",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        155,
+                        1209,
+                        183,
+                        1237
+                    ],
+                    "text": "Y"
+                },
+                {
+                    "box": [
+                        183,
+                        1209,
+                        253,
+                        1237
+                    ],
+                    "text": "para"
+                },
+                {
+                    "box": [
+                        253,
+                        1209,
+                        314,
+                        1237
+                    ],
+                    "text": "que"
+                },
+                {
+                    "box": [
+                        314,
+                        1209,
+                        364,
+                        1237
+                    ],
+                    "text": "as\u00ed"
+                },
+                {
+                    "box": [
+                        364,
+                        1209,
+                        464,
+                        1237
+                    ],
+                    "text": "conste"
+                },
+                {
+                    "box": [
+                        464,
+                        1209,
+                        489,
+                        1237
+                    ],
+                    "text": "y"
+                },
+                {
+                    "box": [
+                        489,
+                        1209,
+                        570,
+                        1237
+                    ],
+                    "text": "surta"
+                },
+                {
+                    "box": [
+                        570,
+                        1209,
+                        617,
+                        1237
+                    ],
+                    "text": "los"
+                },
+                {
+                    "box": [
+                        617,
+                        1209,
+                        729,
+                        1237
+                    ],
+                    "text": "efectos"
+                },
+                {
+                    "box": [
+                        729,
+                        1209,
+                        887,
+                        1237
+                    ],
+                    "text": "oportunos,"
+                },
+                {
+                    "box": [
+                        729,
+                        1209,
+                        971,
+                        1237
+                    ],
+                    "text": "firmo"
+                },
+                {
+                    "box": [
+                        971,
+                        1209,
+                        996,
+                        1237
+                    ],
+                    "text": "y"
+                },
+                {
+                    "box": [
+                        996,
+                        1209,
+                        1068,
+                        1237
+                    ],
+                    "text": "sello"
+                },
+                {
+                    "box": [
+                        1068,
+                        1209,
+                        1102,
+                        1237
+                    ],
+                    "text": "el"
+                },
+                {
+                    "box": [
+                        1102,
+                        1209,
+                        1233,
+                        1237
+                    ],
+                    "text": "presente"
+                },
+                {
+                    "box": [
+                        1233,
+                        1209,
+                        1277,
+                        1237
+                    ],
+                    "text": "en"
+                },
+                {
+                    "box": [
+                        1277,
+                        1209,
+                        1383,
+                        1237
+                    ],
+                    "text": "Madrid"
+                },
+                {
+                    "box": [
+                        1383,
+                        1209,
+                        1408,
+                        1237
+                    ],
+                    "text": "a"
+                },
+                {
+                    "box": [
+                        1408,
+                        1209,
+                        1433,
+                        1237
+                    ],
+                    "text": "4"
+                },
+                {
+                    "box": [
+                        1433,
+                        1209,
+                        1478,
+                        1237
+                    ],
+                    "text": "de"
+                }
+            ],
+            "linking": [],
+            "id": 59
+        },
+        {
+            "box": [
+                155,
+                1240,
+                448,
+                1268
+            ],
+            "text": "noviembre de 2022.",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        155,
+                        1240,
+                        314,
+                        1268
+                    ],
+                    "text": "noviembre"
+                },
+                {
+                    "box": [
+                        314,
+                        1240,
+                        359,
+                        1268
+                    ],
+                    "text": "de"
+                },
+                {
+                    "box": [
+                        359,
+                        1240,
+                        448,
+                        1268
+                    ],
+                    "text": "2022."
+                }
+            ],
+            "linking": [],
+            "id": 60
+        },
+        {
+            "box": [
+                322,
+                1393,
+                609,
+                1421
+            ],
+            "text": "V\u00ba B\u00ba El/la Director/a",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        322,
+                        1393,
+                        361,
+                        1421
+                    ],
+                    "text": "V\u00ba"
+                },
+                {
+                    "box": [
+                        361,
+                        1393,
+                        403,
+                        1421
+                    ],
+                    "text": "B\u00ba"
+                },
+                {
+                    "box": [
+                        403,
+                        1393,
+                        473,
+                        1421
+                    ],
+                    "text": "El/la"
+                },
+                {
+                    "box": [
+                        470,
+                        1393,
+                        609,
+                        1421
+                    ],
+                    "text": "Director/a"
+                }
+            ],
+            "linking": [],
+            "id": 61
+        },
+        {
+            "box": [
+                1018,
+                1396,
+                1255,
+                1424
+            ],
+            "text": "El/la Secretario/a",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        1018,
+                        1396,
+                        1088,
+                        1424
+                    ],
+                    "text": "El/la"
+                },
+                {
+                    "box": [
+                        1088,
+                        1396,
+                        1255,
+                        1424
+                    ],
+                    "text": "Secretario/a"
+                }
+            ],
+            "linking": [],
+            "id": 62
+        },
+        {
+            "box": [
+                278,
+                1460,
+                654,
+                1488
+            ],
+            "text": "Fdo: Roque Gallego Crespo",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        278,
+                        1460,
+                        345,
+                        1488
+                    ],
+                    "text": "Fdo:"
+                },
+                {
+                    "box": [
+                        345,
+                        1460,
+                        442,
+                        1488
+                    ],
+                    "text": "Roque"
+                },
+                {
+                    "box": [
+                        442,
+                        1460,
+                        556,
+                        1488
+                    ],
+                    "text": "Gallego"
+                },
+                {
+                    "box": [
+                        556,
+                        1460,
+                        654,
+                        1488
+                    ],
+                    "text": "Crespo"
+                }
+            ],
+            "linking": [],
+            "id": 63
+        },
+        {
+            "box": [
+                949,
+                1460,
+                1327,
+                1488
+            ],
+            "text": "Fdo: Ulrico Miranda Aranda",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        949,
+                        1460,
+                        1018,
+                        1488
+                    ],
+                    "text": "Fdo:"
+                },
+                {
+                    "box": [
+                        1018,
+                        1460,
+                        1105,
+                        1488
+                    ],
+                    "text": "Ulrico"
+                },
+                {
+                    "box": [
+                        1105,
+                        1460,
+                        1227,
+                        1488
+                    ],
+                    "text": "Miranda"
+                },
+                {
+                    "box": [
+                        1227,
+                        1460,
+                        1327,
+                        1488
+                    ],
+                    "text": "Aranda"
+                }
+            ],
+            "linking": [],
+            "id": 64
+        }
+    ]
+}

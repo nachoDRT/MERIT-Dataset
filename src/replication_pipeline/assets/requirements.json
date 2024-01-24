@@ -309,7 +309,7 @@
             }
         }
     },
-    "blender_modified": 0.5,
+    "blender_modified": 1,
     "female_proportion": 0.5,
     "male_proportion": 0.5,
     "font_path": "/home/msi/.config/Ultralytics/Arial.ttf",

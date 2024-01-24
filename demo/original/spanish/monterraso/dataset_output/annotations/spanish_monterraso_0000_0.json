@@ -1,0 +1,3587 @@
+{
+    "form": [
+        {
+            "box": [
+                673,
+                127,
+                1016,
+                171
+            ],
+            "text": "EL VALOR DE",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        673,
+                        127,
+                        748,
+                        171
+                    ],
+                    "text": "EL"
+                },
+                {
+                    "box": [
+                        748,
+                        127,
+                        932,
+                        171
+                    ],
+                    "text": "VALOR"
+                },
+                {
+                    "box": [
+                        932,
+                        127,
+                        1016,
+                        171
+                    ],
+                    "text": "DE"
+                }
+            ],
+            "linking": [],
+            "id": 0
+        },
+        {
+            "box": [
+                645,
+                179,
+                1029,
+                224
+            ],
+            "text": "LA EXCELENCIA",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        645,
+                        179,
+                        723,
+                        224
+                    ],
+                    "text": "LA"
+                },
+                {
+                    "box": [
+                        723,
+                        179,
+                        1029,
+                        224
+                    ],
+                    "text": "EXCELENCIA"
+                }
+            ],
+            "linking": [],
+            "id": 1
+        },
+        {
+            "box": [
+                1269,
+                101,
+                1497,
+                135
+            ],
+            "text": "P\u00e1gina 1 de 2",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        1269,
+                        101,
+                        1391,
+                        135
+                    ],
+                    "text": "P\u00e1gina"
+                },
+                {
+                    "box": [
+                        1391,
+                        101,
+                        1425,
+                        135
+                    ],
+                    "text": "1"
+                },
+                {
+                    "box": [
+                        1425,
+                        101,
+                        1478,
+                        135
+                    ],
+                    "text": "de"
+                },
+                {
+                    "box": [
+                        1478,
+                        101,
+                        1497,
+                        135
+                    ],
+                    "text": "2"
+                }
+            ],
+            "linking": [],
+            "id": 2
+        },
+        {
+            "box": [
+                567,
+                335,
+                1088,
+                369
+            ],
+            "text": "CERTIFICACI\u00d3N ACAD\u00c9MICA",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        567,
+                        335,
+                        865,
+                        369
+                    ],
+                    "text": "CERTIFICACI\u00d3N"
+                },
+                {
+                    "box": [
+                        865,
+                        335,
+                        1088,
+                        369
+                    ],
+                    "text": "ACAD\u00c9MICA"
+                }
+            ],
+            "linking": [],
+            "id": 3
+        },
+        {
+            "box": [
+                155,
+                405,
+                1221,
+                433
+            ],
+            "text": "Don/Do\u00f1a Ulrico Miranda Aranda, secretario/a del centro escolar Monterraso",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        155,
+                        405,
+                        303,
+                        433
+                    ],
+                    "text": "Don/Do\u00f1a"
+                },
+                {
+                    "box": [
+                        303,
+                        405,
+                        392,
+                        433
+                    ],
+                    "text": "Ulrico"
+                },
+                {
+                    "box": [
+                        392,
+                        405,
+                        514,
+                        433
+                    ],
+                    "text": "Miranda"
+                },
+                {
+                    "box": [
+                        514,
+                        405,
+                        631,
+                        433
+                    ],
+                    "text": "Aranda,"
+                },
+                {
+                    "box": [
+                        631,
+                        405,
+                        807,
+                        433
+                    ],
+                    "text": "secretario/a"
+                },
+                {
+                    "box": [
+                        807,
+                        405,
+                        857,
+                        433
+                    ],
+                    "text": "del"
+                },
+                {
+                    "box": [
+                        857,
+                        405,
+                        954,
+                        433
+                    ],
+                    "text": "centro"
+                },
+                {
+                    "box": [
+                        954,
+                        405,
+                        1063,
+                        433
+                    ],
+                    "text": "escolar"
+                },
+                {
+                    "box": [
+                        1063,
+                        405,
+                        1221,
+                        433
+                    ],
+                    "text": "Monterraso"
+                }
+            ],
+            "linking": [],
+            "id": 4
+        },
+        {
+            "box": [
+                155,
+                472,
+                1483,
+                500
+            ],
+            "text": "CERTIFICO: Que Oliver Rojas Bravo ha cursado con las calificaciones y en los a\u00f1os acad\u00e9micos",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        155,
+                        472,
+                        322,
+                        500
+                    ],
+                    "text": "CERTIFICO:"
+                },
+                {
+                    "box": [
+                        322,
+                        472,
+                        386,
+                        500
+                    ],
+                    "text": "Que"
+                },
+                {
+                    "box": [
+                        386,
+                        472,
+                        478,
+                        500
+                    ],
+                    "text": "Oliver"
+                },
+                {
+                    "box": [
+                        478,
+                        472,
+                        562,
+                        500
+                    ],
+                    "text": "Rojas"
+                },
+                {
+                    "box": [
+                        562,
+                        472,
+                        654,
+                        500
+                    ],
+                    "text": "Bravo"
+                },
+                {
+                    "box": [
+                        654,
+                        472,
+                        695,
+                        500
+                    ],
+                    "text": "ha"
+                },
+                {
+                    "box": [
+                        695,
+                        472,
+                        815,
+                        500
+                    ],
+                    "text": "cursado"
+                },
+                {
+                    "box": [
+                        815,
+                        472,
+                        874,
+                        500
+                    ],
+                    "text": "con"
+                },
+                {
+                    "box": [
+                        874,
+                        472,
+                        921,
+                        500
+                    ],
+                    "text": "las"
+                },
+                {
+                    "box": [
+                        921,
+                        472,
+                        1119,
+                        500
+                    ],
+                    "text": "calificaciones"
+                },
+                {
+                    "box": [
+                        1119,
+                        472,
+                        1144,
+                        500
+                    ],
+                    "text": "y"
+                },
+                {
+                    "box": [
+                        1144,
+                        472,
+                        1185,
+                        500
+                    ],
+                    "text": "en"
+                },
+                {
+                    "box": [
+                        1185,
+                        472,
+                        1235,
+                        500
+                    ],
+                    "text": "los"
+                },
+                {
+                    "box": [
+                        1235,
+                        472,
+                        1311,
+                        500
+                    ],
+                    "text": "a\u00f1os"
+                },
+                {
+                    "box": [
+                        1311,
+                        472,
+                        1483,
+                        500
+                    ],
+                    "text": "acad\u00e9micos"
+                }
+            ],
+            "linking": [],
+            "id": 5
+        },
+        {
+            "box": [
+                155,
+                502,
+                943,
+                530
+            ],
+            "text": "que a continuaci\u00f3n se expresan, los estudios de la ESO.",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        155,
+                        502,
+                        217,
+                        530
+                    ],
+                    "text": "que"
+                },
+                {
+                    "box": [
+                        217,
+                        502,
+                        244,
+                        530
+                    ],
+                    "text": "a"
+                },
+                {
+                    "box": [
+                        244,
+                        502,
+                        431,
+                        530
+                    ],
+                    "text": "continuaci\u00f3n"
+                },
+                {
+                    "box": [
+                        431,
+                        502,
+                        470,
+                        530
+                    ],
+                    "text": "se"
+                },
+                {
+                    "box": [
+                        470,
+                        502,
+                        617,
+                        530
+                    ],
+                    "text": "expresan,"
+                },
+                {
+                    "box": [
+                        617,
+                        502,
+                        665,
+                        530
+                    ],
+                    "text": "los"
+                },
+                {
+                    "box": [
+                        665,
+                        502,
+                        793,
+                        530
+                    ],
+                    "text": "estudios"
+                },
+                {
+                    "box": [
+                        793,
+                        502,
+                        835,
+                        530
+                    ],
+                    "text": "de"
+                },
+                {
+                    "box": [
+                        835,
+                        502,
+                        868,
+                        530
+                    ],
+                    "text": "la"
+                },
+                {
+                    "box": [
+                        868,
+                        502,
+                        943,
+                        530
+                    ],
+                    "text": "ESO."
+                }
+            ],
+            "linking": [],
+            "id": 6
+        },
+        {
+            "box": [
+                189,
+                630,
+                283,
+                658
+            ],
+            "text": "Centro",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        189,
+                        630,
+                        283,
+                        658
+                    ],
+                    "text": "Centro"
+                }
+            ],
+            "linking": [],
+            "id": 7
+        },
+        {
+            "box": [
+                175,
+                675,
+                300,
+                697
+            ],
+            "text": "Monterraso",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        175,
+                        675,
+                        300,
+                        697
+                    ],
+                    "text": "Monterraso"
+                }
+            ],
+            "linking": [],
+            "id": 8
+        },
+        {
+            "box": [
+                231,
+                717,
+                242,
+                739
+            ],
+            "text": "\"",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        231,
+                        717,
+                        242,
+                        739
+                    ],
+                    "text": "\""
+                }
+            ],
+            "linking": [],
+            "id": 9
+        },
+        {
+            "box": [
+                231,
+                756,
+                242,
+                778
+            ],
+            "text": "\"",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        231,
+                        756,
+                        242,
+                        778
+                    ],
+                    "text": "\""
+                }
+            ],
+            "linking": [],
+            "id": 10
+        },
+        {
+            "box": [
+                231,
+                795,
+                242,
+                817
+            ],
+            "text": "\"",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        231,
+                        795,
+                        242,
+                        817
+                    ],
+                    "text": "\""
+                }
+            ],
+            "linking": [],
+            "id": 11
+        },
+        {
+            "box": [
+                231,
+                834,
+                242,
+                856
+            ],
+            "text": "\"",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        231,
+                        834,
+                        242,
+                        856
+                    ],
+                    "text": "\""
+                }
+            ],
+            "linking": [],
+            "id": 12
+        },
+        {
+            "box": [
+                231,
+                873,
+                242,
+                895
+            ],
+            "text": "\"",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        231,
+                        873,
+                        242,
+                        895
+                    ],
+                    "text": "\""
+                }
+            ],
+            "linking": [],
+            "id": 13
+        },
+        {
+            "box": [
+                231,
+                912,
+                242,
+                934
+            ],
+            "text": "\"",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        231,
+                        912,
+                        242,
+                        934
+                    ],
+                    "text": "\""
+                }
+            ],
+            "linking": [],
+            "id": 14
+        },
+        {
+            "box": [
+                231,
+                953,
+                242,
+                976
+            ],
+            "text": "\"",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        231,
+                        953,
+                        242,
+                        976
+                    ],
+                    "text": "\""
+                }
+            ],
+            "linking": [],
+            "id": 15
+        },
+        {
+            "box": [
+                231,
+                992,
+                242,
+                1015
+            ],
+            "text": "\"",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        231,
+                        992,
+                        242,
+                        1015
+                    ],
+                    "text": "\""
+                }
+            ],
+            "linking": [],
+            "id": 16
+        },
+        {
+            "box": [
+                231,
+                1031,
+                242,
+                1053
+            ],
+            "text": "\"",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        231,
+                        1031,
+                        242,
+                        1053
+                    ],
+                    "text": "\""
+                }
+            ],
+            "linking": [],
+            "id": 17
+        },
+        {
+            "box": [
+                231,
+                1070,
+                242,
+                1092
+            ],
+            "text": "\"",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        231,
+                        1070,
+                        242,
+                        1092
+                    ],
+                    "text": "\""
+                }
+            ],
+            "linking": [],
+            "id": 18
+        },
+        {
+            "box": [
+                231,
+                1109,
+                242,
+                1131
+            ],
+            "text": "\"",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        231,
+                        1109,
+                        242,
+                        1131
+                    ],
+                    "text": "\""
+                }
+            ],
+            "linking": [],
+            "id": 19
+        },
+        {
+            "box": [
+                392,
+                630,
+                453,
+                658
+            ],
+            "text": "A\u00f1o",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        392,
+                        630,
+                        453,
+                        658
+                    ],
+                    "text": "A\u00f1o"
+                }
+            ],
+            "linking": [],
+            "id": 20
+        },
+        {
+            "box": [
+                373,
+                675,
+                464,
+                697
+            ],
+            "text": "2019/20",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        373,
+                        675,
+                        464,
+                        697
+                    ],
+                    "text": "2019/20"
+                }
+            ],
+            "linking": [],
+            "id": 21
+        },
+        {
+            "box": [
+                373,
+                717,
+                464,
+                739
+            ],
+            "text": "2019/20",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        373,
+                        717,
+                        464,
+                        739
+                    ],
+                    "text": "2019/20"
+                }
+            ],
+            "linking": [],
+            "id": 22
+        },
+        {
+            "box": [
+                373,
+                756,
+                464,
+                778
+            ],
+            "text": "2019/20",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        373,
+                        756,
+                        464,
+                        778
+                    ],
+                    "text": "2019/20"
+                }
+            ],
+            "linking": [],
+            "id": 23
+        },
+        {
+            "box": [
+                373,
+                795,
+                464,
+                817
+            ],
+            "text": "2019/20",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        373,
+                        795,
+                        464,
+                        817
+                    ],
+                    "text": "2019/20"
+                }
+            ],
+            "linking": [],
+            "id": 24
+        },
+        {
+            "box": [
+                373,
+                834,
+                464,
+                856
+            ],
+            "text": "2019/20",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        373,
+                        834,
+                        464,
+                        856
+                    ],
+                    "text": "2019/20"
+                }
+            ],
+            "linking": [],
+            "id": 25
+        },
+        {
+            "box": [
+                373,
+                873,
+                464,
+                895
+            ],
+            "text": "2019/20",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        373,
+                        873,
+                        464,
+                        895
+                    ],
+                    "text": "2019/20"
+                }
+            ],
+            "linking": [],
+            "id": 26
+        },
+        {
+            "box": [
+                373,
+                912,
+                464,
+                934
+            ],
+            "text": "2019/20",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        373,
+                        912,
+                        464,
+                        934
+                    ],
+                    "text": "2019/20"
+                }
+            ],
+            "linking": [],
+            "id": 27
+        },
+        {
+            "box": [
+                373,
+                953,
+                464,
+                976
+            ],
+            "text": "2019/20",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        373,
+                        953,
+                        464,
+                        976
+                    ],
+                    "text": "2019/20"
+                }
+            ],
+            "linking": [],
+            "id": 28
+        },
+        {
+            "box": [
+                373,
+                992,
+                464,
+                1015
+            ],
+            "text": "2019/20",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        373,
+                        992,
+                        464,
+                        1015
+                    ],
+                    "text": "2019/20"
+                }
+            ],
+            "linking": [],
+            "id": 29
+        },
+        {
+            "box": [
+                373,
+                1031,
+                464,
+                1053
+            ],
+            "text": "2019/20",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        373,
+                        1031,
+                        464,
+                        1053
+                    ],
+                    "text": "2019/20"
+                }
+            ],
+            "linking": [],
+            "id": 30
+        },
+        {
+            "box": [
+                373,
+                1070,
+                464,
+                1092
+            ],
+            "text": "2019/20",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        373,
+                        1070,
+                        464,
+                        1092
+                    ],
+                    "text": "2019/20"
+                }
+            ],
+            "linking": [],
+            "id": 31
+        },
+        {
+            "box": [
+                373,
+                1109,
+                464,
+                1131
+            ],
+            "text": "2019/20",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        373,
+                        1109,
+                        464,
+                        1131
+                    ],
+                    "text": "2019/20"
+                }
+            ],
+            "linking": [],
+            "id": 32
+        },
+        {
+            "box": [
+                467,
+                586,
+                751,
+                614
+            ],
+            "text": "TERCER CURSO ESO",
+            "label": "3_de_la_eso",
+            "words": [
+                {
+                    "box": [
+                        467,
+                        586,
+                        587,
+                        614
+                    ],
+                    "text": "TERCER"
+                },
+                {
+                    "box": [
+                        587,
+                        586,
+                        695,
+                        614
+                    ],
+                    "text": "CURSO"
+                },
+                {
+                    "box": [
+                        695,
+                        586,
+                        751,
+                        614
+                    ],
+                    "text": "ESO"
+                }
+            ],
+            "linking": [],
+            "id": 33
+        },
+        {
+            "box": [
+                732,
+                630,
+                851,
+                658
+            ],
+            "text": "Materias",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        732,
+                        630,
+                        851,
+                        658
+                    ],
+                    "text": "Materias"
+                }
+            ],
+            "linking": [],
+            "id": 34
+        },
+        {
+            "box": [
+                537,
+                669,
+                840,
+                692
+            ],
+            "text": "Lengua Extranjera: Alem\u00e1n",
+            "label": "aleman_3_de_la_eso",
+            "words": [
+                {
+                    "box": [
+                        537,
+                        669,
+                        626,
+                        692
+                    ],
+                    "text": "Lengua"
+                },
+                {
+                    "box": [
+                        626,
+                        669,
+                        754,
+                        692
+                    ],
+                    "text": "Extranjera:"
+                },
+                {
+                    "box": [
+                        754,
+                        669,
+                        840,
+                        692
+                    ],
+                    "text": "Alem\u00e1n"
+                }
+            ],
+            "linking": [],
+            "id": 35
+        },
+        {
+            "box": [
+                1202,
+                669,
+                1216,
+                692
+            ],
+            "text": "1",
+            "label": "aleman_3_de_la_eso_answer",
+            "words": [
+                {
+                    "box": [
+                        1202,
+                        669,
+                        1216,
+                        692
+                    ],
+                    "text": "1"
+                }
+            ],
+            "linking": [],
+            "id": 36
+        },
+        {
+            "box": [
+                537,
+                708,
+                751,
+                731
+            ],
+            "text": "Ciencias del Mundo",
+            "label": "ciencias_del_mundo_3_de_la_eso",
+            "words": [
+                {
+                    "box": [
+                        537,
+                        708,
+                        637,
+                        731
+                    ],
+                    "text": "Ciencias"
+                },
+                {
+                    "box": [
+                        637,
+                        708,
+                        676,
+                        731
+                    ],
+                    "text": "del"
+                },
+                {
+                    "box": [
+                        676,
+                        708,
+                        751,
+                        731
+                    ],
+                    "text": "Mundo"
+                }
+            ],
+            "linking": [],
+            "id": 37
+        },
+        {
+            "box": [
+                1202,
+                708,
+                1216,
+                731
+            ],
+            "text": "1",
+            "label": "ciencias_del_mundo_3_de_la_eso_answer",
+            "words": [
+                {
+                    "box": [
+                        1202,
+                        708,
+                        1216,
+                        731
+                    ],
+                    "text": "1"
+                }
+            ],
+            "linking": [],
+            "id": 38
+        },
+        {
+            "box": [
+                537,
+                747,
+                609,
+                770
+            ],
+            "text": "Griego",
+            "label": "griego_3_de_la_eso",
+            "words": [
+                {
+                    "box": [
+                        537,
+                        747,
+                        609,
+                        770
+                    ],
+                    "text": "Griego"
+                }
+            ],
+            "linking": [],
+            "id": 39
+        },
+        {
+            "box": [
+                1202,
+                747,
+                1216,
+                770
+            ],
+            "text": "1",
+            "label": "griego_3_de_la_eso_answer",
+            "words": [
+                {
+                    "box": [
+                        1202,
+                        747,
+                        1216,
+                        770
+                    ],
+                    "text": "1"
+                }
+            ],
+            "linking": [],
+            "id": 40
+        },
+        {
+            "box": [
+                537,
+                786,
+                729,
+                809
+            ],
+            "text": "Cultura Cient\u00edfica",
+            "label": "generic_3_de_la_eso",
+            "words": [
+                {
+                    "box": [
+                        537,
+                        786,
+                        623,
+                        809
+                    ],
+                    "text": "Cultura"
+                },
+                {
+                    "box": [
+                        623,
+                        786,
+                        729,
+                        809
+                    ],
+                    "text": "Cient\u00edfica"
+                }
+            ],
+            "linking": [],
+            "id": 41
+        },
+        {
+            "box": [
+                1202,
+                786,
+                1216,
+                809
+            ],
+            "text": "2",
+            "label": "generic_3_de_la_eso_answer",
+            "words": [
+                {
+                    "box": [
+                        1202,
+                        786,
+                        1216,
+                        809
+                    ],
+                    "text": "2"
+                }
+            ],
+            "linking": [],
+            "id": 42
+        },
+        {
+            "box": [
+                537,
+                828,
+                626,
+                850
+            ],
+            "text": "Biolog\u00eda",
+            "label": "biologia_3_de_la_eso",
+            "words": [
+                {
+                    "box": [
+                        537,
+                        828,
+                        626,
+                        850
+                    ],
+                    "text": "Biolog\u00eda"
+                }
+            ],
+            "linking": [],
+            "id": 43
+        },
+        {
+            "box": [
+                1202,
+                828,
+                1216,
+                850
+            ],
+            "text": "1",
+            "label": "biologia_3_de_la_eso_answer",
+            "words": [
+                {
+                    "box": [
+                        1202,
+                        828,
+                        1216,
+                        850
+                    ],
+                    "text": "1"
+                }
+            ],
+            "linking": [],
+            "id": 44
+        },
+        {
+            "box": [
+                537,
+                867,
+                620,
+                889
+            ],
+            "text": "Historia",
+            "label": "historia_3_de_la_eso",
+            "words": [
+                {
+                    "box": [
+                        537,
+                        867,
+                        620,
+                        889
+                    ],
+                    "text": "Historia"
+                }
+            ],
+            "linking": [],
+            "id": 45
+        },
+        {
+            "box": [
+                1202,
+                867,
+                1216,
+                889
+            ],
+            "text": "0",
+            "label": "historia_3_de_la_eso_answer",
+            "words": [
+                {
+                    "box": [
+                        1202,
+                        867,
+                        1216,
+                        889
+                    ],
+                    "text": "0"
+                }
+            ],
+            "linking": [],
+            "id": 46
+        },
+        {
+            "box": [
+                537,
+                906,
+                662,
+                928
+            ],
+            "text": "Inform\u00e1tica",
+            "label": "informatica_3_de_la_eso",
+            "words": [
+                {
+                    "box": [
+                        537,
+                        906,
+                        662,
+                        928
+                    ],
+                    "text": "Inform\u00e1tica"
+                }
+            ],
+            "linking": [],
+            "id": 47
+        },
+        {
+            "box": [
+                1202,
+                906,
+                1216,
+                928
+            ],
+            "text": "0",
+            "label": "informatica_3_de_la_eso_answer",
+            "words": [
+                {
+                    "box": [
+                        1202,
+                        906,
+                        1216,
+                        928
+                    ],
+                    "text": "0"
+                }
+            ],
+            "linking": [],
+            "id": 48
+        },
+        {
+            "box": [
+                537,
+                945,
+                612,
+                967
+            ],
+            "text": "M\u00fasica",
+            "label": "musica_3_de_la_eso",
+            "words": [
+                {
+                    "box": [
+                        537,
+                        945,
+                        612,
+                        967
+                    ],
+                    "text": "M\u00fasica"
+                }
+            ],
+            "linking": [],
+            "id": 49
+        },
+        {
+            "box": [
+                1202,
+                945,
+                1216,
+                967
+            ],
+            "text": "0",
+            "label": "musica_3_de_la_eso_answer",
+            "words": [
+                {
+                    "box": [
+                        1202,
+                        945,
+                        1216,
+                        967
+                    ],
+                    "text": "0"
+                }
+            ],
+            "linking": [],
+            "id": 50
+        },
+        {
+            "box": [
+                537,
+                984,
+                601,
+                1006
+            ],
+            "text": "Ingl\u00e9s",
+            "label": "ingles_3_de_la_eso",
+            "words": [
+                {
+                    "box": [
+                        537,
+                        984,
+                        601,
+                        1006
+                    ],
+                    "text": "Ingl\u00e9s"
+                }
+            ],
+            "linking": [],
+            "id": 51
+        },
+        {
+            "box": [
+                1202,
+                984,
+                1216,
+                1006
+            ],
+            "text": "0",
+            "label": "ingles_3_de_la_eso_answer",
+            "words": [
+                {
+                    "box": [
+                        1202,
+                        984,
+                        1216,
+                        1006
+                    ],
+                    "text": "0"
+                }
+            ],
+            "linking": [],
+            "id": 52
+        },
+        {
+            "box": [
+                537,
+                1023,
+                590,
+                1045
+            ],
+            "text": "Lat\u00edn",
+            "label": "latin_3_de_la_eso",
+            "words": [
+                {
+                    "box": [
+                        537,
+                        1023,
+                        590,
+                        1045
+                    ],
+                    "text": "Lat\u00edn"
+                }
+            ],
+            "linking": [],
+            "id": 53
+        },
+        {
+            "box": [
+                1202,
+                1023,
+                1216,
+                1045
+            ],
+            "text": "2",
+            "label": "latin_3_de_la_eso_answer",
+            "words": [
+                {
+                    "box": [
+                        1202,
+                        1023,
+                        1216,
+                        1045
+                    ],
+                    "text": "2"
+                }
+            ],
+            "linking": [],
+            "id": 54
+        },
+        {
+            "box": [
+                537,
+                1065,
+                623,
+                1087
+            ],
+            "text": "Franc\u00e9s",
+            "label": "frances_3_de_la_eso",
+            "words": [
+                {
+                    "box": [
+                        537,
+                        1065,
+                        623,
+                        1087
+                    ],
+                    "text": "Franc\u00e9s"
+                }
+            ],
+            "linking": [],
+            "id": 55
+        },
+        {
+            "box": [
+                1202,
+                1065,
+                1216,
+                1087
+            ],
+            "text": "1",
+            "label": "frances_3_de_la_eso_answer",
+            "words": [
+                {
+                    "box": [
+                        1202,
+                        1065,
+                        1216,
+                        1087
+                    ],
+                    "text": "1"
+                }
+            ],
+            "linking": [],
+            "id": 56
+        },
+        {
+            "box": [
+                537,
+                1104,
+                743,
+                1126
+            ],
+            "text": "Ciencias Naturales",
+            "label": "ciencias_naturales_3_de_la_eso",
+            "words": [
+                {
+                    "box": [
+                        537,
+                        1104,
+                        637,
+                        1126
+                    ],
+                    "text": "Ciencias"
+                },
+                {
+                    "box": [
+                        637,
+                        1104,
+                        743,
+                        1126
+                    ],
+                    "text": "Naturales"
+                }
+            ],
+            "linking": [],
+            "id": 57
+        },
+        {
+            "box": [
+                1202,
+                1104,
+                1216,
+                1126
+            ],
+            "text": "1",
+            "label": "ciencias_naturales_3_de_la_eso_answer",
+            "words": [
+                {
+                    "box": [
+                        1202,
+                        1104,
+                        1216,
+                        1126
+                    ],
+                    "text": "1"
+                }
+            ],
+            "linking": [],
+            "id": 58
+        },
+        {
+            "box": [
+                189,
+                1234,
+                283,
+                1262
+            ],
+            "text": "Centro",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        189,
+                        1234,
+                        283,
+                        1262
+                    ],
+                    "text": "Centro"
+                }
+            ],
+            "linking": [],
+            "id": 59
+        },
+        {
+            "box": [
+                175,
+                1279,
+                300,
+                1301
+            ],
+            "text": "Monterraso",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        175,
+                        1279,
+                        300,
+                        1301
+                    ],
+                    "text": "Monterraso"
+                }
+            ],
+            "linking": [],
+            "id": 60
+        },
+        {
+            "box": [
+                231,
+                1318,
+                242,
+                1340
+            ],
+            "text": "\"",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        231,
+                        1318,
+                        242,
+                        1340
+                    ],
+                    "text": "\""
+                }
+            ],
+            "linking": [],
+            "id": 61
+        },
+        {
+            "box": [
+                231,
+                1357,
+                242,
+                1379
+            ],
+            "text": "\"",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        231,
+                        1357,
+                        242,
+                        1379
+                    ],
+                    "text": "\""
+                }
+            ],
+            "linking": [],
+            "id": 62
+        },
+        {
+            "box": [
+                231,
+                1396,
+                242,
+                1418
+            ],
+            "text": "\"",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        231,
+                        1396,
+                        242,
+                        1418
+                    ],
+                    "text": "\""
+                }
+            ],
+            "linking": [],
+            "id": 63
+        },
+        {
+            "box": [
+                231,
+                1435,
+                242,
+                1457
+            ],
+            "text": "\"",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        231,
+                        1435,
+                        242,
+                        1457
+                    ],
+                    "text": "\""
+                }
+            ],
+            "linking": [],
+            "id": 64
+        },
+        {
+            "box": [
+                231,
+                1477,
+                242,
+                1499
+            ],
+            "text": "\"",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        231,
+                        1477,
+                        242,
+                        1499
+                    ],
+                    "text": "\""
+                }
+            ],
+            "linking": [],
+            "id": 65
+        },
+        {
+            "box": [
+                231,
+                1516,
+                242,
+                1538
+            ],
+            "text": "\"",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        231,
+                        1516,
+                        242,
+                        1538
+                    ],
+                    "text": "\""
+                }
+            ],
+            "linking": [],
+            "id": 66
+        },
+        {
+            "box": [
+                231,
+                1555,
+                242,
+                1577
+            ],
+            "text": "\"",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        231,
+                        1555,
+                        242,
+                        1577
+                    ],
+                    "text": "\""
+                }
+            ],
+            "linking": [],
+            "id": 67
+        },
+        {
+            "box": [
+                231,
+                1593,
+                242,
+                1616
+            ],
+            "text": "\"",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        231,
+                        1593,
+                        242,
+                        1616
+                    ],
+                    "text": "\""
+                }
+            ],
+            "linking": [],
+            "id": 68
+        },
+        {
+            "box": [
+                231,
+                1632,
+                242,
+                1655
+            ],
+            "text": "\"",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        231,
+                        1632,
+                        242,
+                        1655
+                    ],
+                    "text": "\""
+                }
+            ],
+            "linking": [],
+            "id": 69
+        },
+        {
+            "box": [
+                231,
+                1671,
+                242,
+                1694
+            ],
+            "text": "\"",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        231,
+                        1671,
+                        242,
+                        1694
+                    ],
+                    "text": "\""
+                }
+            ],
+            "linking": [],
+            "id": 70
+        },
+        {
+            "box": [
+                464,
+                1190,
+                754,
+                1218
+            ],
+            "text": "CUARTO CURSO ESO",
+            "label": "4_de_la_eso",
+            "words": [
+                {
+                    "box": [
+                        464,
+                        1190,
+                        590,
+                        1218
+                    ],
+                    "text": "CUARTO"
+                },
+                {
+                    "box": [
+                        590,
+                        1190,
+                        698,
+                        1218
+                    ],
+                    "text": "CURSO"
+                },
+                {
+                    "box": [
+                        698,
+                        1190,
+                        754,
+                        1218
+                    ],
+                    "text": "ESO"
+                }
+            ],
+            "linking": [],
+            "id": 71
+        },
+        {
+            "box": [
+                392,
+                1234,
+                453,
+                1262
+            ],
+            "text": "A\u00f1o",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        392,
+                        1234,
+                        453,
+                        1262
+                    ],
+                    "text": "A\u00f1o"
+                }
+            ],
+            "linking": [],
+            "id": 72
+        },
+        {
+            "box": [
+                373,
+                1279,
+                464,
+                1301
+            ],
+            "text": "2020/21",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        373,
+                        1279,
+                        464,
+                        1301
+                    ],
+                    "text": "2020/21"
+                }
+            ],
+            "linking": [],
+            "id": 73
+        },
+        {
+            "box": [
+                373,
+                1318,
+                464,
+                1340
+            ],
+            "text": "2020/21",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        373,
+                        1318,
+                        464,
+                        1340
+                    ],
+                    "text": "2020/21"
+                }
+            ],
+            "linking": [],
+            "id": 74
+        },
+        {
+            "box": [
+                373,
+                1357,
+                464,
+                1379
+            ],
+            "text": "2020/21",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        373,
+                        1357,
+                        464,
+                        1379
+                    ],
+                    "text": "2020/21"
+                }
+            ],
+            "linking": [],
+            "id": 75
+        },
+        {
+            "box": [
+                373,
+                1396,
+                464,
+                1418
+            ],
+            "text": "2020/21",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        373,
+                        1396,
+                        464,
+                        1418
+                    ],
+                    "text": "2020/21"
+                }
+            ],
+            "linking": [],
+            "id": 76
+        },
+        {
+            "box": [
+                373,
+                1435,
+                464,
+                1457
+            ],
+            "text": "2020/21",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        373,
+                        1435,
+                        464,
+                        1457
+                    ],
+                    "text": "2020/21"
+                }
+            ],
+            "linking": [],
+            "id": 77
+        },
+        {
+            "box": [
+                373,
+                1477,
+                464,
+                1499
+            ],
+            "text": "2020/21",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        373,
+                        1477,
+                        464,
+                        1499
+                    ],
+                    "text": "2020/21"
+                }
+            ],
+            "linking": [],
+            "id": 78
+        },
+        {
+            "box": [
+                373,
+                1516,
+                464,
+                1538
+            ],
+            "text": "2020/21",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        373,
+                        1516,
+                        464,
+                        1538
+                    ],
+                    "text": "2020/21"
+                }
+            ],
+            "linking": [],
+            "id": 79
+        },
+        {
+            "box": [
+                373,
+                1555,
+                464,
+                1577
+            ],
+            "text": "2020/21",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        373,
+                        1555,
+                        464,
+                        1577
+                    ],
+                    "text": "2020/21"
+                }
+            ],
+            "linking": [],
+            "id": 80
+        },
+        {
+            "box": [
+                373,
+                1593,
+                464,
+                1616
+            ],
+            "text": "2020/21",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        373,
+                        1593,
+                        464,
+                        1616
+                    ],
+                    "text": "2020/21"
+                }
+            ],
+            "linking": [],
+            "id": 81
+        },
+        {
+            "box": [
+                373,
+                1632,
+                464,
+                1655
+            ],
+            "text": "2020/21",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        373,
+                        1632,
+                        464,
+                        1655
+                    ],
+                    "text": "2020/21"
+                }
+            ],
+            "linking": [],
+            "id": 82
+        },
+        {
+            "box": [
+                373,
+                1671,
+                464,
+                1694
+            ],
+            "text": "2020/21",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        373,
+                        1671,
+                        464,
+                        1694
+                    ],
+                    "text": "2020/21"
+                }
+            ],
+            "linking": [],
+            "id": 83
+        },
+        {
+            "box": [
+                732,
+                1234,
+                851,
+                1262
+            ],
+            "text": "Materias",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        732,
+                        1234,
+                        851,
+                        1262
+                    ],
+                    "text": "Materias"
+                }
+            ],
+            "linking": [],
+            "id": 84
+        },
+        {
+            "box": [
+                537,
+                1273,
+                743,
+                1296
+            ],
+            "text": "Educaci\u00f3n Pl\u00e1stica",
+            "label": "educacion_plastica_4_de_la_eso",
+            "words": [
+                {
+                    "box": [
+                        537,
+                        1273,
+                        656,
+                        1296
+                    ],
+                    "text": "Educaci\u00f3n"
+                },
+                {
+                    "box": [
+                        656,
+                        1273,
+                        743,
+                        1296
+                    ],
+                    "text": "Pl\u00e1stica"
+                }
+            ],
+            "linking": [],
+            "id": 85
+        },
+        {
+            "box": [
+                1202,
+                1273,
+                1216,
+                1296
+            ],
+            "text": "1",
+            "label": "educacion_plastica_4_de_la_eso_answer",
+            "words": [
+                {
+                    "box": [
+                        1202,
+                        1273,
+                        1216,
+                        1296
+                    ],
+                    "text": "1"
+                }
+            ],
+            "linking": [],
+            "id": 86
+        },
+        {
+            "box": [
+                537,
+                1310,
+                915,
+                1332
+            ],
+            "text": "Primera Lengua Extranjera: Ingl\u00e9s",
+            "label": "ingles_4_de_la_eso",
+            "words": [
+                {
+                    "box": [
+                        537,
+                        1310,
+                        629,
+                        1332
+                    ],
+                    "text": "Primera"
+                },
+                {
+                    "box": [
+                        629,
+                        1310,
+                        718,
+                        1332
+                    ],
+                    "text": "Lengua"
+                },
+                {
+                    "box": [
+                        718,
+                        1310,
+                        848,
+                        1332
+                    ],
+                    "text": "Extranjera:"
+                },
+                {
+                    "box": [
+                        848,
+                        1310,
+                        915,
+                        1332
+                    ],
+                    "text": "Ingl\u00e9s"
+                }
+            ],
+            "linking": [],
+            "id": 87
+        },
+        {
+            "box": [
+                1202,
+                1310,
+                1216,
+                1332
+            ],
+            "text": "1",
+            "label": "ingles_4_de_la_eso_answer",
+            "words": [
+                {
+                    "box": [
+                        1202,
+                        1310,
+                        1216,
+                        1332
+                    ],
+                    "text": "1"
+                }
+            ],
+            "linking": [],
+            "id": 88
+        },
+        {
+            "box": [
+                537,
+                1351,
+                701,
+                1374
+            ],
+            "text": "Dibujo T\u00e9cnico",
+            "label": "dibujo_tecnico_4_de_la_eso",
+            "words": [
+                {
+                    "box": [
+                        537,
+                        1351,
+                        615,
+                        1374
+                    ],
+                    "text": "Dibujo"
+                },
+                {
+                    "box": [
+                        615,
+                        1351,
+                        701,
+                        1374
+                    ],
+                    "text": "T\u00e9cnico"
+                }
+            ],
+            "linking": [],
+            "id": 89
+        },
+        {
+            "box": [
+                1202,
+                1351,
+                1216,
+                1374
+            ],
+            "text": "0",
+            "label": "dibujo_tecnico_4_de_la_eso_answer",
+            "words": [
+                {
+                    "box": [
+                        1202,
+                        1351,
+                        1216,
+                        1374
+                    ],
+                    "text": "0"
+                }
+            ],
+            "linking": [],
+            "id": 90
+        },
+        {
+            "box": [
+                537,
+                1390,
+                759,
+                1413
+            ],
+            "text": "Geograf\u00eda e Historia",
+            "label": "geografia_e_historia_4_de_la_eso",
+            "words": [
+                {
+                    "box": [
+                        537,
+                        1390,
+                        651,
+                        1413
+                    ],
+                    "text": "Geograf\u00eda"
+                },
+                {
+                    "box": [
+                        651,
+                        1390,
+                        673,
+                        1413
+                    ],
+                    "text": "e"
+                },
+                {
+                    "box": [
+                        673,
+                        1390,
+                        759,
+                        1413
+                    ],
+                    "text": "Historia"
+                }
+            ],
+            "linking": [],
+            "id": 91
+        },
+        {
+            "box": [
+                1202,
+                1390,
+                1216,
+                1413
+            ],
+            "text": "1",
+            "label": "geografia_e_historia_4_de_la_eso_answer",
+            "words": [
+                {
+                    "box": [
+                        1202,
+                        1390,
+                        1216,
+                        1413
+                    ],
+                    "text": "1"
+                }
+            ],
+            "linking": [],
+            "id": 92
+        },
+        {
+            "box": [
+                537,
+                1429,
+                743,
+                1452
+            ],
+            "text": "Ciencias Naturales",
+            "label": "ciencias_naturales_4_de_la_eso",
+            "words": [
+                {
+                    "box": [
+                        537,
+                        1429,
+                        637,
+                        1452
+                    ],
+                    "text": "Ciencias"
+                },
+                {
+                    "box": [
+                        637,
+                        1429,
+                        743,
+                        1452
+                    ],
+                    "text": "Naturales"
+                }
+            ],
+            "linking": [],
+            "id": 93
+        },
+        {
+            "box": [
+                1202,
+                1429,
+                1216,
+                1452
+            ],
+            "text": "1",
+            "label": "ciencias_naturales_4_de_la_eso_answer",
+            "words": [
+                {
+                    "box": [
+                        1202,
+                        1429,
+                        1216,
+                        1452
+                    ],
+                    "text": "1"
+                }
+            ],
+            "linking": [],
+            "id": 94
+        },
+        {
+            "box": [
+                537,
+                1468,
+                812,
+                1491
+            ],
+            "text": "Econom\u00eda de la Empresa",
+            "label": "economia_4_de_la_eso",
+            "words": [
+                {
+                    "box": [
+                        537,
+                        1468,
+                        651,
+                        1491
+                    ],
+                    "text": "Econom\u00eda"
+                },
+                {
+                    "box": [
+                        651,
+                        1468,
+                        687,
+                        1491
+                    ],
+                    "text": "de"
+                },
+                {
+                    "box": [
+                        687,
+                        1468,
+                        715,
+                        1491
+                    ],
+                    "text": "la"
+                },
+                {
+                    "box": [
+                        715,
+                        1468,
+                        812,
+                        1491
+                    ],
+                    "text": "Empresa"
+                }
+            ],
+            "linking": [],
+            "id": 95
+        },
+        {
+            "box": [
+                1202,
+                1468,
+                1216,
+                1491
+            ],
+            "text": "1",
+            "label": "economia_4_de_la_eso_answer",
+            "words": [
+                {
+                    "box": [
+                        1202,
+                        1468,
+                        1216,
+                        1491
+                    ],
+                    "text": "1"
+                }
+            ],
+            "linking": [],
+            "id": 96
+        },
+        {
+            "box": [
+                537,
+                1507,
+                707,
+                1529
+            ],
+            "text": "Dibujo Art\u00edstico",
+            "label": "dibujo_artistico_4_de_la_eso",
+            "words": [
+                {
+                    "box": [
+                        537,
+                        1507,
+                        615,
+                        1529
+                    ],
+                    "text": "Dibujo"
+                },
+                {
+                    "box": [
+                        615,
+                        1507,
+                        707,
+                        1529
+                    ],
+                    "text": "Art\u00edstico"
+                }
+            ],
+            "linking": [],
+            "id": 97
+        },
+        {
+            "box": [
+                1202,
+                1507,
+                1216,
+                1529
+            ],
+            "text": "1",
+            "label": "dibujo_artistico_4_de_la_eso_answer",
+            "words": [
+                {
+                    "box": [
+                        1202,
+                        1507,
+                        1216,
+                        1529
+                    ],
+                    "text": "1"
+                }
+            ],
+            "linking": [],
+            "id": 98
+        },
+        {
+            "box": [
+                537,
+                1546,
+                620,
+                1568
+            ],
+            "text": "Alem\u00e1n",
+            "label": "aleman_4_de_la_eso",
+            "words": [
+                {
+                    "box": [
+                        537,
+                        1546,
+                        620,
+                        1568
+                    ],
+                    "text": "Alem\u00e1n"
+                }
+            ],
+            "linking": [],
+            "id": 99
+        },
+        {
+            "box": [
+                1202,
+                1546,
+                1216,
+                1568
+            ],
+            "text": "1",
+            "label": "aleman_4_de_la_eso_answer",
+            "words": [
+                {
+                    "box": [
+                        1202,
+                        1546,
+                        1216,
+                        1568
+                    ],
+                    "text": "1"
+                }
+            ],
+            "linking": [],
+            "id": 100
+        },
+        {
+            "box": [
+                537,
+                1588,
+                843,
+                1610
+            ],
+            "text": "Lengua Extranjera: Franc\u00e9s",
+            "label": "frances_4_de_la_eso",
+            "words": [
+                {
+                    "box": [
+                        537,
+                        1588,
+                        626,
+                        1610
+                    ],
+                    "text": "Lengua"
+                },
+                {
+                    "box": [
+                        626,
+                        1588,
+                        754,
+                        1610
+                    ],
+                    "text": "Extranjera:"
+                },
+                {
+                    "box": [
+                        754,
+                        1588,
+                        843,
+                        1610
+                    ],
+                    "text": "Franc\u00e9s"
+                }
+            ],
+            "linking": [],
+            "id": 101
+        },
+        {
+            "box": [
+                1202,
+                1588,
+                1216,
+                1610
+            ],
+            "text": "1",
+            "label": "frances_4_de_la_eso_answer",
+            "words": [
+                {
+                    "box": [
+                        1202,
+                        1588,
+                        1216,
+                        1610
+                    ],
+                    "text": "1"
+                }
+            ],
+            "linking": [],
+            "id": 102
+        },
+        {
+            "box": [
+                537,
+                1627,
+                590,
+                1649
+            ],
+            "text": "Lat\u00edn",
+            "label": "latin_4_de_la_eso",
+            "words": [
+                {
+                    "box": [
+                        537,
+                        1627,
+                        590,
+                        1649
+                    ],
+                    "text": "Lat\u00edn"
+                }
+            ],
+            "linking": [],
+            "id": 103
+        },
+        {
+            "box": [
+                1202,
+                1627,
+                1216,
+                1649
+            ],
+            "text": "1",
+            "label": "latin_4_de_la_eso_answer",
+            "words": [
+                {
+                    "box": [
+                        1202,
+                        1627,
+                        1216,
+                        1649
+                    ],
+                    "text": "1"
+                }
+            ],
+            "linking": [],
+            "id": 104
+        },
+        {
+            "box": [
+                537,
+                1666,
+                720,
+                1688
+            ],
+            "text": "Educaci\u00f3n F\u00edsica",
+            "label": "educacion_fisica_4_de_la_eso",
+            "words": [
+                {
+                    "box": [
+                        537,
+                        1666,
+                        656,
+                        1688
+                    ],
+                    "text": "Educaci\u00f3n"
+                },
+                {
+                    "box": [
+                        656,
+                        1666,
+                        720,
+                        1688
+                    ],
+                    "text": "F\u00edsica"
+                }
+            ],
+            "linking": [],
+            "id": 105
+        },
+        {
+            "box": [
+                1202,
+                1666,
+                1216,
+                1688
+            ],
+            "text": "0",
+            "label": "educacion_fisica_4_de_la_eso_answer",
+            "words": [
+                {
+                    "box": [
+                        1202,
+                        1666,
+                        1216,
+                        1688
+                    ],
+                    "text": "0"
+                }
+            ],
+            "linking": [],
+            "id": 106
+        },
+        {
+            "box": [
+                1177,
+                586,
+                1383,
+                614
+            ],
+            "text": "Convocatorias:",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        1177,
+                        586,
+                        1383,
+                        614
+                    ],
+                    "text": "Convocatorias:"
+                }
+            ],
+            "linking": [],
+            "id": 107
+        },
+        {
+            "box": [
+                1146,
+                630,
+                1274,
+                658
+            ],
+            "text": "Ordinaria",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        1146,
+                        630,
+                        1274,
+                        658
+                    ],
+                    "text": "Ordinaria"
+                }
+            ],
+            "linking": [],
+            "id": 108
+        },
+        {
+            "box": [
+                1386,
+                630,
+                1466,
+                658
+            ],
+            "text": "Extra.",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        1386,
+                        630,
+                        1466,
+                        658
+                    ],
+                    "text": "Extra."
+                }
+            ],
+            "linking": [],
+            "id": 109
+        },
+        {
+            "box": [
+                1177,
+                1190,
+                1383,
+                1218
+            ],
+            "text": "Convocatorias:",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        1177,
+                        1190,
+                        1383,
+                        1218
+                    ],
+                    "text": "Convocatorias:"
+                }
+            ],
+            "linking": [],
+            "id": 110
+        },
+        {
+            "box": [
+                1146,
+                1234,
+                1274,
+                1262
+            ],
+            "text": "Ordinaria",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        1146,
+                        1234,
+                        1274,
+                        1262
+                    ],
+                    "text": "Ordinaria"
+                }
+            ],
+            "linking": [],
+            "id": 111
+        },
+        {
+            "box": [
+                1386,
+                1234,
+                1466,
+                1262
+            ],
+            "text": "Extra.",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        1386,
+                        1234,
+                        1466,
+                        1262
+                    ],
+                    "text": "Extra."
+                }
+            ],
+            "linking": [],
+            "id": 112
+        },
+        {
+            "box": [
+                155,
+                1777,
+                1478,
+                1805
+            ],
+            "text": "Y para que as\u00ed conste y surta los efectos oportunos, firmo y sello el presente en Madrid a 4 de",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        155,
+                        1777,
+                        183,
+                        1805
+                    ],
+                    "text": "Y"
+                },
+                {
+                    "box": [
+                        183,
+                        1777,
+                        253,
+                        1805
+                    ],
+                    "text": "para"
+                },
+                {
+                    "box": [
+                        253,
+                        1777,
+                        314,
+                        1805
+                    ],
+                    "text": "que"
+                },
+                {
+                    "box": [
+                        314,
+                        1777,
+                        364,
+                        1805
+                    ],
+                    "text": "as\u00ed"
+                },
+                {
+                    "box": [
+                        364,
+                        1777,
+                        464,
+                        1805
+                    ],
+                    "text": "conste"
+                },
+                {
+                    "box": [
+                        464,
+                        1777,
+                        489,
+                        1805
+                    ],
+                    "text": "y"
+                },
+                {
+                    "box": [
+                        489,
+                        1777,
+                        570,
+                        1805
+                    ],
+                    "text": "surta"
+                },
+                {
+                    "box": [
+                        570,
+                        1777,
+                        617,
+                        1805
+                    ],
+                    "text": "los"
+                },
+                {
+                    "box": [
+                        617,
+                        1777,
+                        729,
+                        1805
+                    ],
+                    "text": "efectos"
+                },
+                {
+                    "box": [
+                        729,
+                        1777,
+                        887,
+                        1805
+                    ],
+                    "text": "oportunos,"
+                },
+                {
+                    "box": [
+                        729,
+                        1777,
+                        971,
+                        1805
+                    ],
+                    "text": "firmo"
+                },
+                {
+                    "box": [
+                        971,
+                        1777,
+                        996,
+                        1805
+                    ],
+                    "text": "y"
+                },
+                {
+                    "box": [
+                        996,
+                        1777,
+                        1068,
+                        1805
+                    ],
+                    "text": "sello"
+                },
+                {
+                    "box": [
+                        1068,
+                        1777,
+                        1102,
+                        1805
+                    ],
+                    "text": "el"
+                },
+                {
+                    "box": [
+                        1102,
+                        1777,
+                        1233,
+                        1805
+                    ],
+                    "text": "presente"
+                },
+                {
+                    "box": [
+                        1233,
+                        1777,
+                        1277,
+                        1805
+                    ],
+                    "text": "en"
+                },
+                {
+                    "box": [
+                        1277,
+                        1777,
+                        1383,
+                        1805
+                    ],
+                    "text": "Madrid"
+                },
+                {
+                    "box": [
+                        1383,
+                        1777,
+                        1408,
+                        1805
+                    ],
+                    "text": "a"
+                },
+                {
+                    "box": [
+                        1408,
+                        1777,
+                        1433,
+                        1805
+                    ],
+                    "text": "4"
+                },
+                {
+                    "box": [
+                        1433,
+                        1777,
+                        1478,
+                        1805
+                    ],
+                    "text": "de"
+                }
+            ],
+            "linking": [],
+            "id": 113
+        },
+        {
+            "box": [
+                155,
+                1811,
+                448,
+                1838
+            ],
+            "text": "noviembre de 2022.",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        155,
+                        1811,
+                        314,
+                        1838
+                    ],
+                    "text": "noviembre"
+                },
+                {
+                    "box": [
+                        314,
+                        1811,
+                        359,
+                        1838
+                    ],
+                    "text": "de"
+                },
+                {
+                    "box": [
+                        359,
+                        1811,
+                        448,
+                        1838
+                    ],
+                    "text": "2022."
+                }
+            ],
+            "linking": [],
+            "id": 114
+        },
+        {
+            "box": [
+                320,
+                1930,
+                606,
+                1958
+            ],
+            "text": "V\u00ba B\u00ba El/la Director/a",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        320,
+                        1930,
+                        359,
+                        1958
+                    ],
+                    "text": "V\u00ba"
+                },
+                {
+                    "box": [
+                        359,
+                        1930,
+                        400,
+                        1958
+                    ],
+                    "text": "B\u00ba"
+                },
+                {
+                    "box": [
+                        400,
+                        1930,
+                        470,
+                        1958
+                    ],
+                    "text": "El/la"
+                },
+                {
+                    "box": [
+                        467,
+                        1930,
+                        606,
+                        1958
+                    ],
+                    "text": "Director/a"
+                }
+            ],
+            "linking": [],
+            "id": 115
+        },
+        {
+            "box": [
+                275,
+                1997,
+                651,
+                2025
+            ],
+            "text": "Fdo: Roque Gallego Crespo",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        275,
+                        1997,
+                        342,
+                        2025
+                    ],
+                    "text": "Fdo:"
+                },
+                {
+                    "box": [
+                        342,
+                        1997,
+                        439,
+                        2025
+                    ],
+                    "text": "Roque"
+                },
+                {
+                    "box": [
+                        439,
+                        1997,
+                        553,
+                        2025
+                    ],
+                    "text": "Gallego"
+                },
+                {
+                    "box": [
+                        553,
+                        1997,
+                        651,
+                        2025
+                    ],
+                    "text": "Crespo"
+                }
+            ],
+            "linking": [],
+            "id": 116
+        },
+        {
+            "box": [
+                1021,
+                1941,
+                1258,
+                1969
+            ],
+            "text": "El/la Secretario/a",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        1021,
+                        1941,
+                        1088,
+                        1969
+                    ],
+                    "text": "El/la"
+                },
+                {
+                    "box": [
+                        1088,
+                        1941,
+                        1258,
+                        1969
+                    ],
+                    "text": "Secretario/a"
+                }
+            ],
+            "linking": [],
+            "id": 117
+        },
+        {
+            "box": [
+                949,
+                2005,
+                1327,
+                2033
+            ],
+            "text": "Fdo: Ulrico Miranda Aranda",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        949,
+                        2005,
+                        1018,
+                        2033
+                    ],
+                    "text": "Fdo:"
+                },
+                {
+                    "box": [
+                        1018,
+                        2005,
+                        1107,
+                        2033
+                    ],
+                    "text": "Ulrico"
+                },
+                {
+                    "box": [
+                        1107,
+                        2005,
+                        1227,
+                        2033
+                    ],
+                    "text": "Miranda"
+                },
+                {
+                    "box": [
+                        1227,
+                        2005,
+                        1327,
+                        2033
+                    ],
+                    "text": "Aranda"
+                }
+            ],
+            "linking": [],
+            "id": 118
+        }
+    ]
+}

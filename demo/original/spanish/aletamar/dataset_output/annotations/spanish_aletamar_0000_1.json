@@ -1,0 +1,2277 @@
+{
+    "form": [
+        {
+            "box": [
+                626,
+                335,
+                1077,
+                369
+            ],
+            "text": "Certificaci\u00f3n Acad\u00e9mica",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        626,
+                        335,
+                        874,
+                        369
+                    ],
+                    "text": "Certificaci\u00f3n"
+                },
+                {
+                    "box": [
+                        874,
+                        335,
+                        1077,
+                        369
+                    ],
+                    "text": "Acad\u00e9mica"
+                }
+            ],
+            "linking": [],
+            "id": 0
+        },
+        {
+            "box": [
+                197,
+                410,
+                1444,
+                438
+            ],
+            "text": "Don Gabriel M\u00e1rquez Nieto, responsable de secretar\u00eda del COLEGIO ALETAMAR.",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        197,
+                        410,
+                        261,
+                        438
+                    ],
+                    "text": "Don"
+                },
+                {
+                    "box": [
+                        261,
+                        410,
+                        384,
+                        438
+                    ],
+                    "text": "Gabriel"
+                },
+                {
+                    "box": [
+                        384,
+                        410,
+                        528,
+                        438
+                    ],
+                    "text": "M\u00e1rquez"
+                },
+                {
+                    "box": [
+                        528,
+                        410,
+                        631,
+                        438
+                    ],
+                    "text": "Nieto,"
+                },
+                {
+                    "box": [
+                        631,
+                        410,
+                        835,
+                        438
+                    ],
+                    "text": "responsable"
+                },
+                {
+                    "box": [
+                        835,
+                        410,
+                        882,
+                        438
+                    ],
+                    "text": "de"
+                },
+                {
+                    "box": [
+                        882,
+                        410,
+                        1052,
+                        438
+                    ],
+                    "text": "secretar\u00eda"
+                },
+                {
+                    "box": [
+                        1052,
+                        410,
+                        1107,
+                        438
+                    ],
+                    "text": "del"
+                },
+                {
+                    "box": [
+                        1107,
+                        410,
+                        1255,
+                        438
+                    ],
+                    "text": "COLEGIO"
+                },
+                {
+                    "box": [
+                        1258,
+                        410,
+                        1444,
+                        438
+                    ],
+                    "text": "ALETAMAR."
+                }
+            ],
+            "linking": [],
+            "id": 1
+        },
+        {
+            "box": [
+                197,
+                474,
+                1416,
+                502
+            ],
+            "text": "CERTIFICO: Que Don Bel\u00e9n Cuenca Valero, ha cursado con las calificaciones y en los",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        197,
+                        474,
+                        361,
+                        502
+                    ],
+                    "text": "CERTIFICO:"
+                },
+                {
+                    "box": [
+                        361,
+                        474,
+                        425,
+                        502
+                    ],
+                    "text": "Que"
+                },
+                {
+                    "box": [
+                        425,
+                        474,
+                        492,
+                        502
+                    ],
+                    "text": "Don"
+                },
+                {
+                    "box": [
+                        492,
+                        474,
+                        590,
+                        502
+                    ],
+                    "text": "Bel\u00e9n"
+                },
+                {
+                    "box": [
+                        590,
+                        474,
+                        715,
+                        502
+                    ],
+                    "text": "Cuenca"
+                },
+                {
+                    "box": [
+                        715,
+                        474,
+                        832,
+                        502
+                    ],
+                    "text": "Valero,"
+                },
+                {
+                    "box": [
+                        832,
+                        474,
+                        876,
+                        502
+                    ],
+                    "text": "ha"
+                },
+                {
+                    "box": [
+                        876,
+                        474,
+                        996,
+                        502
+                    ],
+                    "text": "cursado"
+                },
+                {
+                    "box": [
+                        996,
+                        474,
+                        1054,
+                        502
+                    ],
+                    "text": "con"
+                },
+                {
+                    "box": [
+                        1054,
+                        474,
+                        1102,
+                        502
+                    ],
+                    "text": "las"
+                },
+                {
+                    "box": [
+                        1102,
+                        474,
+                        1299,
+                        502
+                    ],
+                    "text": "calificaciones"
+                },
+                {
+                    "box": [
+                        1299,
+                        474,
+                        1324,
+                        502
+                    ],
+                    "text": "y"
+                },
+                {
+                    "box": [
+                        1324,
+                        474,
+                        1366,
+                        502
+                    ],
+                    "text": "en"
+                },
+                {
+                    "box": [
+                        1366,
+                        474,
+                        1416,
+                        502
+                    ],
+                    "text": "los"
+                }
+            ],
+            "linking": [],
+            "id": 2
+        },
+        {
+            "box": [
+                197,
+                505,
+                1380,
+                533
+            ],
+            "text": "cursos que a continuaci\u00f3n de expresan los estudios de BACHILLERATO, modalidad",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        197,
+                        505,
+                        295,
+                        533
+                    ],
+                    "text": "cursos"
+                },
+                {
+                    "box": [
+                        295,
+                        505,
+                        356,
+                        533
+                    ],
+                    "text": "que"
+                },
+                {
+                    "box": [
+                        356,
+                        505,
+                        381,
+                        533
+                    ],
+                    "text": "a"
+                },
+                {
+                    "box": [
+                        381,
+                        505,
+                        570,
+                        533
+                    ],
+                    "text": "continuaci\u00f3n"
+                },
+                {
+                    "box": [
+                        570,
+                        505,
+                        612,
+                        533
+                    ],
+                    "text": "de"
+                },
+                {
+                    "box": [
+                        612,
+                        505,
+                        751,
+                        533
+                    ],
+                    "text": "expresan"
+                },
+                {
+                    "box": [
+                        751,
+                        505,
+                        798,
+                        533
+                    ],
+                    "text": "los"
+                },
+                {
+                    "box": [
+                        798,
+                        505,
+                        924,
+                        533
+                    ],
+                    "text": "estudios"
+                },
+                {
+                    "box": [
+                        924,
+                        505,
+                        968,
+                        533
+                    ],
+                    "text": "de"
+                },
+                {
+                    "box": [
+                        968,
+                        505,
+                        1224,
+                        533
+                    ],
+                    "text": "BACHILLERATO,"
+                },
+                {
+                    "box": [
+                        1224,
+                        505,
+                        1380,
+                        533
+                    ],
+                    "text": "modalidad"
+                }
+            ],
+            "linking": [],
+            "id": 3
+        },
+        {
+            "box": [
+                197,
+                539,
+                345,
+                566
+            ],
+            "text": "Ciencias.",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        197,
+                        539,
+                        345,
+                        566
+                    ],
+                    "text": "Ciencias."
+                }
+            ],
+            "linking": [],
+            "id": 4
+        },
+        {
+            "box": [
+                289,
+                669,
+                331,
+                692
+            ],
+            "text": "A\u00f1o",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        289,
+                        669,
+                        331,
+                        692
+                    ],
+                    "text": "A\u00f1o"
+                }
+            ],
+            "linking": [],
+            "id": 5
+        },
+        {
+            "box": [
+                395,
+                642,
+                531,
+                664
+            ],
+            "text": "Centro en el",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        395,
+                        642,
+                        478,
+                        664
+                    ],
+                    "text": "Centro"
+                },
+                {
+                    "box": [
+                        478,
+                        642,
+                        512,
+                        664
+                    ],
+                    "text": "en"
+                },
+                {
+                    "box": [
+                        512,
+                        642,
+                        531,
+                        664
+                    ],
+                    "text": "el"
+                }
+            ],
+            "linking": [],
+            "id": 6
+        },
+        {
+            "box": [
+                384,
+                669,
+                545,
+                692
+            ],
+            "text": "que realiz\u00f3 los",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        384,
+                        669,
+                        431,
+                        692
+                    ],
+                    "text": "que"
+                },
+                {
+                    "box": [
+                        431,
+                        669,
+                        514,
+                        692
+                    ],
+                    "text": "realiz\u00f3"
+                },
+                {
+                    "box": [
+                        514,
+                        669,
+                        545,
+                        692
+                    ],
+                    "text": "los"
+                }
+            ],
+            "linking": [],
+            "id": 7
+        },
+        {
+            "box": [
+                417,
+                694,
+                512,
+                717
+            ],
+            "text": "estudios",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        417,
+                        694,
+                        512,
+                        717
+                    ],
+                    "text": "estudios"
+                }
+            ],
+            "linking": [],
+            "id": 8
+        },
+        {
+            "box": [
+                270,
+                831,
+                350,
+                850
+            ],
+            "text": "2020/21",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        270,
+                        831,
+                        350,
+                        850
+                    ],
+                    "text": "2020/21"
+                }
+            ],
+            "linking": [],
+            "id": 9
+        },
+        {
+            "box": [
+                420,
+                820,
+                509,
+                839
+            ],
+            "text": "COLEGIO",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        420,
+                        820,
+                        509,
+                        839
+                    ],
+                    "text": "COLEGIO"
+                }
+            ],
+            "linking": [],
+            "id": 10
+        },
+        {
+            "box": [
+                411,
+                842,
+                517,
+                861
+            ],
+            "text": "ALETAMAR",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        411,
+                        842,
+                        517,
+                        861
+                    ],
+                    "text": "ALETAMAR"
+                }
+            ],
+            "linking": [],
+            "id": 11
+        },
+        {
+            "box": [
+                798,
+                608,
+                893,
+                630
+            ],
+            "text": "Curso 1",
+            "label": "1_de_bachillerato",
+            "words": [
+                {
+                    "box": [
+                        798,
+                        608,
+                        879,
+                        630
+                    ],
+                    "text": "Curso"
+                },
+                {
+                    "box": [
+                        879,
+                        608,
+                        893,
+                        630
+                    ],
+                    "text": "1"
+                }
+            ],
+            "linking": [],
+            "id": 12
+        },
+        {
+            "box": [
+                773,
+                669,
+                868,
+                692
+            ],
+            "text": "Materias",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        773,
+                        669,
+                        868,
+                        692
+                    ],
+                    "text": "Materias"
+                }
+            ],
+            "linking": [],
+            "id": 13
+        },
+        {
+            "box": [
+                718,
+                761,
+                924,
+                781
+            ],
+            "text": "MATERIAS COMUNES",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        718,
+                        761,
+                        823,
+                        781
+                    ],
+                    "text": "MATERIAS"
+                },
+                {
+                    "box": [
+                        823,
+                        761,
+                        924,
+                        781
+                    ],
+                    "text": "COMUNES"
+                }
+            ],
+            "linking": [],
+            "id": 14
+        },
+        {
+            "box": [
+                796,
+                847,
+                846,
+                867
+            ],
+            "text": "Lat\u00edn",
+            "label": "latin_1_de_bachillerato",
+            "words": [
+                {
+                    "box": [
+                        796,
+                        847,
+                        846,
+                        867
+                    ],
+                    "text": "Lat\u00edn"
+                }
+            ],
+            "linking": [],
+            "id": 15
+        },
+        {
+            "box": [
+                1191,
+                847,
+                1202,
+                867
+            ],
+            "text": "8",
+            "label": "latin_1_de_bachillerato_answer",
+            "words": [
+                {
+                    "box": [
+                        1191,
+                        847,
+                        1202,
+                        867
+                    ],
+                    "text": "8"
+                }
+            ],
+            "linking": [],
+            "id": 16
+        },
+        {
+            "box": [
+                746,
+                917,
+                896,
+                937
+            ],
+            "text": "Dibujo Art\u00edstico",
+            "label": "dibujo_artistico_1_de_bachillerato",
+            "words": [
+                {
+                    "box": [
+                        746,
+                        917,
+                        815,
+                        937
+                    ],
+                    "text": "Dibujo"
+                },
+                {
+                    "box": [
+                        815,
+                        917,
+                        896,
+                        937
+                    ],
+                    "text": "Art\u00edstico"
+                }
+            ],
+            "linking": [],
+            "id": 17
+        },
+        {
+            "box": [
+                1191,
+                917,
+                1202,
+                937
+            ],
+            "text": "9",
+            "label": "dibujo_artistico_1_de_bachillerato_answer",
+            "words": [
+                {
+                    "box": [
+                        1191,
+                        917,
+                        1202,
+                        937
+                    ],
+                    "text": "9"
+                }
+            ],
+            "linking": [],
+            "id": 18
+        },
+        {
+            "box": [
+                748,
+                973,
+                893,
+                992
+            ],
+            "text": "Cultura Cl\u00e1sica",
+            "label": "ciencias_del_mundo_1_de_bachillerato",
+            "words": [
+                {
+                    "box": [
+                        748,
+                        973,
+                        826,
+                        992
+                    ],
+                    "text": "Cultura"
+                },
+                {
+                    "box": [
+                        826,
+                        973,
+                        893,
+                        992
+                    ],
+                    "text": "Cl\u00e1sica"
+                }
+            ],
+            "linking": [],
+            "id": 19
+        },
+        {
+            "box": [
+                1191,
+                973,
+                1202,
+                992
+            ],
+            "text": "9",
+            "label": "ciencias_del_mundo_1_de_bachillerato_answer",
+            "words": [
+                {
+                    "box": [
+                        1191,
+                        973,
+                        1202,
+                        992
+                    ],
+                    "text": "9"
+                }
+            ],
+            "linking": [],
+            "id": 20
+        },
+        {
+            "box": [
+                793,
+                1031,
+                848,
+                1051
+            ],
+            "text": "F\u00edsica",
+            "label": "fisica_y_quimica_1_de_bachillerato",
+            "words": [
+                {
+                    "box": [
+                        793,
+                        1031,
+                        848,
+                        1051
+                    ],
+                    "text": "F\u00edsica"
+                }
+            ],
+            "linking": [],
+            "id": 21
+        },
+        {
+            "box": [
+                1191,
+                1031,
+                1202,
+                1051
+            ],
+            "text": "9",
+            "label": "fisica_y_quimica_1_de_bachillerato_answer",
+            "words": [
+                {
+                    "box": [
+                        1191,
+                        1031,
+                        1202,
+                        1051
+                    ],
+                    "text": "9"
+                }
+            ],
+            "linking": [],
+            "id": 22
+        },
+        {
+            "box": [
+                695,
+                1090,
+                946,
+                1109
+            ],
+            "text": "Lengua Extranjera: Ingl\u00e9s",
+            "label": "ingles_1_de_bachillerato",
+            "words": [
+                {
+                    "box": [
+                        695,
+                        1090,
+                        773,
+                        1109
+                    ],
+                    "text": "Lengua"
+                },
+                {
+                    "box": [
+                        773,
+                        1090,
+                        887,
+                        1109
+                    ],
+                    "text": "Extranjera:"
+                },
+                {
+                    "box": [
+                        887,
+                        1090,
+                        946,
+                        1109
+                    ],
+                    "text": "Ingl\u00e9s"
+                }
+            ],
+            "linking": [],
+            "id": 23
+        },
+        {
+            "box": [
+                1191,
+                1090,
+                1202,
+                1109
+            ],
+            "text": "9",
+            "label": "ingles_1_de_bachillerato_answer",
+            "words": [
+                {
+                    "box": [
+                        1191,
+                        1090,
+                        1202,
+                        1109
+                    ],
+                    "text": "9"
+                }
+            ],
+            "linking": [],
+            "id": 24
+        },
+        {
+            "box": [
+                801,
+                1145,
+                840,
+                1165
+            ],
+            "text": "Arte",
+            "label": "educacion_plastica_1_de_bachillerato",
+            "words": [
+                {
+                    "box": [
+                        801,
+                        1145,
+                        840,
+                        1165
+                    ],
+                    "text": "Arte"
+                }
+            ],
+            "linking": [],
+            "id": 25
+        },
+        {
+            "box": [
+                1191,
+                1145,
+                1202,
+                1165
+            ],
+            "text": "9",
+            "label": "educacion_plastica_1_de_bachillerato_answer",
+            "words": [
+                {
+                    "box": [
+                        1191,
+                        1145,
+                        1202,
+                        1165
+                    ],
+                    "text": "9"
+                }
+            ],
+            "linking": [],
+            "id": 26
+        },
+        {
+            "box": [
+                765,
+                1204,
+                876,
+                1223
+            ],
+            "text": "Inform\u00e1tica",
+            "label": "informatica_1_de_bachillerato",
+            "words": [
+                {
+                    "box": [
+                        765,
+                        1204,
+                        876,
+                        1223
+                    ],
+                    "text": "Inform\u00e1tica"
+                }
+            ],
+            "linking": [],
+            "id": 27
+        },
+        {
+            "box": [
+                1191,
+                1204,
+                1202,
+                1223
+            ],
+            "text": "9",
+            "label": "informatica_1_de_bachillerato_answer",
+            "words": [
+                {
+                    "box": [
+                        1191,
+                        1204,
+                        1202,
+                        1223
+                    ],
+                    "text": "9"
+                }
+            ],
+            "linking": [],
+            "id": 28
+        },
+        {
+            "box": [
+                726,
+                1262,
+                915,
+                1282
+            ],
+            "text": "Biolog\u00eda y Geolog\u00eda",
+            "label": "biologia_y_geologia_1_de_bachillerato",
+            "words": [
+                {
+                    "box": [
+                        726,
+                        1262,
+                        810,
+                        1282
+                    ],
+                    "text": "Biolog\u00eda"
+                },
+                {
+                    "box": [
+                        810,
+                        1262,
+                        829,
+                        1282
+                    ],
+                    "text": "y"
+                },
+                {
+                    "box": [
+                        829,
+                        1262,
+                        915,
+                        1282
+                    ],
+                    "text": "Geolog\u00eda"
+                }
+            ],
+            "linking": [],
+            "id": 29
+        },
+        {
+            "box": [
+                1191,
+                1262,
+                1202,
+                1282
+            ],
+            "text": "9",
+            "label": "biologia_y_geologia_1_de_bachillerato_answer",
+            "words": [
+                {
+                    "box": [
+                        1191,
+                        1262,
+                        1202,
+                        1282
+                    ],
+                    "text": "9"
+                }
+            ],
+            "linking": [],
+            "id": 30
+        },
+        {
+            "box": [
+                784,
+                1318,
+                857,
+                1337
+            ],
+            "text": "\u00c1lgebra",
+            "label": "matematicas_1_de_bachillerato",
+            "words": [
+                {
+                    "box": [
+                        784,
+                        1318,
+                        857,
+                        1337
+                    ],
+                    "text": "\u00c1lgebra"
+                }
+            ],
+            "linking": [],
+            "id": 31
+        },
+        {
+            "box": [
+                1191,
+                1318,
+                1202,
+                1337
+            ],
+            "text": "8",
+            "label": "matematicas_1_de_bachillerato_answer",
+            "words": [
+                {
+                    "box": [
+                        1191,
+                        1318,
+                        1202,
+                        1337
+                    ],
+                    "text": "8"
+                }
+            ],
+            "linking": [],
+            "id": 32
+        },
+        {
+            "box": [
+                701,
+                1376,
+                940,
+                1396
+            ],
+            "text": "Econom\u00eda de la Empresa",
+            "label": "economia_1_de_bachillerato",
+            "words": [
+                {
+                    "box": [
+                        701,
+                        1376,
+                        801,
+                        1396
+                    ],
+                    "text": "Econom\u00eda"
+                },
+                {
+                    "box": [
+                        801,
+                        1376,
+                        832,
+                        1396
+                    ],
+                    "text": "de"
+                },
+                {
+                    "box": [
+                        832,
+                        1376,
+                        857,
+                        1396
+                    ],
+                    "text": "la"
+                },
+                {
+                    "box": [
+                        857,
+                        1376,
+                        940,
+                        1396
+                    ],
+                    "text": "Empresa"
+                }
+            ],
+            "linking": [],
+            "id": 33
+        },
+        {
+            "box": [
+                1191,
+                1376,
+                1202,
+                1396
+            ],
+            "text": "9",
+            "label": "economia_1_de_bachillerato_answer",
+            "words": [
+                {
+                    "box": [
+                        1191,
+                        1376,
+                        1202,
+                        1396
+                    ],
+                    "text": "9"
+                }
+            ],
+            "linking": [],
+            "id": 34
+        },
+        {
+            "box": [
+                659,
+                1435,
+                982,
+                1454
+            ],
+            "text": "Desarrollo Personal y Ciudadan\u00eda",
+            "label": "educacion_etico_civica_1_de_bachillerato",
+            "words": [
+                {
+                    "box": [
+                        659,
+                        1435,
+                        765,
+                        1454
+                    ],
+                    "text": "Desarrollo"
+                },
+                {
+                    "box": [
+                        765,
+                        1435,
+                        854,
+                        1454
+                    ],
+                    "text": "Personal"
+                },
+                {
+                    "box": [
+                        854,
+                        1435,
+                        874,
+                        1454
+                    ],
+                    "text": "y"
+                },
+                {
+                    "box": [
+                        874,
+                        1435,
+                        982,
+                        1454
+                    ],
+                    "text": "Ciudadan\u00eda"
+                }
+            ],
+            "linking": [],
+            "id": 35
+        },
+        {
+            "box": [
+                1191,
+                1435,
+                1202,
+                1454
+            ],
+            "text": "9",
+            "label": "educacion_etico_civica_1_de_bachillerato_answer",
+            "words": [
+                {
+                    "box": [
+                        1191,
+                        1435,
+                        1202,
+                        1454
+                    ],
+                    "text": "9"
+                }
+            ],
+            "linking": [],
+            "id": 36
+        },
+        {
+            "box": [
+                681,
+                1474,
+                960,
+                1493
+            ],
+            "text": "Decisi\u00f3n sobre la promoci\u00f3n",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        681,
+                        1474,
+                        771,
+                        1493
+                    ],
+                    "text": "Decisi\u00f3n"
+                },
+                {
+                    "box": [
+                        771,
+                        1474,
+                        832,
+                        1493
+                    ],
+                    "text": "sobre"
+                },
+                {
+                    "box": [
+                        832,
+                        1474,
+                        857,
+                        1493
+                    ],
+                    "text": "la"
+                },
+                {
+                    "box": [
+                        857,
+                        1474,
+                        960,
+                        1493
+                    ],
+                    "text": "promoci\u00f3n"
+                }
+            ],
+            "linking": [],
+            "id": 37
+        },
+        {
+            "box": [
+                1202,
+                639,
+                1316,
+                661
+            ],
+            "text": "Ex\u00e1menes",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        1202,
+                        639,
+                        1316,
+                        661
+                    ],
+                    "text": "Ex\u00e1menes"
+                }
+            ],
+            "linking": [],
+            "id": 38
+        },
+        {
+            "box": [
+                1138,
+                703,
+                1252,
+                725
+            ],
+            "text": "Ordinarios",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        1138,
+                        703,
+                        1252,
+                        725
+                    ],
+                    "text": "Ordinarios"
+                }
+            ],
+            "linking": [],
+            "id": 39
+        },
+        {
+            "box": [
+                1341,
+                703,
+                1408,
+                725
+            ],
+            "text": "Extra.",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        1341,
+                        703,
+                        1408,
+                        725
+                    ],
+                    "text": "Extra."
+                }
+            ],
+            "linking": [],
+            "id": 40
+        },
+        {
+            "box": [
+                297,
+                1599,
+                1416,
+                1627
+            ],
+            "text": "Y para que as\u00ed conste y surta los efectos oportunos, firmo y sello el presente en",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        297,
+                        1599,
+                        322,
+                        1627
+                    ],
+                    "text": "Y"
+                },
+                {
+                    "box": [
+                        322,
+                        1599,
+                        395,
+                        1627
+                    ],
+                    "text": "para"
+                },
+                {
+                    "box": [
+                        395,
+                        1599,
+                        456,
+                        1627
+                    ],
+                    "text": "que"
+                },
+                {
+                    "box": [
+                        456,
+                        1599,
+                        503,
+                        1627
+                    ],
+                    "text": "as\u00ed"
+                },
+                {
+                    "box": [
+                        503,
+                        1599,
+                        604,
+                        1627
+                    ],
+                    "text": "conste"
+                },
+                {
+                    "box": [
+                        604,
+                        1599,
+                        629,
+                        1627
+                    ],
+                    "text": "y"
+                },
+                {
+                    "box": [
+                        629,
+                        1599,
+                        709,
+                        1627
+                    ],
+                    "text": "surta"
+                },
+                {
+                    "box": [
+                        709,
+                        1599,
+                        759,
+                        1627
+                    ],
+                    "text": "los"
+                },
+                {
+                    "box": [
+                        759,
+                        1599,
+                        868,
+                        1627
+                    ],
+                    "text": "efectos"
+                },
+                {
+                    "box": [
+                        868,
+                        1599,
+                        1027,
+                        1627
+                    ],
+                    "text": "oportunos,"
+                },
+                {
+                    "box": [
+                        1027,
+                        1599,
+                        1110,
+                        1627
+                    ],
+                    "text": "firmo"
+                },
+                {
+                    "box": [
+                        1110,
+                        1599,
+                        1135,
+                        1627
+                    ],
+                    "text": "y"
+                },
+                {
+                    "box": [
+                        1135,
+                        1599,
+                        1208,
+                        1627
+                    ],
+                    "text": "sello"
+                },
+                {
+                    "box": [
+                        1208,
+                        1599,
+                        1241,
+                        1627
+                    ],
+                    "text": "el"
+                },
+                {
+                    "box": [
+                        1241,
+                        1599,
+                        1372,
+                        1627
+                    ],
+                    "text": "presente"
+                },
+                {
+                    "box": [
+                        1372,
+                        1599,
+                        1416,
+                        1627
+                    ],
+                    "text": "en"
+                }
+            ],
+            "linking": [],
+            "id": 41
+        },
+        {
+            "box": [
+                197,
+                1630,
+                854,
+                1658
+            ],
+            "text": "POZAS DE ODIEL a 27 de septiembre de 2022.",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        197,
+                        1630,
+                        300,
+                        1658
+                    ],
+                    "text": "POZAS"
+                },
+                {
+                    "box": [
+                        300,
+                        1630,
+                        347,
+                        1658
+                    ],
+                    "text": "DE"
+                },
+                {
+                    "box": [
+                        347,
+                        1630,
+                        439,
+                        1658
+                    ],
+                    "text": "ODIEL"
+                },
+                {
+                    "box": [
+                        439,
+                        1630,
+                        467,
+                        1658
+                    ],
+                    "text": "a"
+                },
+                {
+                    "box": [
+                        467,
+                        1630,
+                        512,
+                        1658
+                    ],
+                    "text": "27"
+                },
+                {
+                    "box": [
+                        512,
+                        1630,
+                        553,
+                        1658
+                    ],
+                    "text": "de"
+                },
+                {
+                    "box": [
+                        553,
+                        1630,
+                        720,
+                        1658
+                    ],
+                    "text": "septiembre"
+                },
+                {
+                    "box": [
+                        720,
+                        1630,
+                        765,
+                        1658
+                    ],
+                    "text": "de"
+                },
+                {
+                    "box": [
+                        765,
+                        1630,
+                        854,
+                        1658
+                    ],
+                    "text": "2022."
+                }
+            ],
+            "linking": [],
+            "id": 42
+        },
+        {
+            "box": [
+                347,
+                1769,
+                645,
+                1797
+            ],
+            "text": "V\u00b0 B\u00b0 LA DIRECCI\u00d3N",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        347,
+                        1769,
+                        389,
+                        1797
+                    ],
+                    "text": "V\u00b0"
+                },
+                {
+                    "box": [
+                        389,
+                        1769,
+                        431,
+                        1797
+                    ],
+                    "text": "B\u00b0"
+                },
+                {
+                    "box": [
+                        431,
+                        1769,
+                        473,
+                        1797
+                    ],
+                    "text": "LA"
+                },
+                {
+                    "box": [
+                        473,
+                        1769,
+                        645,
+                        1797
+                    ],
+                    "text": "DIRECCI\u00d3N"
+                }
+            ],
+            "linking": [],
+            "id": 43
+        },
+        {
+            "box": [
+                244,
+                1836,
+                601,
+                1864
+            ],
+            "text": "Firmado por Sergio Soler",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        244,
+                        1836,
+                        367,
+                        1864
+                    ],
+                    "text": "Firmado"
+                },
+                {
+                    "box": [
+                        367,
+                        1836,
+                        423,
+                        1864
+                    ],
+                    "text": "por"
+                },
+                {
+                    "box": [
+                        423,
+                        1836,
+                        520,
+                        1864
+                    ],
+                    "text": "Sergio"
+                },
+                {
+                    "box": [
+                        520,
+                        1836,
+                        601,
+                        1864
+                    ],
+                    "text": "Soler"
+                }
+            ],
+            "linking": [],
+            "id": 44
+        },
+        {
+            "box": [
+                244,
+                1866,
+                489,
+                1894
+            ],
+            "text": "Hern\u00e1ndez el d\u00eda",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        244,
+                        1866,
+                        406,
+                        1894
+                    ],
+                    "text": "Hern\u00e1ndez"
+                },
+                {
+                    "box": [
+                        406,
+                        1866,
+                        439,
+                        1894
+                    ],
+                    "text": "el"
+                },
+                {
+                    "box": [
+                        439,
+                        1866,
+                        489,
+                        1894
+                    ],
+                    "text": "d\u00eda"
+                }
+            ],
+            "linking": [],
+            "id": 45
+        },
+        {
+            "box": [
+                244,
+                1900,
+                406,
+                1928
+            ],
+            "text": "30/09/2022",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        244,
+                        1900,
+                        406,
+                        1928
+                    ],
+                    "text": "30/09/2022"
+                }
+            ],
+            "linking": [],
+            "id": 46
+        },
+        {
+            "box": [
+                311,
+                1964,
+                681,
+                1992
+            ],
+            "text": "Sergio Soler Hern\u00e1ndez",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        311,
+                        1964,
+                        423,
+                        1992
+                    ],
+                    "text": "Sergio"
+                },
+                {
+                    "box": [
+                        423,
+                        1964,
+                        512,
+                        1992
+                    ],
+                    "text": "Soler"
+                },
+                {
+                    "box": [
+                        512,
+                        1964,
+                        681,
+                        1992
+                    ],
+                    "text": "Hern\u00e1ndez"
+                }
+            ],
+            "linking": [],
+            "id": 47
+        },
+        {
+            "box": [
+                1110,
+                1758,
+                1305,
+                1786
+            ],
+            "text": "SECRETAR\u00cdA",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        1110,
+                        1758,
+                        1305,
+                        1786
+                    ],
+                    "text": "SECRETAR\u00cdA"
+                }
+            ],
+            "linking": [],
+            "id": 48
+        },
+        {
+            "box": [
+                904,
+                1822,
+                1505,
+                1850
+            ],
+            "text": "Firmado digitalmente por Gabriel M\u00e1rquez",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        904,
+                        1822,
+                        1027,
+                        1850
+                    ],
+                    "text": "Firmado"
+                },
+                {
+                    "box": [
+                        1027,
+                        1822,
+                        1213,
+                        1850
+                    ],
+                    "text": "digitalmente"
+                },
+                {
+                    "box": [
+                        1213,
+                        1822,
+                        1266,
+                        1850
+                    ],
+                    "text": "por"
+                },
+                {
+                    "box": [
+                        1266,
+                        1822,
+                        1377,
+                        1850
+                    ],
+                    "text": "Gabriel"
+                },
+                {
+                    "box": [
+                        1377,
+                        1822,
+                        1505,
+                        1850
+                    ],
+                    "text": "M\u00e1rquez"
+                }
+            ],
+            "linking": [],
+            "id": 49
+        },
+        {
+            "box": [
+                904,
+                1855,
+                1255,
+                1883
+            ],
+            "text": "Nieto \u2013 el d\u00eda 30/09/2022",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        904,
+                        1855,
+                        988,
+                        1883
+                    ],
+                    "text": "Nieto"
+                },
+                {
+                    "box": [
+                        988,
+                        1855,
+                        1010,
+                        1883
+                    ],
+                    "text": "\u2013"
+                },
+                {
+                    "box": [
+                        1010,
+                        1855,
+                        1043,
+                        1883
+                    ],
+                    "text": "el"
+                },
+                {
+                    "box": [
+                        1043,
+                        1855,
+                        1093,
+                        1883
+                    ],
+                    "text": "d\u00eda"
+                },
+                {
+                    "box": [
+                        1093,
+                        1855,
+                        1255,
+                        1883
+                    ],
+                    "text": "30/09/2022"
+                }
+            ],
+            "linking": [],
+            "id": 50
+        },
+        {
+            "box": [
+                904,
+                1928,
+                1166,
+                1955
+            ],
+            "text": "Fecha: 2022.09.30",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        904,
+                        1928,
+                        1004,
+                        1955
+                    ],
+                    "text": "Fecha:"
+                },
+                {
+                    "box": [
+                        1004,
+                        1928,
+                        1166,
+                        1955
+                    ],
+                    "text": "2022.09.30"
+                }
+            ],
+            "linking": [],
+            "id": 51
+        },
+        {
+            "box": [
+                1032,
+                1958,
+                1383,
+                1986
+            ],
+            "text": "Gabriel M\u00e1rquez Nieto",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        1032,
+                        1958,
+                        1155,
+                        1986
+                    ],
+                    "text": "Gabriel"
+                },
+                {
+                    "box": [
+                        1155,
+                        1958,
+                        1299,
+                        1986
+                    ],
+                    "text": "M\u00e1rquez"
+                },
+                {
+                    "box": [
+                        1299,
+                        1958,
+                        1383,
+                        1986
+                    ],
+                    "text": "Nieto"
+                }
+            ],
+            "linking": [],
+            "id": 52
+        },
+        {
+            "box": [
+                459,
+                2217,
+                1244,
+                2250
+            ],
+            "text": "_______________________________________________",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        459,
+                        2217,
+                        1244,
+                        2250
+                    ],
+                    "text": "_______________________________________________"
+                }
+            ],
+            "linking": [],
+            "id": 53
+        },
+        {
+            "box": [
+                381,
+                2253,
+                1319,
+                2275
+            ],
+            "text": "Tinto 22, 21005 Pozas de Odiel (Huelva) | Tel.: +34 959 032 919 | www.aletamar.es",
+            "label": "other",
+            "words": [
+                {
+                    "box": [
+                        381,
+                        2253,
+                        445,
+                        2275
+                    ],
+                    "text": "Tinto"
+                },
+                {
+                    "box": [
+                        445,
+                        2253,
+                        487,
+                        2275
+                    ],
+                    "text": "22,"
+                },
+                {
+                    "box": [
+                        487,
+                        2253,
+                        565,
+                        2275
+                    ],
+                    "text": "21005"
+                },
+                {
+                    "box": [
+                        565,
+                        2253,
+                        637,
+                        2275
+                    ],
+                    "text": "Pozas"
+                },
+                {
+                    "box": [
+                        637,
+                        2253,
+                        670,
+                        2275
+                    ],
+                    "text": "de"
+                },
+                {
+                    "box": [
+                        670,
+                        2253,
+                        737,
+                        2275
+                    ],
+                    "text": "Odiel"
+                },
+                {
+                    "box": [
+                        734,
+                        2253,
+                        837,
+                        2275
+                    ],
+                    "text": "(Huelva)"
+                },
+                {
+                    "box": [
+                        837,
+                        2253,
+                        851,
+                        2275
+                    ],
+                    "text": "|"
+                },
+                {
+                    "box": [
+                        851,
+                        2253,
+                        907,
+                        2275
+                    ],
+                    "text": "Tel.:"
+                },
+                {
+                    "box": [
+                        907,
+                        2253,
+                        963,
+                        2275
+                    ],
+                    "text": "+34"
+                },
+                {
+                    "box": [
+                        963,
+                        2253,
+                        1010,
+                        2275
+                    ],
+                    "text": "959"
+                },
+                {
+                    "box": [
+                        1010,
+                        2253,
+                        1060,
+                        2275
+                    ],
+                    "text": "032"
+                },
+                {
+                    "box": [
+                        1060,
+                        2253,
+                        1110,
+                        2275
+                    ],
+                    "text": "919"
+                },
+                {
+                    "box": [
+                        1110,
+                        2253,
+                        1124,
+                        2275
+                    ],
+                    "text": "|"
+                },
+                {
+                    "box": [
+                        1124,
+                        2253,
+                        1319,
+                        2275
+                    ],
+                    "text": "www.aletamar.es"
+                }
+            ],
+            "linking": [],
+            "id": 54
+        }
+    ]
+}
