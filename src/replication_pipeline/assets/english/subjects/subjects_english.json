@@ -13,7 +13,7 @@
         "civic_and_ethical_education": [
             "Civic Education",
             "Ethics",
-            "Personal Development and Civics",
+            "Personal Development",
             "Values"
         ],
         "computer_science": [
@@ -43,7 +43,6 @@
             "Drama",
             "Education for Work",
             "Foreign Language Italian",
-            "Fundamentals of Administration and Management",
             "Communication Technologies",
             "Italian",
             "Mandarin Chinese",
@@ -75,11 +74,17 @@
         "mathematics": [
             "Academic Mathematics",
             "Algebra",
+            "Algebra I",
+            "Algebra II",
             "Applied Mathematics",
             "Calculus",
-            "Mathematics",
-            "Mathematics Applied to Social Sciences",
-            "Mathematics for Academic Teaching"
+            "Calculus I",
+            "Calculus II",
+            "Geometry",
+            "Integrated Math",
+            "Integrated Math I",
+            "Integrated Math II",
+            "Mathematics"
         ],
         "music": [
             "Music"

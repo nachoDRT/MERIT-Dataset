@@ -3,7 +3,7 @@
         "english": {
             "eng_1": {
                 "nickname": "greenfields",
-                "students": 0,
+                "students": 2,
                 "verbose_level": 0,
                 "possible_courses_global": [
                     "Year 10",
@@ -39,16 +39,21 @@
                 "include": false
             },
             "eng_2": {
-                "nickname": "eng_school_2",
-                "students": 0,
+                "nickname": "pinnacle",
+                "students": 1,
                 "verbose_level": 0,
+                "possible_courses_global": [
+                    "2019 to 2020 - Grade 9",
+                    "2020 to 2021 - Grade 10",
+                    "2021 to 2022 - Grade 11"
+                ],
                 "template_layout": {
                     "page_1": {
                         "num_subjects": [
-                            11
+                            7
                         ],
                         "academic_years": [
-                            "3_de_la_eso"
+                            "year_9"
                         ]
                     },
                     "page_2": {
@@ -56,25 +61,118 @@
                             10
                         ],
                         "academic_years": [
-                            "4_de_la_eso"
+                            "year_10"
                         ]
                     },
                     "page_3": {
                         "num_subjects": [
-                            11
+                            10
                         ],
                         "academic_years": [
-                            "1_de_bachillerato"
+                            "year_11"
                         ]
                     }
                 },
                 "include": false
+            },
+            "eng_3": {
+                "nickname": "whitney",
+                "students": 1,
+                "verbose_level": 0,
+                "possible_courses_global": [
+                    "9th Course",
+                    "10th Course",
+                    "11th Course"
+                ],
+                "template_layout": {
+                    "page_1": {
+                        "num_subjects": [
+                            10,
+                            10
+                        ],
+                        "academic_years": [
+                            "year_9",
+                            "year_10"
+                        ]
+                    },
+                    "page_2": {
+                        "num_subjects": [
+                            10
+                        ],
+                        "academic_years": [
+                            "year_11"
+                        ]
+                    }
+                },
+                "include": false
+            },
+            "eng_4": {
+                "nickname": "james",
+                "students": 1,
+                "verbose_level": 0,
+                "possible_courses_global": [
+                    "YEAR 9",
+                    "YEAR 10",
+                    "YEAR 11"
+                ],
+                "template_layout": {
+                    "page_1": {
+                        "num_subjects": [
+                            7,
+                            6,
+                            8
+                        ],
+                        "academic_years": [
+                            "year_9",
+                            "year_10",
+                            "year_11"
+                        ]
+                    }
+                },
+                "include": false
+            },
+            "eng_5": {
+                "nickname": "freefields",
+                "students": 1,
+                "verbose_level": 0,
+                "possible_courses_global": [
+                    "YEAR NINE",
+                    "YEAR TEN",
+                    "YEAR ELEVEN"
+                ],
+                "template_layout": {
+                    "page_1": {
+                        "num_subjects": [
+                            8
+                        ],
+                        "academic_years": [
+                            "year_9"
+                        ]
+                    },
+                    "page_2": {
+                        "num_subjects": [
+                            7
+                        ],
+                        "academic_years": [
+                            "year_10"
+                        ]
+                    },
+                    "page_3": {
+                        "num_subjects": [
+                            8
+                        ],
+                        "academic_years": [
+                            "year_11"
+                        ]
+                    }
+                },
+                "include": true
             }
         },
         "spanish": {
             "esp_1": {
                 "nickname": "liceo",
-                "students": 1,
+                "students": 60,
                 "verbose_level": 0,
                 "possible_courses_global": [
                     "Tercer curso",
@@ -107,11 +205,11 @@
                         ]
                     }
                 },
-                "include": true
+                "include": false
             },
             "esp_2": {
                 "nickname": "britanico",
-                "students": 1,
+                "students": 60,
                 "verbose_level": 0,
                 "possible_courses_global": [
                     "3º ESO",
@@ -144,11 +242,11 @@
                         ]
                     }
                 },
-                "include": true
+                "include": false
             },
             "esp_3": {
                 "nickname": "deus",
-                "students": 1,
+                "students": 60,
                 "verbose_level": 0,
                 "possible_courses_global": [
                     "Tercero de ESO",
@@ -175,11 +273,11 @@
                         ]
                     }
                 },
-                "include": true
+                "include": false
             },
             "esp_4": {
                 "nickname": "monterraso",
-                "students": 1,
+                "students": 60,
                 "verbose_level": 0,
                 "possible_courses_global": [
                     "TERCER CURSO ESO",
@@ -206,11 +304,11 @@
                         ]
                     }
                 },
-                "include": true
+                "include": false
             },
             "esp_5": {
                 "nickname": "aletamar",
-                "students": 1,
+                "students": 60,
                 "verbose_level": 0,
                 "possible_courses_global": [
                     "TERCER CURSO",
@@ -237,11 +335,11 @@
                         ]
                     }
                 },
-                "include": true
+                "include": false
             },
             "esp_6": {
                 "nickname": "lusitano",
-                "students": 1,
+                "students": 60,
                 "verbose_level": 0,
                 "possible_courses_global": [
                     "TERCERO DE ESO",
@@ -268,11 +366,11 @@
                         ]
                     }
                 },
-                "include": true
+                "include": false
             },
             "esp_7": {
                 "nickname": "patria",
-                "students": 1,
+                "students": 60,
                 "verbose_level": 0,
                 "possible_courses_global": [
                     "TERCER CURSO",
@@ -305,7 +403,7 @@
                         ]
                     }
                 },
-                "include": true
+                "include": false
             }
         }
     },
