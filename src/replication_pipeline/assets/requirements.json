@@ -412,38 +412,38 @@
     "male_proportion": 0.5,
     "font_path": "/home/msi/.config/Ultralytics/Arial.ttf",
     "origins": {
-        "English": {
-            "English": {
+        "english": {
+            "english": {
                 "proportion": 70.0,
                 "average": 5,
-                "deviation": 0.1
+                "deviation": 1
             },
-            "Spanish": {
+            "spanish": {
                 "proportion": 10.0,
-                "average": 5,
-                "deviation": 0.1
+                "average": 7,
+                "deviation": 1
             },
-            "Chinese": {
+            "chinese": {
                 "proportion": 10.0,
-                "average": 5,
-                "deviation": 0.1
+                "average": 8,
+                "deviation": 1
             },
-            "Indian": {
+            "indian": {
                 "proportion": 10.0,
-                "average": 5,
-                "deviation": 0.1
+                "average": 7,
+                "deviation": 1
             }
         },
-        "Spanish": {
-            "Spanish": {
+        "spanish": {
+            "spanish": {
                 "proportion": 77.0,
                 "average": 5,
-                "deviation": 0.1
+                "deviation": 1
             },
-            "Arabic": {
+            "arabic": {
                 "proportion": 23.0,
-                "average": 5,
-                "deviation": 0.1
+                "average": 7,
+                "deviation": 1
             }
         }
     },

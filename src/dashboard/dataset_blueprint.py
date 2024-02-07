@@ -183,24 +183,41 @@ def compute_origins_distributions(reqs: dict) -> list:
     return total_origins_distribution
 
 
+def build_language_distribution(reqs: dict):
+    langs = []
+    for language_name, language_info in reqs["samples"].items():
+        for school in language_info.values():
+            if school["include"]:
+                for _ in range(school["students"]):
+                    langs.append(language_name)
+
+    return langs
+
+
 def compute_grades_distributions(reqs: dict, gender: list, origin: list) -> list:
     grades_dist = []
     num_students = compute_num_students(reqs)
+    langs = build_language_distribution(reqs)
 
     for index in range(num_students):
         dist = {}
 
+        lang = langs[index]
         student_gender = gender[index]
+        student_origin = origin[index]
 
         gender_bias_key = "".join([student_gender, "_bias_distribution"])
         mean_g = reqs[gender_bias_key]["average"]
         dev_g = reqs[gender_bias_key]["deviation"]
 
-        # TODO Compose 3D distribution
-        # student_name_origin = origin[index]
+        mean_o = reqs["origins"][lang][student_origin]["average"]
+        dev_o = reqs["origins"][lang][student_origin]["deviation"]
 
-        dist["mean"] = mean_g
-        dist["dev"] = dev_g
+        dist["mean_gender"] = mean_g
+        dist["dev_gender"] = dev_g
+
+        dist["mean_origin"] = mean_o
+        dist["dev_origin"] = dev_o
 
         grades_dist.append(dist)
 

@@ -128,9 +128,25 @@ class Person:
 
                 for subject in subjects:
                     subject_dict = {}
-                    grade = np.random.normal(
-                        student_grades_seeds["mean"], student_grades_seeds["dev"], 1
-                    )[0]
+                    mean = np.array(
+                        [
+                            student_grades_seeds["mean_origin"],
+                            student_grades_seeds["mean_gender"],
+                        ]
+                    )
+                    cov = np.array(
+                        [
+                            [student_grades_seeds["dev_gender"], 0],
+                            [0, student_grades_seeds["dev_origin"]],
+                        ]
+                    )
+                    grade = np.random.multivariate_normal(mean, cov)
+                    grade = 0.5 * grade[0] + 0.5 * grade[1]
+                    # grade = np.random.normal(
+                    #     student_grades_seeds["mean_gender"],
+                    #     student_grades_seeds["dev_gender"],
+                    #     1,
+                    # )[0]
                     subject_dict["grade"] = round(np.clip(grade, 0, 10))
                     verbose_name = random.choice(
                         list(self.dataLoader.subjects[subject])

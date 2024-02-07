@@ -33,11 +33,10 @@
         ],
         "french": [
             "Foreign Language: French",
-            "French",
-            "Second Foreign Language: French"
+            "French"
         ],
         "generic": [
-            "Administration and Management",
+            "Administration",
             "Chinese",
             "Communication",
             "Drama",
@@ -45,6 +44,7 @@
             "Foreign Language Italian",
             "Communication Technologies",
             "Italian",
+            "Management",
             "Mandarin Chinese",
             "Political Science",
             "Psychology",
@@ -108,7 +108,6 @@
         ],
         "spanish_language": [
             "Spanish as a Foreign Language",
-            "Second Foreign Language: Spanish",
             "Spanish"
         ],
         "sports": [
