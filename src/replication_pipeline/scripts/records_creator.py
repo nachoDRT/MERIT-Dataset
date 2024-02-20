@@ -13,6 +13,7 @@ import copy
 import random
 from tqdm import tqdm
 import xml.etree.ElementTree as ET
+from typing import Union
 
 ASSET_ROT = 20
 MAPS_THRESHOLD = 15
@@ -222,6 +223,10 @@ class SchoolRecord:
         n_subjects: int,
         retrieved_info: dict,
         verbose_level: int = 0,
+        system_alpha_grades: dict = {},
+        grade_synonyms: Union[bool, int] = False,
+        grade_decimals: bool = False,
+        alpha_numeric_separator: str = "",
         new_school: bool = False,
         new_student: bool = False,
     ) -> None:
@@ -257,6 +262,8 @@ class SchoolRecord:
             self.student = person_generator.Person(
                 res_path=self.paths["res_path"],
                 language=lang,
+                requirements=self.reqs,
+                grade_decimals=grade_decimals,
                 courses=courses,
                 student=True,
                 n_subjects=n_subjects,
@@ -281,6 +288,8 @@ class SchoolRecord:
                 self.student = person_generator.Person(
                     res_path=self.paths["res_path"],
                     language=lang,
+                    requirements=self.reqs,
+                    grade_decimals=grade_decimals,
                     courses=courses,
                     student=True,
                     n_subjects=n_subjects,
@@ -291,7 +300,9 @@ class SchoolRecord:
             else:
                 self.student = retrieved_info["student_object"]
 
-        self.set_replacements(verbose_level)
+        self.set_replacements(
+            system_alpha_grades, grade_synonyms, verbose_level, alpha_numeric_separator
+        )
         id_parts = id.split("_")
         id = "_".join(id_parts[:-1])
         self.id = id
@@ -318,10 +329,18 @@ class SchoolRecord:
 
         return info_retrieval
 
-    def set_replacements(self, verbose_level=0):
+    def set_replacements(
+        self,
+        system_alpha_grades: dict,
+        grade_synonyms: Union[bool, int] = False,
+        verbose_level: int = 0,
+        alpha_numeric_separator: str = "",
+    ):
         """Populates replacements dictionary"""
         # if self.new_student or self.new_school:
-        self.replacements = self.student.get_replacements(verbose_level)
+        self.replacements = self.student.get_replacements(
+            system_alpha_grades, grade_synonyms, verbose_level, alpha_numeric_separator
+        )
         if self.new_school:
             self.replacements["replace_director"] = self.director.get_full_name()
             self.replacements["replace_secre"] = self.secre.get_full_name()

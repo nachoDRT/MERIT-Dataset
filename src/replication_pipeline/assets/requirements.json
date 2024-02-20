@@ -1,10 +1,79 @@
 {
     "samples": {
         "english": {
+            "grades_system": {
+                "max_grade": 100,
+                "min_grade": 0,
+                "alfa_grades": {
+                    "F": {
+                        "min": 0,
+                        "max": 59,
+                        "synonyms": []
+                    },
+                    "D-": {
+                        "min": 60,
+                        "max": 62,
+                        "synonyms": []
+                    },
+                    "D": {
+                        "min": 63,
+                        "max": 66,
+                        "synonyms": []
+                    },
+                    "D+": {
+                        "min": 67,
+                        "max": 69,
+                        "synonyms": []
+                    },
+                    "C-": {
+                        "min": 70,
+                        "max": 72,
+                        "synonyms": []
+                    },
+                    "C": {
+                        "min": 73,
+                        "max": 76,
+                        "synonyms": []
+                    },
+                    "C+": {
+                        "min": 77,
+                        "max": 79,
+                        "synonyms": []
+                    },
+                    "B-": {
+                        "min": 80,
+                        "max": 82,
+                        "synonyms": []
+                    },
+                    "B": {
+                        "min": 83,
+                        "max": 86,
+                        "synonyms": []
+                    },
+                    "B+": {
+                        "min": 87,
+                        "max": 89,
+                        "synonyms": []
+                    },
+                    "A-": {
+                        "min": 90,
+                        "max": 92,
+                        "synonyms": []
+                    },
+                    "A": {
+                        "min": 93,
+                        "max": 100,
+                        "synonyms": []
+                    }
+                }
+            },
             "eng_1": {
                 "nickname": "greenfields",
-                "students": 2,
-                "verbose_level": 0,
+                "students": 1,
+                "verbose_level": 1,
+                "return_grades_synonym": false,
+                "alphanumeric_separator": " | ",
+                "decimals_allowed": false,
                 "possible_courses_global": [
                     "Year 10",
                     "Year 11",
@@ -36,12 +105,15 @@
                         ]
                     }
                 },
-                "include": false
+                "include": true
             },
             "eng_2": {
                 "nickname": "pinnacle",
                 "students": 1,
-                "verbose_level": 0,
+                "verbose_level": 1,
+                "return_grades_synonym": false,
+                "alphanumeric_separator": " - ",
+                "decimals_allowed": false,
                 "possible_courses_global": [
                     "2019 to 2020 - Grade 9",
                     "2020 to 2021 - Grade 10",
@@ -78,7 +150,10 @@
             "eng_3": {
                 "nickname": "whitney",
                 "students": 1,
-                "verbose_level": 0,
+                "verbose_level": 1,
+                "return_grades_synonym": false,
+                "alphanumeric_separator": " - ",
+                "decimals_allowed": false,
                 "possible_courses_global": [
                     "9th Course",
                     "10th Course",
@@ -109,7 +184,10 @@
             "eng_4": {
                 "nickname": "james",
                 "students": 1,
-                "verbose_level": 0,
+                "verbose_level": 1,
+                "return_grades_synonym": false,
+                "alphanumeric_separator": " - ",
+                "decimals_allowed": false,
                 "possible_courses_global": [
                     "YEAR 9",
                     "YEAR 10",
@@ -135,6 +213,9 @@
                 "nickname": "freefields",
                 "students": 1,
                 "verbose_level": 0,
+                "return_grades_synonym": false,
+                "alphanumeric_separator": " - ",
+                "decimals_allowed": false,
                 "possible_courses_global": [
                     "YEAR NINE",
                     "YEAR TEN",
@@ -166,14 +247,58 @@
                         ]
                     }
                 },
-                "include": true
+                "include": false
             }
         },
         "spanish": {
+            "grades_system": {
+                "max_grade": 10,
+                "min_grade": 0,
+                "alfa_grades": {
+                    "Insuficiente": {
+                        "min": 0,
+                        "max": 4.99,
+                        "synonyms": [
+                            "IN"
+                        ]
+                    },
+                    "Suficiente": {
+                        "min": 5,
+                        "max": 5.99,
+                        "synonyms": [
+                            "SUF"
+                        ]
+                    },
+                    "Bien": {
+                        "min": 6,
+                        "max": 6.99,
+                        "synonyms": [
+                            "BI"
+                        ]
+                    },
+                    "Notable": {
+                        "min": 7,
+                        "max": 8.99,
+                        "synonyms": [
+                            "NT"
+                        ]
+                    },
+                    "Sobresaliente": {
+                        "min": 9,
+                        "max": 10,
+                        "synonyms": [
+                            "SB"
+                        ]
+                    }
+                }
+            },
             "esp_1": {
                 "nickname": "liceo",
-                "students": 60,
-                "verbose_level": 0,
+                "students": 1,
+                "verbose_level": 1,
+                "return_grades_synonym": 0,
+                "alphanumeric_separator": " - ",
+                "decimals_allowed": false,
                 "possible_courses_global": [
                     "Tercer curso",
                     "Cuarto curso",
@@ -205,12 +330,15 @@
                         ]
                     }
                 },
-                "include": false
+                "include": true
             },
             "esp_2": {
                 "nickname": "britanico",
-                "students": 60,
-                "verbose_level": 0,
+                "students": 1,
+                "verbose_level": 1,
+                "return_grades_synonym": false,
+                "alphanumeric_separator": " - ",
+                "decimals_allowed": true,
                 "possible_courses_global": [
                     "3º ESO",
                     "4º ESO",
@@ -242,12 +370,15 @@
                         ]
                     }
                 },
-                "include": false
+                "include": true
             },
             "esp_3": {
                 "nickname": "deus",
-                "students": 60,
+                "students": 1,
                 "verbose_level": 0,
+                "return_grades_synonym": false,
+                "alphanumeric_separator": " - ",
+                "decimals_allowed": false,
                 "possible_courses_global": [
                     "Tercero de ESO",
                     "Cuarto de ESO",
@@ -277,8 +408,11 @@
             },
             "esp_4": {
                 "nickname": "monterraso",
-                "students": 60,
+                "students": 1,
                 "verbose_level": 0,
+                "return_grades_synonym": false,
+                "alphanumeric_separator": " - ",
+                "decimals_allowed": false,
                 "possible_courses_global": [
                     "TERCER CURSO ESO",
                     "CUARTO CURSO ESO",
@@ -308,8 +442,11 @@
             },
             "esp_5": {
                 "nickname": "aletamar",
-                "students": 60,
+                "students": 1,
                 "verbose_level": 0,
+                "return_grades_synonym": false,
+                "alphanumeric_separator": " - ",
+                "decimals_allowed": false,
                 "possible_courses_global": [
                     "TERCER CURSO",
                     "CUARTO CURSO",
@@ -339,8 +476,11 @@
             },
             "esp_6": {
                 "nickname": "lusitano",
-                "students": 60,
+                "students": 1,
                 "verbose_level": 0,
+                "return_grades_synonym": false,
+                "alphanumeric_separator": " - ",
+                "decimals_allowed": false,
                 "possible_courses_global": [
                     "TERCERO DE ESO",
                     "CUARTO DE ESO",
@@ -370,8 +510,11 @@
             },
             "esp_7": {
                 "nickname": "patria",
-                "students": 60,
+                "students": 1,
                 "verbose_level": 0,
+                "return_grades_synonym": false,
+                "alphanumeric_separator": " - ",
+                "decimals_allowed": false,
                 "possible_courses_global": [
                     "TERCER CURSO",
                     "CUARTO CURSO",

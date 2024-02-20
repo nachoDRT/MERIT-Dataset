@@ -5,7 +5,7 @@ from fpdf import FPDF
 import copy
 from unidecode import unidecode
 from pathlib import Path
-from typing import Iterable, Any
+from typing import Iterable, Any, Union
 from pdfminer.high_level import extract_pages
 from person_generator import return_verbose_grade
 from itertools import chain
@@ -169,7 +169,10 @@ def create_annotations_recursively(o: Any, depth=0):
 def update_course_tags(
     course_curriculum,
     annotations_page,
-    verbose_level: int,
+    system_alpha_grades: dict = {},
+    return_synonym: Union[bool, int] = False,
+    verbose_level: int = 0,
+    alpha_numeric_separator: str = "",
     sample_name: str = None,
     page: int = None,
     max_subjects: int = 15,
@@ -193,7 +196,13 @@ def update_course_tags(
 
             if check1 and check2:
                 found = update_answer_tag(
-                    annotations_page, tag, subject_grade, verbose_level
+                    annotations_page,
+                    tag,
+                    subject_grade,
+                    system_alpha_grades,
+                    return_synonym,
+                    verbose_level,
+                    alpha_numeric_separator,
                 )
                 segment["label"] = tag
                 break
@@ -216,9 +225,23 @@ def update_course_tags(
     return success
 
 
-def update_answer_tag(annotations_page, tag, subject_grade, verbose_level: int):
+def update_answer_tag(
+    annotations_page,
+    tag,
+    subject_grade,
+    system_alpha_grades: dict = {},
+    return_synonym: Union[bool, int] = False,
+    verbose_level: int = 0,
+    alpha_numeric_separator: str = "",
+):
     found = 0
-    subject_grade_verbose = return_verbose_grade(subject_grade, verbose_level)
+    subject_grade_verbose = return_verbose_grade(
+        subject_grade,
+        system_alpha_grades,
+        return_synonym,
+        verbose_level,
+        alpha_numeric_separator,
+    )
 
     for segment in annotations_page:
         segment_text = segment["text"]
@@ -239,8 +262,11 @@ def update_answer_tag(annotations_page, tag, subject_grade, verbose_level: int):
 
 def school_nickname_to_key(langs_schools: dict, nickname: str):
     for school_key, school_nickname in langs_schools.items():
-        if nickname == school_nickname["nickname"]:
-            return school_key
+        try:
+            if nickname == school_nickname["nickname"]:
+                return school_key
+        except KeyError:
+            pass
 
     return None
 
@@ -387,7 +413,10 @@ class AnnotationsCreator:
             s = update_course_tags(
                 what_we_send,
                 self.annotations[i]["form"],
+                self.reqs["samples"][lang]["grades_system"]["alfa_grades"],
+                self.reqs["samples"][lang][school_i]["return_grades_synonym"],
                 self.reqs["samples"][lang][school_i]["verbose_level"],
+                self.reqs["samples"][lang][school_i]["alphanumeric_separator"],
                 self.pdf_file_path,
                 i,
                 max_subjects=n_subjects[i],

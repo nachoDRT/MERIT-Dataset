@@ -400,7 +400,17 @@ def create_documents(df: pd.DataFrame, blueprint_path: str):
                 courses,
                 n_subjects,
                 retrieved_info=retrieved_info,
+                system_alpha_grades=reqs["samples"][lang]["grades_system"][
+                    "alfa_grades"
+                ],
                 verbose_level=reqs["samples"][lang][school_id]["verbose_level"],
+                grade_decimals=reqs["samples"][lang][school_id]["decimals_allowed"],
+                grade_synonyms=reqs["samples"][lang][school_id][
+                    "return_grades_synonym"
+                ],
+                alpha_numeric_separator=reqs["samples"][lang][school_id][
+                    "alphanumeric_separator"
+                ],
                 new_school=new_school,
                 new_student=new_student,
             )
