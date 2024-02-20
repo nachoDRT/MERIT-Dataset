@@ -173,6 +173,7 @@ def check_chaotic_crash(
         crash["director"] = df.at[index - 1, "head_name"]
         crash["secretary"] = df.at[index - 1, "secretary_name"]
         crash["student_name"] = df.at[index - 1, "student_name"]
+        crash["school_id"] = df.at[index - 1, "school_id"]
         crash["school_name"] = df.at[index - 1, "school_name"]
         crash["student_gender"] = df.at[index - 1, "student_gender"]
         crash["student_name_origin"] = df.at[index - 1, "student_name_origin"]
@@ -352,6 +353,7 @@ def create_documents(df: pd.DataFrame, blueprint_path: str):
             retrieved_info["secretary"] = crash_data["secretary"]
             retrieved_info["student_name"] = crash_data["student_name"]
             retrieved_info["re_spawn_student"] = True
+            school_id = crash_data["school_id"]
             school = crash_data["school_name"]
             lang = crash_data["language"]
             retrieved_info["student_gender"] = crash_data["student_gender"]
@@ -370,11 +372,13 @@ def create_documents(df: pd.DataFrame, blueprint_path: str):
             grades_seeds = eval(df.at[index, "average_grade"])
 
             if index in language_change_indices.tolist():
+                school_id = df.at[index, "school_id"]
                 school = df.at[index, "school_name"]
                 paths = define_paths(language=lang, school=school)
                 new_school = True
 
             elif index in school_change_indices.tolist():
+                school_id = df.at[index, "school_id"]
                 school = df.at[index, "school_name"]
                 paths = define_paths(language=lang, school=school)
                 new_school = True
@@ -396,6 +400,7 @@ def create_documents(df: pd.DataFrame, blueprint_path: str):
                 courses,
                 n_subjects,
                 retrieved_info=retrieved_info,
+                verbose_level=reqs["samples"][lang][school_id]["verbose_level"],
                 new_school=new_school,
                 new_student=new_student,
             )

@@ -358,22 +358,6 @@ class AnnotationsCreator:
             with open(annotations_full_path, "w") as outfile:
                 json.dump(self.annotations[i], outfile, indent=4)
 
-    def old_new_update_subject_grades_tags(
-        self, curriculum: list, n_subjects: int, lang: str, school: str
-    ):
-        success = 1
-        for i, course_curriculum in enumerate(curriculum):
-            school_i = school_nickname_to_key(self.reqs["samples"][lang], school)
-            s = update_course_tags(
-                course_curriculum,
-                self.annotations[i]["form"],
-                self.reqs["samples"][lang][school_i]["verbose_level"],
-                max_subjects=n_subjects[i],
-            )
-            success *= s
-
-        return success
-
     def new_update_subject_grades_tags(
         self, curriculum: list, n_subjects: int, lang: str, school: str
     ):
@@ -397,27 +381,6 @@ class AnnotationsCreator:
             result.append(aux)
             curriculum_index += num_courses_in_page[i]
 
-        # for i in range(len(num_courses_in_page)):
-        #     print("Hola", i)
-        #     # Extend the curriculum if needed
-        #     course_curriculum = curriculum[
-        #         curriculum_index : curriculum_index + num_courses_in_page[i]
-        #     ]
-        #     course_curriculum.extend(chain(*course_curriculum))
-        #     curriculum_index += num_courses_in_page[i]
-
-        #     what_we_send = course_curriculum[0]
-
-        #     s = update_course_tags(
-        #         what_we_send,
-        #         self.annotations[i]["form"],
-        #         self.reqs["samples"][lang][school_i]["verbose_level"],
-        #         self.pdf_file_path,
-        #         i,
-        #         max_subjects=n_subjects[i],
-        #     )
-        #     success *= s
-
         for i in range(len(num_courses_in_page)):
             what_we_send = result[i]
 
@@ -431,22 +394,6 @@ class AnnotationsCreator:
             )
             success *= s
 
-        return success
-
-    # TODO The following method might be deprecated
-    def update_subject_grades_tags(self, curriculum: list, courses_pages_array: list):
-        success = 1
-        for i, page in enumerate(courses_pages_array):
-            for j, course in enumerate(page):
-                # print(f'page: {i}, course: {course[0]}, max_subjects: {course[1]}')
-                # Tag subjects and grades
-                s = update_course_tags(
-                    curriculum[course[0]],
-                    self.annotations[i]["form"],
-                    self.reqs["verbose_level"],
-                    max_subjects=course[1],
-                )
-                success = success * s
         return success
 
     def update_annotations_tags_courses(self):

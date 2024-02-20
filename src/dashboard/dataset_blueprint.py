@@ -44,6 +44,7 @@ def set_database_headers() -> dict:
 
     attributes["file_name"] = []
     attributes["language"] = []
+    attributes["school_id"] = []
     attributes["school_name"] = []
     attributes["head_name"] = []
     attributes["secretary_name"] = []
@@ -281,7 +282,7 @@ def fill_blueprint(attributes: dict, reqs: dict, props: dict) -> dict:
 
     general_student_index = 0
     for language, language_content in reqs["samples"].items():
-        for school in language_content.values():
+        for school_key, school in language_content.items():
             if school["include"]:
                 students = school["students"]
                 pages_per_student = len(school["template_layout"])
@@ -314,6 +315,8 @@ def fill_blueprint(attributes: dict, reqs: dict, props: dict) -> dict:
                             attributes[key].append(file_name)
                         elif key == "language":
                             attributes[key].append(language)
+                        elif key == "school_id":
+                            attributes[key].append(school_key)
                         elif key == "school_name":
                             attributes[key].append(school["nickname"])
                         elif key == "head_name":
