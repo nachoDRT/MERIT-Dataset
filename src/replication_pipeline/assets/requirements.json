@@ -69,7 +69,7 @@
             },
             "eng_1": {
                 "nickname": "greenfields",
-                "students": 1,
+                "students": 10,
                 "verbose_level": 1,
                 "return_grades_synonym": false,
                 "alphanumeric_separator": " | ",
@@ -294,7 +294,7 @@
             },
             "esp_1": {
                 "nickname": "liceo",
-                "students": 1,
+                "students": 10,
                 "verbose_level": 1,
                 "return_grades_synonym": 0,
                 "alphanumeric_separator": " - ",
