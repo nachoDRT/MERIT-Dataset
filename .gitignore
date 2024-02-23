@@ -1,4 +1,6 @@
 terminal_commands.txt
+benchmark/xlmroberta/wandb
+benchmark/xlmroberta/wandb_logging.json
 data/original/spanish
 data/original/english
 data/modified/spanish
