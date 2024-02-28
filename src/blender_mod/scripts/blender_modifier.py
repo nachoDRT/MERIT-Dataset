@@ -12,6 +12,8 @@ import cv2
 import copy
 import pandas as pd
 import tqdm
+import bmesh
+from mathutils import Vector
 
 file_dir = os.path.join(bpy.path.abspath("//"), "scripts")
 
@@ -196,9 +198,93 @@ def apply_texture(document: str, paper: str):
     mapping_node.inputs["Rotation"].default_value[2] = math.radians(180)
     coord_node = nodes.new(type="ShaderNodeTexCoord")
     principled_node = nodes.new(type="ShaderNodeBsdfPrincipled")
+    principled_node_printer = nodes.new(type="ShaderNodeBsdfPrincipled")
+    principled_node_printer.inputs["Base Color"].default_value = (
+        0.092,
+        0.092,
+        0.092,
+        1,
+    )
+    mix_shader = nodes.new(type="ShaderNodeMixShader")
     output_node = nodes.new(type="ShaderNodeOutputMaterial")
 
-    # Set node locations to prevent overlapping
+    # Printer stain nodes
+
+    # Printer dots
+    dots_coord_node = nodes.new(type="ShaderNodeTexCoord")
+    dots_mapping_node = nodes.new(type="ShaderNodeMapping")
+    dots_voronoi_node = nodes.new(type="ShaderNodeTexVoronoi")
+    dots_voronoi_node.inputs["Scale"].default_value = 500
+    dots_voronoi_node.inputs["Randomness"].default_value = 1
+    dots_color_ramp = nodes.new(type="ShaderNodeValToRGB")
+    dots_color_ramp.color_ramp.interpolation = "LINEAR"
+    dots_color_ramp.color_ramp.elements.remove(dots_color_ramp.color_ramp.elements[1])
+    dots_color_ramp_colors_positions = [
+        (0.964, (0, 0, 0, 1)),
+        (0.982, (1, 1, 1, 1)),
+    ]
+
+    for pos, color in dots_color_ramp_colors_positions:
+        element = dots_color_ramp.color_ramp.elements.new(position=pos)
+        element.color = color
+
+    # Printer lines
+    lines_coord_node = nodes.new(type="ShaderNodeTexCoord")
+    lines_mapping_node = nodes.new(type="ShaderNodeMapping")
+    lines_mapping_node.inputs["Scale"].default_value[0] = -0.2
+    lines_mapping_node.inputs["Scale"].default_value[1] = -2000
+    lines_voronoi_node = nodes.new(type="ShaderNodeTexVoronoi")
+    lines_voronoi_node.inputs["Scale"].default_value = 5
+    lines_voronoi_node.inputs["Randomness"].default_value = 1
+    lines_color_ramp = nodes.new(type="ShaderNodeValToRGB")
+    lines_color_ramp.color_ramp.interpolation = "LINEAR"
+    lines_color_ramp.color_ramp.elements.remove(lines_color_ramp.color_ramp.elements[1])
+    lines_color_ramp_colors_positions = [
+        (0.627, (0, 0, 0, 1)),
+        (0.673, (1, 1, 1, 1)),
+    ]
+
+    for pos, color in lines_color_ramp_colors_positions:
+        element = lines_color_ramp.color_ramp.elements.new(position=pos)
+        element.color = color
+
+    # Printer lines vertical bands mask
+    bands_coord_node = nodes.new(type="ShaderNodeTexCoord")
+    bands_mapping_node = nodes.new(type="ShaderNodeMapping")
+    bands_mapping_node.inputs["Scale"].default_value[0] = 1.39
+    bands_gradient_texture = nodes.new(type="ShaderNodeTexGradient")
+    bands_gradient_texture.gradient_type = "LINEAR"
+    bands_color_ramp = nodes.new(type="ShaderNodeValToRGB")
+    bands_color_ramp.color_ramp.interpolation = "EASE"
+    bands_color_ramp.color_ramp.elements.remove(bands_color_ramp.color_ramp.elements[1])
+    bands_color_ramp_colors_positions = [
+        (0.1, (0, 0, 0, 1)),
+        (0.25, (0, 0, 0, 1)),
+        (0.40, (0, 0, 0, 1)),
+        (0.55, (0, 0, 0, 1)),
+        (0.70, (0, 0, 0, 1)),
+        (0.85, (0, 0, 0, 1)),
+        (0.9, (0, 0, 0, 1)),
+    ]
+
+    for _ in range(random.randint(0, 3)):
+        bands_color_ramp_colors_positions.extend([(random.uniform(0, 1), (1, 1, 1, 1))])
+
+    for pos, color in bands_color_ramp_colors_positions:
+        element = bands_color_ramp.color_ramp.elements.new(position=pos)
+        element.color = color
+
+    # Mixer: Printer lines and bands
+    mixer_lines_bands = nodes.new(type="ShaderNodeMixRGB")
+    mixer_lines_bands.blend_type = "MULTIPLY"
+    mixer_lines_bands.inputs[0].default_value = 1.0
+
+    # Mixer: Dots and lines
+    mixer_dots_lines = nodes.new(type="ShaderNodeMixRGB")
+    mixer_dots_lines.blend_type = "ADD"
+    mixer_dots_lines.inputs[0].default_value = 1.0
+
+    # Set node locations to prevent overlapping: Document texture
     doc_texture_node.location = (-300, 300)
     paper_texture_node.location = (-300, 0)
     mix_rgb_node.location = (200, 200)
@@ -206,6 +292,30 @@ def apply_texture(document: str, paper: str):
     coord_node.location = (-800, 300)
     principled_node.location = (500, 300)
     output_node.location = (900, 300)
+
+    # Set node locations to prevent overlapping: Second Principle BSDF
+    principled_node_printer.location = (500, -400)
+
+    # Set node locations to prevent overlapping: Printer dots
+    dots_coord_node.location = (-800, 1500)
+    dots_mapping_node.location = (-600, 1500)
+    dots_voronoi_node.location = (-300, 1500)
+    dots_color_ramp.location = (0, 1500)
+    mixer_dots_lines.location = (500, 1250)
+
+    # Set node locations to prevent overlapping: Printer lines
+    lines_coord_node.location = (-800, 1000)
+    lines_mapping_node.location = (-600, 1000)
+    lines_voronoi_node.location = (-300, 1000)
+    lines_color_ramp.location = (0, 1000)
+    mixer_lines_bands.location = (300, 750)
+
+    # Set node locations to prevent overlapping: Printer bands
+    bands_coord_node.location = (-800, 600)
+    bands_mapping_node.location = (-600, 600)
+    bands_gradient_texture.location = (-300, 600)
+    bands_color_ramp.location = (0, 600)
+    mix_shader.location = (750, 300)
 
     # Load images into the texture node
     doc_image = bpy.data.images.load(document)
@@ -216,14 +326,39 @@ def apply_texture(document: str, paper: str):
 
     mix_rgb_node.blend_type = "MULTIPLY"
 
-    # Connect the nodes
+    # Connect the nodes: Document texture
     links = mat.node_tree.links
     links.new(coord_node.outputs["UV"], mapping_node.inputs["Vector"])
     links.new(mapping_node.outputs["Vector"], doc_texture_node.inputs["Vector"])
     links.new(doc_texture_node.outputs["Color"], mix_rgb_node.inputs["Color1"])
     links.new(paper_texture_node.outputs["Color"], mix_rgb_node.inputs["Color2"])
     links.new(mix_rgb_node.outputs["Color"], principled_node.inputs["Base Color"])
-    links.new(principled_node.outputs["BSDF"], output_node.inputs["Surface"])
+
+    # Connect the nodes: Printer dots
+    links.new(dots_coord_node.outputs["UV"], dots_mapping_node.inputs["Vector"])
+    links.new(dots_mapping_node.outputs["Vector"], dots_voronoi_node.inputs["Vector"])
+    links.new(dots_voronoi_node.outputs["Color"], dots_color_ramp.inputs["Fac"])
+    links.new(dots_color_ramp.outputs["Color"], mixer_dots_lines.inputs[1])
+
+    # Connect the nodes: Printer lines
+    links.new(lines_coord_node.outputs["UV"], lines_mapping_node.inputs["Vector"])
+    links.new(lines_mapping_node.outputs["Vector"], lines_voronoi_node.inputs["Vector"])
+    links.new(lines_voronoi_node.outputs["Color"], lines_color_ramp.inputs["Fac"])
+    links.new(lines_color_ramp.outputs["Color"], mixer_lines_bands.inputs[1])
+
+    # Connect the nodes: Printer bands
+    links.new(bands_coord_node.outputs["UV"], bands_mapping_node.inputs["Vector"])
+    links.new(
+        bands_mapping_node.outputs["Vector"], bands_gradient_texture.inputs["Vector"]
+    )
+    links.new(bands_gradient_texture.outputs["Color"], bands_color_ramp.inputs["Fac"])
+    links.new(bands_color_ramp.outputs["Color"], mixer_lines_bands.inputs[2])
+    links.new(mixer_lines_bands.outputs["Color"], mixer_dots_lines.inputs[2])
+    links.new(mixer_dots_lines.outputs["Color"], mix_shader.inputs["Fac"])
+    links.new(principled_node.outputs["BSDF"], mix_shader.inputs[1])
+    links.new(principled_node_printer.outputs["BSDF"], mix_shader.inputs[2])
+
+    links.new(mix_shader.outputs["Shader"], output_node.inputs["Surface"])
 
     # Assign the material to the object
     if obj.data.materials:
@@ -255,6 +390,7 @@ def create_background(texture_path: str, normals_path: str, back_data: dict):
     plane = bpy.data.objects["Plane"]
     plane.scale = (back_data["scale_x"], back_data["scale_y"], 1)
     plane.location = (back_data["pos_x"], back_data["pos_y"], back_data["pos_z"])
+    bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
 
     # New background material
     mat = bpy.data.materials.new(name="Background_Material")
@@ -669,6 +805,145 @@ def get_sample_paths_and_names(sample_name: str):
     )
 
 
+def prepare_for_cloth_sim():
+    obj = bpy.data.objects["Document"]
+    bpy.context.view_layer.objects.active = obj
+    bpy.ops.object.select_all(action="DESELECT")
+    obj.select_set(True)
+
+    # Transform mesh triangles to quads where possible
+    bpy.ops.object.mode_set(mode="EDIT")
+    bpy.ops.mesh.select_all(action="SELECT")
+    bpy.ops.mesh.tris_convert_to_quads()
+    bpy.ops.object.mode_set(mode="OBJECT")
+
+    # Change its position
+    obj.location.z = 0.015
+
+
+def compute_skewness(obj: bpy.data.objects):
+    print("Computing mesh skewness")
+
+    bpy.context.view_layer.objects.active = obj
+    bpy.ops.object.mode_set(mode="EDIT")
+    bpy.ops.mesh.select_all(action="DESELECT")
+    bpy.ops.object.mode_set(mode="OBJECT")
+
+    mesh = bmesh.new()
+    mesh.from_mesh(obj.data)
+    mesh.verts.ensure_lookup_table()
+    mesh.edges.ensure_lookup_table()
+    mesh.faces.ensure_lookup_table()
+
+    smoothness_scores = []
+
+    for vert in mesh.verts:
+        adj_faces = vert.link_faces
+        if not adj_faces:
+            continue
+        avg_normal = sum((face.normal for face in adj_faces), Vector()) / len(adj_faces)
+
+        deviation = (vert.normal - avg_normal).length
+        smoothness_scores.append(deviation)
+
+    mesh.free()
+
+    average_dev_skewness = (
+        sum(smoothness_scores) / len(smoothness_scores) if smoothness_scores else 0
+    )
+
+    print(f"Mesh skewness: {average_dev_skewness}")
+    return average_dev_skewness
+
+
+def run_cloth_sim():
+    obj = bpy.data.objects.get("Document")
+
+    # Make other objects interact
+    for other_obj in bpy.context.scene.objects:
+        if other_obj.type == "MESH" and other_obj != obj:
+            if "Collision" not in other_obj.modifiers:
+                collision_modifier = other_obj.modifiers.new(
+                    name="Collision", type="COLLISION"
+                )
+
+                collision_modifier.settings.thickness_outer = 0.001
+                collision_modifier.settings.thickness_inner = 0.05
+
+    # Make sure the object is active
+    bpy.context.view_layer.objects.active = obj
+    obj.select_set(True)
+
+    # Add the object a cloth modifier
+    cloth_modifier = obj.modifiers.new(name="Cloth", type="CLOTH")
+
+    # Set the physical properties:
+    cloth_modifier.settings.mass = 0.001
+    cloth_modifier.settings.air_damping = 3
+    cloth_modifier.settings.bending_model = "LINEAR"
+
+    # Paper mechanical
+    cloth_modifier.settings.bending_stiffness = 50
+    cloth_modifier.settings.bending_damping = 50
+
+    # Set the object collition distance to other object
+    cloth_modifier.collision_settings.distance_min = 0.001
+
+    # Set simulation quality parameters
+    cloth_modifier.settings.quality = 5
+    cloth_modifier.collision_settings.collision_quality = 1
+
+    # Activate selfcollisions and set the threshold
+    # cloth_modifier.collision_settings.use_self_collision = True
+    # cloth_modifier.collision_settings.self_distance_min = 0.001
+
+    # Run the simulation step by step to obtain a proper deformed mesh
+    bpy.context.scene.frame_end = 35
+    for frame in range(1, bpy.context.scene.frame_end + 1):
+        bpy.context.scene.frame_set(frame)
+
+    # Apply the cloth modifier
+    bpy.context.scene.frame_set(bpy.context.scene.frame_end)
+    bpy.context.view_layer.objects.active = obj
+    bpy.ops.object.mode_set(mode="OBJECT")
+
+    for modifier in obj.modifiers:
+        if modifier.type == "CLOTH":
+            bpy.ops.object.modifier_apply(modifier=modifier.name)
+
+    # Smooth the mesh
+    bpy.ops.object.shade_smooth()
+
+    # Compute skewness
+    compute_skewness(obj)
+
+
+def import_object(file_path: str, object_name: str):
+
+    directory = os.path.join(file_path, "Object")
+
+    bpy.ops.wm.append(
+        filepath=directory + object_name,
+        directory=directory,
+        filename=object_name,
+    )
+
+    # Select the object
+    obj = bpy.data.objects[object_name]
+    bpy.context.view_layer.objects.active = obj
+    bpy.ops.object.select_all(action="DESELECT")
+    obj.select_set(True)
+
+    # Tune pos/rot data
+    x = random.uniform(-0.1, 0.3)
+    y = random.uniform(-0.1, 0.4)
+    z_angle = random.uniform(0, 360)
+
+    # Change its position and rotation
+    obj.location = (x, y, 0)
+    obj.rotation_euler = (0, 0, math.radians(z_angle))
+
+
 def modify_samples(
     samples_to_mod_df: pd.DataFrame,
     blueprint_df: pd.DataFrame,
@@ -719,6 +994,20 @@ def modify_samples(
         # Set camera
         camera_data = properties["blender"][requirements["styles"][0]]["camera"]
         config_camera(camera_data=camera_data)
+
+        # Import Background Object
+        object_name = random.choice(properties["blender"]["background_objects"])
+        object_file_path = os.path.join(
+            bpy.path.abspath("//"),
+            "assets",
+            "objects",
+            "".join([object_name, ".blend"]),
+        )
+        import_object(file_path=object_file_path, object_name=object_name)
+
+        prepare_for_cloth_sim()
+        run_cloth_sim()
+        print(a)
 
         # Render scene
         rendered_img = render_scene(

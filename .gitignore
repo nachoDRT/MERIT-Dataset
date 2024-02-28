@@ -15,3 +15,5 @@ src/blender_mod/assets/blender_executable_path.json
 src/replication_pipeline/default
 src/replication_pipeline/templates
 src/replication_pipeline/scripts/__pycache__
+
+src/blender_mod/assets/objects/blue_stabilo.blend1

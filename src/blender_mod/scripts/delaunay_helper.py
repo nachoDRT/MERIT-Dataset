@@ -124,7 +124,7 @@ def extract_boxes(form_entry: dict, properties: dict) -> List[Tuple[int, int]]:
     return points
 
 
-def compute_grid(properties: dict, sampling_x: int = 50, sampling_y: int = 50):
+def compute_grid(properties: dict, sampling_x: int = 100, sampling_y: int = 100):
     """
     Generate a grid of points within the bounding box defined by the dimensions of
     an A4 page.
@@ -137,8 +137,8 @@ def compute_grid(properties: dict, sampling_x: int = 50, sampling_y: int = 50):
     Args:
         properties (dict): A dictionary containing the properties of the A4 page
             including its dimensions in pixels.
-        sampling_x (int): The sampling interval along the x-axis. Default is 50.
-        sampling_y (int): The sampling interval along the y-axis.Default is 50.
+        sampling_x (int): The sampling interval along the x-axis. Default is 100.
+        sampling_y (int): The sampling interval along the y-axis.Default is 100.
 
     Returns:
         np.array: An array of tuples where each tuple contains the x and y coordinates

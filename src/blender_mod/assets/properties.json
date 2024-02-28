@@ -115,7 +115,7 @@
             "background": {
                 "pos_x": 0.105,
                 "pos_y": 0.1485,
-                "pos_z": -0.005,
+                "pos_z": 0,
                 "scale_x": 0.5,
                 "scale_y": 0.5
             }
@@ -129,6 +129,22 @@
                 "repeat": 3,
                 "factor": 1
             }
-        }
+        },
+        "background_objects": [
+            "book",
+            "charger",
+            "christmas_cards",
+            "clips",
+            "closed_laptop",
+            "keyboard",
+            "keys",
+            "mail",
+            "mobile",
+            "open_laptop",
+            "pencil",
+            "ps5_game",
+            "stabilo",
+            "tablet"
+        ]
     }
 }
