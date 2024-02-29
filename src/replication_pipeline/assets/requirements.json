@@ -69,7 +69,7 @@
             },
             "eng_1": {
                 "nickname": "greenfields",
-                "students": 10,
+                "students": 100,
                 "verbose_level": 1,
                 "return_grades_synonym": false,
                 "alphanumeric_separator": " | ",
@@ -330,7 +330,7 @@
                         ]
                     }
                 },
-                "include": true
+                "include": false
             },
             "esp_2": {
                 "nickname": "britanico",
@@ -370,7 +370,7 @@
                         ]
                     }
                 },
-                "include": true
+                "include": false
             },
             "esp_3": {
                 "nickname": "deus",
