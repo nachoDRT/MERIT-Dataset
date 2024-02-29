@@ -7,26 +7,29 @@ from transformers import (
     Trainer,
 )
 from datasets import Features, Sequence, ClassLabel, Value, Array2D, Array3D
-import os
 from torch.utils.data import DataLoader
+from huggingface_hub import HfFolder
 import numpy as np
 import wandb
 import json
 
 LOAD_DATASET_FROM_PY = "/app/src/load_funsd_format.py"
 WANDB_LOGGING_PATH = "/app/config/wandb_logging.json"
+HUGGINGFACE_LOGGING_PATH = "/app/config/huggingface_logging.json"
 
-MAX_TRAIN_STEPS = 1000
-EVAL_FRECUENCY = 50
+MAX_TRAIN_STEPS = 500
+EVAL_FRECUENCY = 100
+LOGGING_STEPS = 50
 
 
 class FunsdTrainer(Trainer):
-    def __init__(self, model, args, compute_metrics):
+    def __init__(self, model, args, train_dataset, eval_dataset, compute_metrics):
         super(FunsdTrainer, self).__init__(
             model=model,
             args=args,
             compute_metrics=compute_metrics,
-            eval_dataset=test_dataset,
+            train_dataset=train_dataset,
+            eval_dataset=eval_dataset,
         )
 
     def get_train_dataloader(self):
@@ -98,6 +101,11 @@ with open(WANDB_LOGGING_PATH) as f:
         name=wandb_config["name"],
     )
 
+# Logging in HuggingFace
+# with open(HUGGINGFACE_LOGGING_PATH) as f:
+#     hf_config = json.load(f)
+#     HfFolder.save_token(hf_config["token"])
+
 # Load dataset using a '.py' file
 datasets = load_dataset(LOAD_DATASET_FROM_PY, trust_remote_code=True)
 
@@ -129,7 +137,7 @@ train_dataset = datasets["train"].map(
     remove_columns=datasets["train"].column_names,
     features=features,
 )
-train_dataset.set_format(type="torch", device="cuda")
+train_dataset.set_format(type="torch")
 
 test_dataset = datasets["test"].map(
     preprocess_data,
@@ -137,16 +145,13 @@ test_dataset = datasets["test"].map(
     remove_columns=datasets["test"].column_names,
     features=features,
 )
-test_dataset.set_format(type="torch", device="cuda")
+test_dataset.set_format(type="torch")
 
 # Dataloaders
 train_dataloader = DataLoader(
     train_dataset, batch_size=4, shuffle=True, pin_memory=False
 )
 test_dataloader = DataLoader(test_dataset, batch_size=2, pin_memory=False)
-
-batch = next(iter(train_dataloader))
-
 
 model = LayoutLMv2ForTokenClassification.from_pretrained(
     "microsoft/layoutlmv2-base-uncased", num_labels=len(label2id)
@@ -161,19 +166,27 @@ metric = load_metric("seqeval")
 return_entity_level_metrics = True
 
 args = TrainingArguments(
-    output_dir=wandb_config["project"],  # name of directory to store the checkpoints
-    max_steps=MAX_TRAIN_STEPS,  # we train for a maximum of 1,000 batches
-    warmup_ratio=0.1,  # we warmup a bit
-    fp16=True,  # we use mixed precision (less memory consumption)
-    push_to_hub=False,  # after training, we'd like to push our model to the hub
-    # push_to_hub_model_id=f"layoutlmv2-finetuned-funsd-test", # this is the name we'll use for our model on the hub
-    # evaluation_strategy="steps",
-    # eval_steps=EVAL_FRECUENCY,
+    output_dir=wandb_config["project"],
+    max_steps=MAX_TRAIN_STEPS,
+    warmup_ratio=0.1,
+    fp16=True,
+    push_to_hub=False,
+    # push_to_hub_model_id="CICLAB-Comillas/layoutlmv2-LSD",
+    logging_strategy="steps",
+    logging_steps=LOGGING_STEPS,
+    evaluation_strategy="steps",
+    eval_steps=EVAL_FRECUENCY,
     report_to="wandb",
 )
 
 # Initialize our Trainer
-trainer = FunsdTrainer(model=model, args=args, compute_metrics=compute_metrics)
+trainer = FunsdTrainer(
+    model=model,
+    args=args,
+    train_dataset=train_dataset,
+    eval_dataset=test_dataset,
+    compute_metrics=compute_metrics,
+)
 
 # Train
 trainer.train()
