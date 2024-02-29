@@ -3,6 +3,8 @@ benchmark/xlmroberta/wandb
 benchmark/xlmroberta/wandb_logging.json
 benchmark/layoutlmv2/config/wandb_logging.json
 benchmark/layoutlmv2/config/huggingface_logging.json
+benchmark/layoutlmv3/config/wandb_logging.json
+benchmark/layoutlmv3/config/huggingface_logging.json
 data/original/spanish
 data/original/english
 data/modified/spanish

@@ -1,0 +1,148 @@
+{
+    "subjects": {
+        "artistic_drawing": [
+            "Artistic Drawing"
+        ],
+        "biology": [
+            "Biology"
+        ],
+        "biology_and_geology": [
+            "Biology and Geology",
+            "Geology"
+        ],
+        "civic_and_ethical_education": [
+            "Civic Education",
+            "Ethics",
+            "Personal Development",
+            "Values"
+        ],
+        "computer_science": [
+            "Computer Science",
+            "Programming"
+        ],
+        "economics": [
+            "Business Economics",
+            "Economic Sciences",
+            "Economics"
+        ],
+        "english": [
+            "English Language",
+            "Language and Literature",
+            "Literature",
+            "Grammar"
+        ],
+        "french": [
+            "Foreign Language: French",
+            "French"
+        ],
+        "generic": [
+            "Administration",
+            "Chinese",
+            "Communication",
+            "Drama",
+            "Education for Work",
+            "Foreign Language Italian",
+            "Communication Technologies",
+            "Italian",
+            "Management",
+            "Mandarin Chinese",
+            "Political Science",
+            "Psychology",
+            "Scientific Culture",
+            "Scientific Education",
+            "Spanish Culture",
+            "Tourism",
+            "Tutoring",
+            "World Literature"
+        ],
+        "geography_and_history": [
+            "Geography",
+            "Geography and History",
+            "History"
+        ],
+        "greek": [
+            "Greek"
+        ],
+        "history": [
+            "British History",
+            "History",
+            "World History"
+        ],
+        "latin": [
+            "Latin"
+        ],
+        "mathematics": [
+            "Academic Mathematics",
+            "Algebra",
+            "Algebra I",
+            "Algebra II",
+            "Applied Mathematics",
+            "Calculus",
+            "Calculus I",
+            "Calculus II",
+            "Geometry",
+            "Integrated Math",
+            "Integrated Math I",
+            "Integrated Math II",
+            "Mathematics"
+        ],
+        "music": [
+            "Music"
+        ],
+        "natural_sciences": [
+            "Natural Sciences"
+        ],
+        "philosophy": [
+            "History of Philosophy",
+            "Philosophy"
+        ],
+        "physics_and_chemistry": [
+            "Chemistry",
+            "Physics",
+            "Physics and Chemistry"
+        ],
+        "religion": [
+            "Christianity",
+            "Religious Studies",
+            "Religion"
+        ],
+        "spanish_language": [
+            "Spanish as a Foreign Language",
+            "Spanish"
+        ],
+        "sports": [
+            "Sports"
+        ],
+        "technical_drawing": [
+            "Technical Drawing",
+            "Technical Drawing and Design"
+        ],
+        "technology": [
+            "Programming and Robotics",
+            "Robotics",
+            "Science and Technology",
+            "Technology"
+        ],
+        "visual_arts": [
+            "Art",
+            "Art and Culture",
+            "Plastic Arts",
+            "Visual Arts",
+            "Visual and Audiovisual Arts",
+            "Visual and Plastic Arts"
+        ],
+        "world_sciences": [
+            "Classical Culture",
+            "Contemporary World History",
+            "Social Sciences",
+            "Social Studies",
+            "World Sciences"
+        ]
+    },
+    "academic_years_tags": [
+        "_year_9",
+        "_year_10",
+        "_year_11",
+        "_year_12"
+    ]
+}
