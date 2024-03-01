@@ -258,7 +258,7 @@ class DataTrainingArguments:
 
 def main():
 
-    with open("wandb_logging.json") as f:
+    with open("/app/config/wandb_logging.json") as f:
         wandb_config = json.load(f)
 
     wandb.login()

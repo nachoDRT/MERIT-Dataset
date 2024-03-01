@@ -12,9 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-python3 run_ner.py \
+python run_ner.py \
   --model_name_or_path bert-base-uncased \
-  --dataset_name conll2003 \
-  --output_dir /tmp/test-ner \
+  --train_file /app/data/train.json \
+  --validation_file /app/data/validation.json \
+  --test_file /app/data/test.json \
+  --output_dir /app/output \
   --do_train \
-  --do_eval
+  --do_eval \
+  --do_predict \
+  --report_to='wandb' \
+  --logging_steps=100 \
+  --overwrite_output_dir
