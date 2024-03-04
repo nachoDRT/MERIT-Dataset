@@ -1,12 +1,14 @@
 terminal_commands.txt
-benchmark/layoutxlm
+benchmark/layoutxlm/data
 benchmark/xlmroberta/wandb
 benchmark/xlmroberta/data
 benchmark/xlmroberta/config/wandb_logging.json
 benchmark/layoutlmv2/config/wandb_logging.json
-benchmark/layoutlmv2/config/huggingface_logging.json
+benchmark/layoutxlm/config/wandb_logging.json
 benchmark/layoutlmv3/config/wandb_logging.json
+benchmark/layoutlmv2/config/huggingface_logging.json
 benchmark/layoutlmv3/config/huggingface_logging.json
+benchmark/layoutxlm/config/huggingface_logging.json
 data/original/spanish
 data/original/english
 data/modified/spanish

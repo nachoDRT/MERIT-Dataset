@@ -1,0 +1,17 @@
+{
+    "dataset_language_possibilities": [
+        "zh",
+        "de",
+        "es",
+        "fr",
+        "en",
+        "it",
+        "ja",
+        "pt"
+    ],
+    "dataset_language": "es",
+    "dataset_partitions": {
+        "train": 0.7,
+        "eval": 0.3
+    }
+}
