@@ -10,7 +10,7 @@ from transformers.data.data_collator import default_data_collator
 import json
 import wandb
 
-LOAD_DATASET_FROM_PY = "/app/src/load_funsd_format_lmv3.py"
+LOAD_DATASET_FROM_PY = "/app/src/load_dataset.py"
 WANDB_LOGGING_PATH = "/app/config/wandb_logging.json"
 
 MAX_TRAIN_STEPS = 500
