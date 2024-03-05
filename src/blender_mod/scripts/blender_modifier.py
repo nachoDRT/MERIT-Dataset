@@ -14,6 +14,8 @@ import pandas as pd
 import tqdm
 import bmesh
 from mathutils import Vector
+from datetime import datetime
+
 
 file_dir = os.path.join(bpy.path.abspath("//"), "scripts")
 
@@ -90,7 +92,11 @@ def compute_mesh(sample_path: str, properties: dict):
 
 
 def create_mesh_object(
-    n_bboxes_vertices: int, vertices: np.array, mesh: Delaunay, properties: dict
+    n_bboxes_vertices: int,
+    vertices: np.array,
+    mesh: Delaunay,
+    properties: dict,
+    mesh_name: str,
 ):
     """
     Create a new Blender mesh using a Delaunay mesh object and its vertices.
@@ -113,7 +119,7 @@ def create_mesh_object(
     """
 
     # Create a new mesh data block and object
-    mesh_data = bpy.data.meshes.new(name="Document Mesh")
+    mesh_data = bpy.data.meshes.new(name=mesh_name)
     mesh_obj = bpy.data.objects.new("Document", mesh_data)
 
     # Link the mesh object to the current collection
@@ -675,7 +681,7 @@ def get_vertices_id_from_group(object_name: str, group_name: str):
     return vertices_in_group
 
 
-def retrieve_bboxes_pixel_points(img: np.array):
+def retrieve_bboxes_pixel_points(img: np.array, mesh_name: str):
     """
     Retrieve the pixel coordinates of vertices belonging to a vertex group (words
     bboxes) and draw these points on the rendered image.
@@ -698,7 +704,7 @@ def retrieve_bboxes_pixel_points(img: np.array):
 
     camera_name = "Camera"
     obj_name = "Document"
-    mesh_name = "Document Mesh"
+    mesh_name = mesh_name
 
     camera = bpy.data.objects[camera_name]
     doc_object = bpy.data.objects[obj_name]
@@ -709,6 +715,16 @@ def retrieve_bboxes_pixel_points(img: np.array):
     )
 
     mesh = bpy.data.meshes[mesh_name]
+
+    # TODO
+    # num_vertices = len(mesh.vertices)
+    # print(f"Vertices num: {num_vertices}")
+    # scene = bpy.context.scene
+    # for obj in scene.objects:
+    #     if obj.type == "MESH":
+    #         print(f"{obj.name}: {len(obj.data.vertices)}")
+    # TODO
+
     bboxes_vertices_px = []
 
     # Bboxes vertices: transform 3D world coordinates to 2D pixel coordinates
@@ -818,7 +834,7 @@ def prepare_for_cloth_sim():
     bpy.ops.object.mode_set(mode="OBJECT")
 
     # Change its position
-    obj.location.z = 0.015
+    obj.location.z = 0.025
 
 
 def compute_skewness(obj: bpy.data.objects):
@@ -890,15 +906,15 @@ def run_cloth_sim():
     cloth_modifier.collision_settings.distance_min = 0.001
 
     # Set simulation quality parameters
-    cloth_modifier.settings.quality = 5
-    cloth_modifier.collision_settings.collision_quality = 1
+    cloth_modifier.settings.quality = 10
+    cloth_modifier.collision_settings.collision_quality = 10
 
     # Activate selfcollisions and set the threshold
     # cloth_modifier.collision_settings.use_self_collision = True
     # cloth_modifier.collision_settings.self_distance_min = 0.001
 
     # Run the simulation step by step to obtain a proper deformed mesh
-    bpy.context.scene.frame_end = 35
+    bpy.context.scene.frame_end = 75
     for frame in range(1, bpy.context.scene.frame_end + 1):
         bpy.context.scene.frame_set(frame)
 
@@ -965,11 +981,14 @@ def modify_samples(
         n_bboxes_vertices, all_vertices, delaunay_mesh = compute_mesh(
             sample_path=labels_path, properties=properties
         )
+
+        mesh_name = "".join([sample[1], "_", datetime.now().isoformat()])
         create_mesh_object(
             n_bboxes_vertices=n_bboxes_vertices,
             vertices=all_vertices,
             mesh=delaunay_mesh,
             properties=properties,
+            mesh_name=mesh_name,
         )
 
         # Textures
@@ -1018,7 +1037,7 @@ def modify_samples(
 
         # Obtain new bbox pixel coordinates and write the output
         bboxes_px_points, img = retrieve_bboxes_pixel_points(
-            img=copy.deepcopy(rendered_img)
+            img=copy.deepcopy(rendered_img), mesh_name=mesh_name
         )
         bboxes_sample_path = os.path.join(
             dst_folder, "debug_bboxes", bboxes_sample_name
