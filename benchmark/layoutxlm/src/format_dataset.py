@@ -14,9 +14,6 @@ DATASET_FEATURES_JSON = "/app/config/dataset_features.json"
 IMAGES_DIR = "/app/data/dataset_output/images/"
 ANNOTATIONS_DIR = "/app/data/dataset_output/annotations/"
 
-# Dataset output path
-DATASET_ZIP_PATH = ""
-
 
 def generate_json(*, json_path: str, dataset_partition: str, dict: dict):
 
@@ -25,7 +22,6 @@ def generate_json(*, json_path: str, dataset_partition: str, dict: dict):
         json_path, "".join([dataset_partition, "_json"])
     )
     json_name = "".join([json_name_no_json_extension, ".json"])
-    # os.path.join(json_path, "".join([dataset_partition, "_json.json"]))
 
     with open(json_name, "w") as outfile:
         outfile.write(json_object)

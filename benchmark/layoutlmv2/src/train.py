@@ -13,7 +13,7 @@ import numpy as np
 import wandb
 import json
 
-LOAD_DATASET_FROM_PY = "/app/src/load_funsd_format.py"
+LOAD_DATASET_FROM_PY = "/app/src/load_dataset.py"
 WANDB_LOGGING_PATH = "/app/config/wandb_logging.json"
 HUGGINGFACE_LOGGING_PATH = "/app/config/huggingface_logging.json"
 
@@ -178,7 +178,6 @@ args = TrainingArguments(
     eval_steps=EVAL_FRECUENCY,
     report_to="wandb",
     load_best_model_at_end=True,
-    metric_for_best_model="f1",
 )
 
 # Initialize our Trainer
