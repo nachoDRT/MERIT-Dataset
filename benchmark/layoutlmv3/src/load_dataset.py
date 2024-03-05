@@ -189,11 +189,11 @@ class Funsd(datasets.GeneratorBasedBuilder):
         return [
             datasets.SplitGenerator(
                 name=datasets.Split.TRAIN,
-                gen_kwargs={"filepath": f"{downloaded_file}/dataset/training_data/"},
+                gen_kwargs={"filepath": f"{downloaded_file}/training_data/"},
             ),
             datasets.SplitGenerator(
                 name=datasets.Split.TEST,
-                gen_kwargs={"filepath": f"{downloaded_file}/dataset/testing_data/"},
+                gen_kwargs={"filepath": f"{downloaded_file}/testing_data/"},
             ),
         ]
 

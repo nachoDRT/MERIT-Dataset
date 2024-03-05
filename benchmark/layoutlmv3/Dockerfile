@@ -24,5 +24,5 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Execute the training
-RUN chmod +x src/train_layoutlmv3.py
-CMD ["python", "src/train_layoutlmv3.py"]
+RUN chmod +x src/start.sh
+CMD ["bash", "src/start.sh"]
