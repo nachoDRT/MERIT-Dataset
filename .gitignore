@@ -17,6 +17,7 @@ benchmark/layoutlmv2/config/huggingface_logging.json
 benchmark/layoutlmv3/config/huggingface_logging.json
 benchmark/layoutxlm/config/huggingface_logging.json
 
+figs
 data/original/spanish
 data/original/english
 data/modified/spanish
@@ -32,3 +33,5 @@ src/blender_mod/assets/blender_executable_path.json
 src/replication_pipeline/default
 src/replication_pipeline/templates
 src/replication_pipeline/scripts/__pycache__
+
+src/blender_mod/assets/objects/blue_stabilo.blend1

@@ -115,7 +115,7 @@
             "background": {
                 "pos_x": 0.105,
                 "pos_y": 0.1485,
-                "pos_z": -0.005,
+                "pos_z": 0,
                 "scale_x": 0.5,
                 "scale_y": 0.5
             }
@@ -129,6 +129,18 @@
                 "repeat": 3,
                 "factor": 1
             }
-        }
+        },
+        "background_objects": [
+            "book",
+            "christmas_cards",
+            "keyboard",
+            "keys",
+            "mail",
+            "mobile",
+            "pencil",
+            "ps5_game",
+            "stabilo",
+            "tablet"
+        ]
     }
 }
