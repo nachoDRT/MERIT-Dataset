@@ -1,19 +1,27 @@
 import os
 from pathlib import Path
 import pandas as pd
+import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.collections as collects
 import seaborn as sns
 import numpy as np
 import ast
 import json
+from matplotlib.colors import to_hex, rgb_to_hsv, to_rgb, hsv_to_rgb
 
-color_palette = {
-    "female": "#7030A0",
-    "male": "#006337",
-    "female_pale": "#bc71f5",
-    "male_pale": "#02F186",
-    "grey": "#b3b3b3",
+DARK_VIOLET = "#7030A0"
+DARK_GREEN = "#006337"
+LIGHT_VIOLET = "#bc71f5"
+LIGHT_GREEN = "#02F186"
+GREY = "#b3b3b3"
+
+violin_color_palette = {
+    "female": DARK_VIOLET,
+    "male": DARK_GREEN,
+    "female_pale": LIGHT_VIOLET,
+    "male_pale": LIGHT_GREEN,
+    "grey": GREY,
 }
 
 
@@ -70,7 +78,7 @@ def plot_grade_violins(dataframe: pd.DataFrame, reqs: json, save_path: str):
         for grade, info in grades_segments.items():
             plt.axhline(
                 y=info["max"],
-                color=color_palette["male_pale"],
+                color=violin_color_palette["male_pale"],
                 linestyle="dotted",
                 zorder=2,
                 alpha=0.5,
@@ -94,7 +102,7 @@ def plot_grade_violins(dataframe: pd.DataFrame, reqs: json, save_path: str):
                 position,
                 ymin=min_grade,
                 ymax=max_grade,
-                colors=color_palette["grey"],
+                colors=violin_color_palette["grey"],
                 linestyles="solid",
                 alpha=0.5,
             )
@@ -105,8 +113,8 @@ def plot_grade_violins(dataframe: pd.DataFrame, reqs: json, save_path: str):
             hue="student_gender",
             data=df_expanded,
             palette={
-                "Male": color_palette["male_pale"],
-                "Female": color_palette["female_pale"],
+                "Male": violin_color_palette["male_pale"],
+                "Female": violin_color_palette["female_pale"],
             },
             split=True,
             inner=None,
@@ -116,7 +124,11 @@ def plot_grade_violins(dataframe: pd.DataFrame, reqs: json, save_path: str):
 
         # Borders color adjustment
         for i, artist in enumerate(ax.findobj(collects.PolyCollection)):
-            color = color_palette["female"] if i % 2 == 0 else color_palette["male"]
+            color = (
+                violin_color_palette["female"]
+                if i % 2 == 0
+                else violin_color_palette["male"]
+            )
             artist.set_edgecolor(color)
             artist.set_linewidth(1.5)
 
@@ -134,8 +146,8 @@ def plot_grade_violins(dataframe: pd.DataFrame, reqs: json, save_path: str):
             title="Gender",
             labels=["Female", "Male"],
             handles=[
-                plt.Line2D([0], [0], color=color_palette["female"], lw=4),
-                plt.Line2D([0], [0], color=color_palette["male"], lw=4),
+                plt.Line2D([0], [0], color=violin_color_palette["female"], lw=4),
+                plt.Line2D([0], [0], color=violin_color_palette["male"], lw=4),
             ],
         )
 
@@ -172,6 +184,134 @@ def get_blueprint():
     return blueprint_df
 
 
+def config_histogram_columns(
+    color_palette: dict, labels: dict, bars: matplotlib.axes._axes.Axes
+):
+    columns_dict = {}
+    for label in labels:
+        columns_dict[label] = {}
+        columns_dict[label]["color"] = color_palette[label]
+        columns_dict[label]["x_pos"] = None
+
+    for bar in bars.patches:
+        x_pos = bar.get_x()
+
+        x_positions = [column["x_pos"] for column in columns_dict.values()]
+
+        if x_pos not in x_positions:
+            for column in columns_dict.values():
+                if column["x_pos"] == None:
+                    column["x_pos"] = x_pos
+                    break
+
+    for column in columns_dict.values():
+        column["total_height"] = sum(
+            bar.get_height() for bar in bars.patches if bar.get_x() == column["x_pos"]
+        )
+
+    return columns_dict
+
+
+def plot_visual_categories_histogram(df: pd.DataFrame, save_path: str):
+    # Preprocess data
+    modifications = df["modification_done"]
+    languages = df["language"].str.capitalize()
+
+    modifications_mapped = modifications.map(
+        {True: "Photorealistic", False: "Digital Document", np.nan: "N/A"}
+    )
+    adhoc_df = pd.DataFrame(
+        {"Language": languages, "Modification": modifications_mapped}
+    )
+    language_modification_count = (
+        adhoc_df.groupby(["Modification", "Language"]).size().unstack(fill_value=0)
+    )
+    normalized_counts = language_modification_count.div(
+        language_modification_count.sum(axis=1), axis=0
+    )
+
+    # Color palette definition
+    color_palette = {
+        "Photorealistic": DARK_VIOLET,
+        "Digital Document": DARK_GREEN,
+        "N/A": GREY,
+    }
+
+    # Define plot
+    _, ax = plt.subplots(figsize=(10, 6))
+    bars = language_modification_count.plot(
+        kind="bar", stacked=True, ax=ax, legend=None
+    )
+
+    labels = [item.get_text() for item in ax.get_xticklabels()]
+
+    # Config the columns based on their x_pos
+    columns_dict = config_histogram_columns(color_palette, labels, bars)
+
+    # Draw the blocks that compose every column
+    for bar, lang in zip(
+        bars.patches,
+        pd.Series(normalized_counts.columns).repeat(len(normalized_counts)),
+    ):
+        bar_x = bar.get_x()
+        base_color = get_base_color(columns=columns_dict, x=bar_x)
+        intensity = bar.get_height() / get_column_height(columns=columns_dict, x=bar_x)
+        adjusted_color = adjust_color_intensity(base_color, intensity)
+        bar.set_facecolor(adjusted_color)
+
+        # Add text
+        if bar.get_height() != 0:
+            text_x = bar.get_x() + bar.get_width() / 2
+            bar_height = bar.get_y() + bar.get_height() / 2
+            print(f"{lang} {bar.get_x()}, {bar.get_height()}")
+            plt.text(
+                text_x, bar_height, f"{lang}", ha="center", va="center", color="white"
+            )
+
+    # Tune the plot
+    plt.title("Sample Visual Categories: Photorealistic vs. Digital Document")
+    plt.xlabel("Modification Label")
+    plt.ylabel("Number of Samples")
+    plt.xticks(rotation=0)
+    # plt.legend(title="Language", loc="upper left", bbox_to_anchor=(1, 1))
+
+    # Save the plot
+    plot_save_path = os.path.join(save_path, "visual_categories.pdf")
+    plt.savefig(plot_save_path, dpi=300, bbox_inches="tight")
+    plt.show()
+
+
+def get_base_color(columns: dict, x: float):
+
+    for column in columns.values():
+        if column["x_pos"] == x:
+            base_color = column["color"]
+            break
+
+    return base_color
+
+
+def get_column_height(columns: dict, x: float):
+    for column in columns.values():
+        if column["x_pos"] == x:
+            height = column["total_height"]
+            break
+
+    return height
+
+
+def adjust_color_intensity(color, intensity, min_intensity=0.25):
+    """Adjuts color intensity"""
+
+    rgb = to_rgb(color)
+    hsv = rgb_to_hsv(rgb)
+    hsv[2] = np.clip(1 - intensity, min_intensity, 1)
+    rgb = hsv_to_rgb(hsv)
+    hex = to_hex(rgb)
+
+    return hex
+
+
 if __name__ == "__main__":
     sns.set_theme(style="whitegrid")
 
@@ -186,7 +326,14 @@ if __name__ == "__main__":
         Path(__file__).resolve().parents[0], "dataset_figs", "metrics"
     )
 
+    # Load data
     reqs = read_json(requirements_path)
     blueprint_df = get_blueprint()
 
+    """PLOTS"""
+
+    # Original vs. Blender Mod replicas
+    plot_visual_categories_histogram(blueprint_df, save_path)
+
+    # Grade distributions per language, origin and gender
     plot_grade_violins(blueprint_df, reqs, save_path)
