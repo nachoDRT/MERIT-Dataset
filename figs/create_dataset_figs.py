@@ -212,75 +212,6 @@ def config_histogram_columns(
     return columns_dict
 
 
-def plot_visual_categories_histogram(df: pd.DataFrame, save_path: str):
-    # Preprocess data
-    modifications = df["modification_done"]
-    languages = df["language"].str.capitalize()
-
-    modifications_mapped = modifications.map(
-        {True: "Photorealistic", False: "Digital Document", np.nan: "N/A"}
-    )
-    adhoc_df = pd.DataFrame(
-        {"Language": languages, "Modification": modifications_mapped}
-    )
-    language_modification_count = (
-        adhoc_df.groupby(["Modification", "Language"]).size().unstack(fill_value=0)
-    )
-    normalized_counts = language_modification_count.div(
-        language_modification_count.sum(axis=1), axis=0
-    )
-
-    # Color palette definition
-    color_palette = {
-        "Photorealistic": DARK_VIOLET,
-        "Digital Document": DARK_GREEN,
-        "N/A": GREY,
-    }
-
-    # Define plot
-    _, ax = plt.subplots(figsize=(10, 6))
-    bars = language_modification_count.plot(
-        kind="bar", stacked=True, ax=ax, legend=None
-    )
-
-    labels = [item.get_text() for item in ax.get_xticklabels()]
-
-    # Config the columns based on their x_pos
-    columns_dict = config_histogram_columns(color_palette, labels, bars)
-
-    # Draw the blocks that compose every column
-    for bar, lang in zip(
-        bars.patches,
-        pd.Series(normalized_counts.columns).repeat(len(normalized_counts)),
-    ):
-        bar_x = bar.get_x()
-        base_color = get_base_color(columns=columns_dict, x=bar_x)
-        intensity = bar.get_height() / get_column_height(columns=columns_dict, x=bar_x)
-        adjusted_color = adjust_color_intensity(base_color, intensity)
-        bar.set_facecolor(adjusted_color)
-
-        # Add text
-        if bar.get_height() != 0:
-            text_x = bar.get_x() + bar.get_width() / 2
-            bar_height = bar.get_y() + bar.get_height() / 2
-            print(f"{lang} {bar.get_x()}, {bar.get_height()}")
-            plt.text(
-                text_x, bar_height, f"{lang}", ha="center", va="center", color="white"
-            )
-
-    # Tune the plot
-    plt.title("Sample Visual Categories: Photorealistic vs. Digital Document")
-    plt.xlabel("Modification Label")
-    plt.ylabel("Number of Samples")
-    plt.xticks(rotation=0)
-    # plt.legend(title="Language", loc="upper left", bbox_to_anchor=(1, 1))
-
-    # Save the plot
-    plot_save_path = os.path.join(save_path, "visual_categories.pdf")
-    plt.savefig(plot_save_path, dpi=300, bbox_inches="tight")
-    plt.show()
-
-
 def get_base_color(columns: dict, x: float):
 
     for column in columns.values():
@@ -300,7 +231,7 @@ def get_column_height(columns: dict, x: float):
     return height
 
 
-def adjust_color_intensity(color, intensity, min_intensity=0.25):
+def adjust_color_intensity(color, intensity, min_intensity=0.35):
     """Adjuts color intensity"""
 
     rgb = to_rgb(color)
@@ -310,6 +241,140 @@ def adjust_color_intensity(color, intensity, min_intensity=0.25):
     hex = to_hex(rgb)
 
     return hex
+
+
+def get_mapping_dict(features: pd.core.series.Series, maps_to: pd.core.series.Series):
+    mapping_dict = {}
+
+    for feature, map_to in zip(features, maps_to):
+        if feature not in mapping_dict:
+            mapping_dict[feature] = map_to
+
+    return mapping_dict
+
+
+def get_color_generic_palette(labels: list):
+    color_palette = {}
+
+    for label in labels:
+        if len(color_palette) % 2 == 0:
+            color_palette[label] = DARK_GREEN
+        else:
+            color_palette[label] = DARK_VIOLET
+
+    return color_palette
+
+
+def plot_school_statistics(df: pd.DataFrame, save_path: str):
+    categories = df["language"].str.capitalize()
+    categories_items = df["school_name"].str.capitalize()
+    mapping = get_mapping_dict(categories_items, categories)
+    cat_mapped = categories_items.map(mapping)
+
+    plot_histogram(
+        cat_items=categories_items,
+        cat_mapped=cat_mapped,
+        save_path=save_path,
+        title="Schools Recount",
+        x_label="Languages",
+        y_label="Number of Samples",
+        plot_name="school_recount",
+    )
+
+
+def plot_visual_categories_histogram(df: pd.DataFrame, save_path: str):
+    categories = df["modification_done"]
+    categories_items = df["language"].str.capitalize()
+    color_palette = {
+        "Photorealistic": DARK_VIOLET,
+        "Digital Document": DARK_GREEN,
+        "Non Processed": GREY,
+    }
+
+    mapping = {
+        True: "Photorealistic",
+        False: "Non Processed",
+        np.nan: "Digital Document",
+    }
+
+    cat_mapped = categories.map(mapping)
+
+    plot_histogram(
+        cat_items=categories_items,
+        cat_mapped=cat_mapped,
+        save_path=save_path,
+        title="Visual Styles",
+        x_label="Visual Styles",
+        y_label="Number of Samples",
+        plot_name="documents_visual_styles_recount",
+        color_palette=color_palette,
+    )
+
+
+def plot_histogram(
+    cat_items,
+    cat_mapped: dict,
+    save_path: str,
+    title: str,
+    x_label: str,
+    y_label: str,
+    plot_name: str,
+    color_palette: dict = None,
+):
+
+    adhoc_df = pd.DataFrame({"Items": cat_items, "Categories": cat_mapped})
+
+    language_modification_count = (
+        adhoc_df.groupby(["Categories", "Items"]).size().unstack(fill_value=0)
+    )
+
+    normalized_counts = language_modification_count.div(
+        language_modification_count.sum(axis=1), axis=0
+    )
+
+    # Define plot
+    _, ax = plt.subplots(figsize=(10, 6))
+    bars = language_modification_count.plot(
+        kind="bar", stacked=True, ax=ax, legend=None
+    )
+
+    labels = [item.get_text() for item in ax.get_xticklabels()]
+
+    if not color_palette:
+        color_palette = get_color_generic_palette(labels)
+
+    # Config the columns based on their x_pos
+    columns_dict = config_histogram_columns(color_palette, labels, bars)
+
+    # Draw the blocks that compose every column
+    for bar, lang in zip(
+        bars.patches,
+        pd.Series(normalized_counts.columns).repeat(len(normalized_counts)),
+    ):
+        bar_x = bar.get_x()
+        base_color = get_base_color(columns=columns_dict, x=bar_x)
+        intensity = bar.get_height() / get_column_height(columns=columns_dict, x=bar_x)
+        adjusted_color = adjust_color_intensity(base_color, intensity)
+        bar.set_facecolor(adjusted_color)
+
+        # Add text
+        if bar.get_height() != 0:
+            text_x = bar.get_x() + bar.get_width() / 2
+            bar_height = bar.get_y() + bar.get_height() / 2
+            plt.text(
+                text_x, bar_height, f"{lang}", ha="center", va="center", color="white"
+            )
+
+    # Tune the plot
+    plt.title(title, fontsize=14, fontweight="bold")
+    plt.xlabel(x_label)
+    plt.ylabel(y_label)
+    plt.xticks(rotation=0)
+
+    # Save the plot
+    plot_save_path = os.path.join(save_path, "".join([plot_name, ".pdf"]))
+    plt.savefig(plot_save_path, dpi=300, bbox_inches="tight")
+    plt.show()
 
 
 if __name__ == "__main__":
@@ -335,5 +400,8 @@ if __name__ == "__main__":
     # Original vs. Blender Mod replicas
     plot_visual_categories_histogram(blueprint_df, save_path)
 
+    # Number of samples from every school
+    plot_school_statistics(blueprint_df, save_path)
+
     # Grade distributions per language, origin and gender
-    plot_grade_violins(blueprint_df, reqs, save_path)
+    # plot_grade_violins(blueprint_df, reqs, save_path)
