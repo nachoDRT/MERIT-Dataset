@@ -11,6 +11,7 @@ DATASET_FEATURES_JSON = "/app/config/dataset_features.json"
 # Folders where data is originally stored
 IMAGES_DIR = "/app/data/dataset_output/images/"
 ANNOTATIONS_DIR = "/app/data/dataset_output/annotations/"
+ASSERT_TOLERANCE = 1e-3
 
 
 def read_dataset_features_json():
@@ -48,11 +49,19 @@ def split_dataset(partitions: List, fractions: List):
     ]
     random.shuffle(file_names)
 
-    # Split train and eval files
-    split_index = int(len(file_names) * fractions[0])
-    train_files = file_names[:split_index]
-    eval_files = file_names[split_index:]
-    files = [train_files, eval_files]
+    assert (
+        abs(sum(fractions) - 1) < ASSERT_TOLERANCE
+    ), f"Your dataset fractions might not be right: {fractions}. Please check"
+
+    split_index_train = int(len(file_names) * fractions[0])
+    split_index_eval = split_index_train + int(len(file_names) * fractions[1])
+
+    # Split train, validation and test files
+    train_files = file_names[:split_index_train]
+    eval_files = file_names[split_index_train:split_index_eval]
+    test_files = file_names[split_index_eval:]
+
+    files = [train_files, eval_files, test_files]
 
     for files_partition, partition in zip(files, partitions):
         move_files(files_partition, "".join([partition, "_data"]))

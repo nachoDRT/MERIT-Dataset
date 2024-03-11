@@ -184,6 +184,10 @@ class Funsd(datasets.GeneratorBasedBuilder):
                 gen_kwargs={"filepath": f"{downloaded_file}/training_data/"},
             ),
             datasets.SplitGenerator(
+                name=datasets.Split.VALIDATION,
+                gen_kwargs={"filepath": f"{downloaded_file}/validating_data/"},
+            ),
+            datasets.SplitGenerator(
                 name=datasets.Split.TEST,
                 gen_kwargs={"filepath": f"{downloaded_file}/testing_data/"},
             ),
