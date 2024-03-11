@@ -232,7 +232,7 @@ def apply_texture(document: str, paper: str):
         obj.data.materials.append(mat)
 
 
-def create_background(texture_path: str, normals_path: str, back_data: dict):
+def create_background(background_folder: str, back_data: dict):
     """
     Creates a background plane in the Blender scene and applies a texture and normal map
     to it.
@@ -248,6 +248,24 @@ def create_background(texture_path: str, normals_path: str, back_data: dict):
         data (dict): A dictionary containing info about the position or scale of the
         plane background.
     """
+
+    # Fetch random texture and normal from background folder
+    backgrounds = [d for d in os.listdir(background_folder) if os.path.isdir(os.path.join(background_folder, d))]
+    random_background = random.choice(backgrounds)
+
+    texture_path = os.path.join(
+        bpy.path.abspath("//"),
+        background_folder,
+        random_background,
+        "texture.png"
+    )
+
+    normals_path = os.path.join(
+        bpy.path.abspath("//"),
+        background_folder,
+        random_background,
+        "normals.png"
+    )
 
     # Create plane
     if not bpy.data.objects.get("Plane"):
@@ -336,7 +354,7 @@ def compute_pos(pos_data: dict, distribution: str = "normal"):
     return pos
 
 
-def config_camera(camera_data: dict):
+def config_camera(camera_style_name: str = None):
     """
     Positions and orients a camera in the Blender scene based on specified style.
 
@@ -365,6 +383,17 @@ def config_camera(camera_data: dict):
             }
     """
 
+    styles = requirements.get("styles", [])
+    
+    if camera_style_name not in styles:
+        camera_style_name = None
+    
+    if camera_style_name is None:
+        camera_style_name = random.choice(styles)
+    
+    camera_data = properties["blender"][camera_style_name]["camera"]
+
+
     # Make sure a camera object exists
     if not bpy.data.objects.get("Camera"):
         bpy.ops.object.camera_add()
@@ -391,7 +420,7 @@ def config_camera(camera_data: dict):
     camera.rotation_euler = (rot_x, rot_y, rot_z)
 
 
-def config_lights(lights_data: dict):
+def config_lights(light_style_name: str = None):
     """
     Create and configure a number of light objects in the Blender scene based on the
     provided data.
@@ -399,36 +428,102 @@ def config_lights(lights_data: dict):
     Args:
         lights_data (dict): A dictionary containing the data to configure lights.
     """
+    styles = requirements.get("styles", [])
+    
+    if light_style_name not in styles:
+        light_style_name = None
+    
+    if light_style_name is None:
+        light_style_name = random.choice(styles)
+    
+    lights_data = properties["blender"][light_style_name]["lights"]
 
-    # TODO Random light style
-    n_lights = lights_data["number"]
+    # Random light style
+    if "random" in light_style_name:
+        min_lights = lights_data["number"]["min"]
+        max_lights = lights_data["number"]["max"]
+        n_lights = random.randint(min_lights, max_lights)
 
-    for light_i in range(n_lights):
-        # Create a new light datablock
-        light = bpy.data.lights.new(name=f"Light_{light_i}", type="POINT")
-        light.energy = lights_data["power"]
-        light.diffuse_factor = lights_data["diffuse"]
-        light.specular_factor = lights_data["specular"]
-        light.shadow_soft_size = lights_data["radius"]
+        for light_i in range(n_lights):
+            # Create a new light datablock
+            light = bpy.data.lights.new(name=f"Light_{light_i}", type="POINT")
 
-        # Create a new light object and link it to the collection
-        light_object = bpy.data.objects.new(f"Light_{light_i}", object_data=light)
-        bpy.context.collection.objects.link(light_object)
+            min_energy = lights_data["power"]["min"]
+            max_energy = lights_data["power"]["max"]
+            light.energy = random.randint(min_energy, max_energy)
 
-        # Set light location
-        light_pos = compute_pos(lights_data["pos_meters"])
-        light_object.location = (light_pos[0], light_pos[1], light_pos[2])
+            min_diffuse = lights_data["diffuse"]["min"]
+            max_diffuse = lights_data["diffuse"]["max"]
+            light.diffuse_factor = random.randint(100 * min_diffuse, 100 * max_diffuse) / 100
 
-        # Light color
-        color_info = lights_data["color"]
-        rgb_color = colorsys.hsv_to_rgb(
-            color_info["hue"], color_info["saturation"], color_info["value"]
-        )
-        light.color = rgb_color
+            min_specular = lights_data["specular"]["min"]
+            max_specular = lights_data["specular"]["max"]
+            light.specular_factor = random.randint(100 * min_specular, 100 * max_specular) / 100
 
-        # Contact shadows
-        light.use_contact_shadow = True
-        light.shadow_buffer_bias = 0.001
+            min_radius = lights_data["radius"]["min"]
+            max_radius = lights_data["radius"]["max"]
+            light.shadow_soft_size = random.randint(100 * min_radius, 100 * max_radius) / 100
+
+
+            # Create a new light object and link it to the collection
+            light_object = bpy.data.objects.new(f"Light_{light_i}", object_data=light)
+            bpy.context.collection.objects.link(light_object)
+
+            # Set light location
+            light_pos = compute_pos(lights_data["pos_meters"])
+            light_object.location = (light_pos[0], light_pos[1], light_pos[2])
+
+            # Light color
+            min_hue = lights_data["color"]["hue"]["min"]
+            max_hue = lights_data["color"]["hue"]["max"]
+            hue = random.randint(100 * min_hue, 100 * max_hue) / 100
+
+            min_saturation = lights_data["color"]["saturation"]["min"]
+            max_saturation = lights_data["color"]["saturation"]["max"]
+            saturation = random.randint(100 * min_saturation, 100 * max_saturation) / 100
+
+            min_value = lights_data["color"]["value"]["min"]
+            max_value = lights_data["color"]["value"]["max"]
+            value = random.randint(100 * min_value, 100 * max_value) / 100
+            
+            rgb_color = colorsys.hsv_to_rgb(
+                hue, saturation, value
+            )
+            light.color = rgb_color
+
+            # Contact shadows
+            light.use_contact_shadow = True
+            light.shadow_buffer_bias = 0.001
+  
+    else: 
+        n_lights = lights_data["number"]
+
+        for light_i in range(n_lights):
+            # Create a new light datablock
+            light = bpy.data.lights.new(name=f"Light_{light_i}", type="POINT")
+            light.energy = lights_data["power"]
+            light.diffuse_factor = lights_data["diffuse"]
+            light.specular_factor = lights_data["specular"]
+            light.shadow_soft_size = lights_data["radius"]
+
+            # Create a new light object and link it to the collection
+            light_object = bpy.data.objects.new(f"Light_{light_i}", object_data=light)
+            bpy.context.collection.objects.link(light_object)
+
+            # Set light location
+            light_pos = compute_pos(lights_data["pos_meters"])
+            light_object.location = (light_pos[0], light_pos[1], light_pos[2])
+
+            # Light color
+            color_info = lights_data["color"]
+            rgb_color = colorsys.hsv_to_rgb(
+                color_info["hue"], color_info["saturation"], color_info["value"]
+            )
+            light.color = rgb_color
+
+            # Contact shadows
+            light.use_contact_shadow = True
+            light.shadow_buffer_bias = 0.001
 
 
 def render_scene(dst_folder: str, name: str, img_dims: dict):
@@ -673,8 +768,7 @@ def modify_samples(
     samples_to_mod_df: pd.DataFrame,
     blueprint_df: pd.DataFrame,
     paper_texture: str,
-    background_texture: str,
-    background_normal: str,
+    background_folder: str
 ):
     for sample in tqdm.tqdm(samples_to_mod_df["file_name"].items()):
         (
@@ -706,19 +800,13 @@ def modify_samples(
 
         # Set background
         background_data = properties["blender"]["common"]["background"]
-        create_background(
-            texture_path=background_texture,
-            normals_path=background_normal,
-            back_data=background_data,
-        )
+        create_background(background_folder, background_data)
 
-        # Set light
-        lights_data = properties["blender"][requirements["styles"][0]]["lights"]
-        config_lights(lights_data=lights_data)
+        # Set light (A style will be chosen at random if empty)
+        config_lights("scanner_style")
 
-        # Set camera
-        camera_data = properties["blender"][requirements["styles"][0]]["camera"]
-        config_camera(camera_data=camera_data)
+        # Set camera (A style will be chosen at random if empty)
+        config_camera("scanner_style")
 
         # Render scene
         rendered_img = render_scene(
@@ -726,6 +814,8 @@ def modify_samples(
             name=mod_sample_name,
             img_dims=requirements["img_output"],
         )
+
+        print(a)
 
         # Obtain new bbox pixel coordinates and write the output
         bboxes_px_points, img = retrieve_bboxes_pixel_points(
@@ -765,10 +855,10 @@ def modify_samples(
         bpy.ops.object.delete()
 
         # Update blueprint
-        blueprint_df.loc[
-            blueprint_df["file_name"] == sample[1], "modification_done"
-        ] = True
-        blueprint_df.to_csv(blueprint_path, index=False)
+        # blueprint_df.loc[
+        #     blueprint_df["file_name"] == sample[1], "modification_done"
+        # ] = True
+        # blueprint_df.to_csv(blueprint_path, index=False)
 
 
 if __name__ == "__main__":
@@ -792,23 +882,13 @@ if __name__ == "__main__":
     paper_texture = os.path.join(
         bpy.path.abspath("//"), "assets", "textures", "papers", "paper.png"
     )
-    background_texture = os.path.join(
+    background_folder = os.path.join(
         bpy.path.abspath("//"),
         "assets",
         "textures",
-        "backgrounds",
-        "white_oak",
-        "texture.png",
-    )
-    background_normal = os.path.join(
-        bpy.path.abspath("//"),
-        "assets",
-        "textures",
-        "backgrounds",
-        "white_oak",
-        "normals.png",
+        "backgrounds"
     )
 
     modify_samples(
-        filtered_df, blueprint_df, paper_texture, background_texture, background_normal
-    )
+        filtered_df, blueprint_df, paper_texture, background_folder
+        )

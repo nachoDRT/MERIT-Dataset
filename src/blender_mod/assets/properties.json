@@ -47,6 +47,86 @@
                 "radius": 0.13
             }
         },
+        "warm_style": {
+            "camera": {
+                "pos_meters": {
+                    "x": 0.105,
+                    "dx": 0,
+                    "y": 0.1485,
+                    "dy": 0,
+                    "z": 0.55,
+                    "dz": 0.05
+                },
+                "rot_degrees": {
+                    "x": 0,
+                    "dx": 1,
+                    "y": 0,
+                    "dy": 4,
+                    "z": 180,
+                    "dz": 5
+                }
+            },
+            "lights": {
+                "number": 1,
+                "pos_meters": {
+                    "x": 0.105,
+                    "dx": 0.1,
+                    "y": 0.01485,
+                    "dy": 0.2,
+                    "z": 0.2,
+                    "dz": 0.05
+                },
+                "color": {
+                    "hue": 0.035,
+                    "saturation": 0.908,
+                    "value": 0.585
+                },
+                "power": 100,
+                "diffuse": 0.15,
+                "specular": 0,
+                "radius": 0.13
+            }
+        },
+        "natural_style": {
+            "camera": {
+                "pos_meters": {
+                    "x": 0.105,
+                    "dx": 0,
+                    "y": 0.1485,
+                    "dy": 0,
+                    "z": 0.55,
+                    "dz": 0.05
+                },
+                "rot_degrees": {
+                    "x": 0,
+                    "dx": 1,
+                    "y": 0,
+                    "dy": 4,
+                    "z": 180,
+                    "dz": 5
+                }
+            },
+            "lights": {
+                "number": 1,
+                "pos_meters": {
+                    "x": 0.105,
+                    "dx": 0.1,
+                    "y": 0.01485,
+                    "dy": 0.2,
+                    "z": 0.2,
+                    "dz": 0.05
+                },
+                "color": {
+                    "hue": 0.124,
+                    "saturation": 0.139,
+                    "value": 0.701
+                },
+                "power": 100,
+                "diffuse": 0.15,
+                "specular": 0,
+                "radius": 0.13
+            }
+        },
         "random_style": {
             "camera": {
                 "pos_meters": {

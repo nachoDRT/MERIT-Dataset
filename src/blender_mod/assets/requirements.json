@@ -1,6 +1,6 @@
 {
     "styles": [
-        "scanner_style"
+        "scanner_style", "warm_style", "natural_style", "random_style"
     ],
     "img_output": {
         "width": 1920,
