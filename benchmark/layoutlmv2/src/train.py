@@ -12,24 +12,34 @@ from huggingface_hub import HfFolder
 import numpy as np
 import wandb
 import json
+import os
+
+os.environ["WANDB_SILENT"] = "true"
 
 LOAD_DATASET_FROM_PY = "/app/src/load_dataset.py"
 WANDB_LOGGING_PATH = "/app/config/wandb_logging.json"
 HUGGINGFACE_LOGGING_PATH = "/app/config/huggingface_logging.json"
 
-MAX_TRAIN_STEPS = 500
-EVAL_FRECUENCY = 100
-LOGGING_STEPS = 50
+MAX_TRAIN_STEPS = 10000
+EVAL_FRECUENCY = 250
+LOGGING_STEPS = 1
 
 
 class FunsdTrainer(Trainer):
-    def __init__(self, model, args, train_dataset, eval_dataset, compute_metrics):
+    def __init__(
+        self,
+        model,
+        args,
+        train_dataset,
+        validation_dataset,
+        compute_metrics,
+    ):
         super(FunsdTrainer, self).__init__(
             model=model,
             args=args,
             compute_metrics=compute_metrics,
             train_dataset=train_dataset,
-            eval_dataset=eval_dataset,
+            eval_dataset=validation_dataset,
         )
 
     def get_train_dataloader(self):
@@ -99,9 +109,10 @@ with open(WANDB_LOGGING_PATH) as f:
         project=wandb_config["project"],
         entity=wandb_config["entity"],
         name=wandb_config["name"],
+        settings=wandb.Settings(console="off"),
     )
 
-# Logging in HuggingFace
+# # Logging in HuggingFace
 # with open(HUGGINGFACE_LOGGING_PATH) as f:
 #     hf_config = json.load(f)
 #     HfFolder.save_token(hf_config["token"])
@@ -130,7 +141,8 @@ features = Features(
     }
 )
 
-# Preprocess train and test datasets
+"""Preprocess datasets partitions"""
+# Train
 train_dataset = datasets["train"].map(
     preprocess_data,
     batched=True,
@@ -139,6 +151,16 @@ train_dataset = datasets["train"].map(
 )
 train_dataset.set_format(type="torch")
 
+# Validation
+validation_dataset = datasets["validation"].map(
+    preprocess_data,
+    batched=True,
+    remove_columns=datasets["validation"].column_names,
+    features=features,
+)
+validation_dataset.set_format(type="torch")
+
+# Test
 test_dataset = datasets["test"].map(
     preprocess_data,
     batched=True,
@@ -150,6 +172,9 @@ test_dataset.set_format(type="torch")
 # Dataloaders
 train_dataloader = DataLoader(
     train_dataset, batch_size=4, shuffle=True, pin_memory=False
+)
+validation_dataloader = DataLoader(
+    validation_dataset, batch_size=2, shuffle=True, pin_memory=False
 )
 test_dataloader = DataLoader(test_dataset, batch_size=2, pin_memory=False)
 
@@ -163,10 +188,10 @@ model.config.label2id = label2id
 
 # Metrics
 metric = load_metric("seqeval")
-return_entity_level_metrics = True
+return_entity_level_metrics = False
 
 args = TrainingArguments(
-    output_dir=wandb_config["project"],
+    output_dir="".join(["app/", wandb_config["project"]]),
     max_steps=MAX_TRAIN_STEPS,
     warmup_ratio=0.1,
     fp16=True,
@@ -185,10 +210,23 @@ trainer = FunsdTrainer(
     model=model,
     args=args,
     train_dataset=train_dataset,
-    eval_dataset=test_dataset,
+    validation_dataset=validation_dataset,
     compute_metrics=compute_metrics,
 )
 
 # Train
 trainer.train()
+
+# Test
+test_results = trainer.predict(test_dataset)
+
+wandb.log(
+    {
+        "test_loss": test_results.metrics["test_loss"],
+        "test_accuracy": test_results.metrics["test_accuracy"],
+        "test_precision": test_results.metrics["test_precision"],
+        "test_recall": test_results.metrics["test_recall"],
+        "test_f1": test_results.metrics["test_f1"],
+    }
+)
 wandb.finish()
