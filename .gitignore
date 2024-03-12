@@ -1,5 +1,8 @@
 terminal_commands.txt
 
+benchmark/original_29k_eng.zip
+benchmark/original_29k_eng
+
 benchmark/layoutlmv2/data
 benchmark/layoutlmv3/data
 benchmark/layoutxlm/data
@@ -25,6 +28,7 @@ data/modified/english
 src/dashboard/__pycache__
 src/dashboard/dataset_blueprint.csv
 src/dashboard/.~lock.dataset_blueprint.csv#
+src/dashboard/dataset_blueprint_29K.csv
 src/blender_mod/mod.blend
 src/blender_mod/mod.blend1
 src/blender_mod/scripts/__pycache__

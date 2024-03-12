@@ -4,9 +4,12 @@ import random
 from typing import List
 import shutil
 from glob import glob
+from tqdm import tqdm
 
-
+LANGUAGE = "english"
 DATASET_FEATURES_JSON = "/app/config/dataset_features.json"
+
+GATHER_FILES_PATH = "/app/data/original/"
 
 # Folders where data is originally stored
 IMAGES_DIR = "/app/data/dataset_output/images/"
@@ -73,11 +76,50 @@ def create_zip():
     shutil.make_archive(base_name=save_here, format="zip", root_dir=zip_this)
 
 
+def gather_files():
+    """Gather all the files (stored by language and school) in a common place"""
+
+    os.makedirs(IMAGES_DIR, exist_ok=True)
+    os.makedirs(ANNOTATIONS_DIR, exist_ok=True)
+
+    # Loop over languages
+    for language in tqdm(os.listdir(GATHER_FILES_PATH)):
+
+        if language == LANGUAGE:
+            language_path = os.path.join(GATHER_FILES_PATH, language)
+
+            # Loop over schools
+            for school in tqdm(os.listdir(language_path)):
+                print(f"Gathering samples for {school} in {language}")
+                school_path = os.path.join(language_path, school)
+                annotations_path = os.path.join(
+                    school_path, "dataset_output", "annotations"
+                )
+                images_path = os.path.join(school_path, "dataset_output", "images")
+
+                # Gather annotations
+                for archivo in tqdm(os.listdir(annotations_path)):
+                    source_file = os.path.join(annotations_path, archivo)
+                    dest_file = os.path.join(ANNOTATIONS_DIR, archivo)
+                    shutil.move(source_file, dest_file)
+
+                # Gather images
+                for archivo in tqdm(os.listdir(images_path)):
+                    source_file = os.path.join(images_path, archivo)
+                    dest_file = os.path.join(IMAGES_DIR, archivo)
+                    shutil.move(source_file, dest_file)
+        else:
+            pass
+
+
 if __name__ == "__main__":
 
     d_features = read_dataset_features_json()
     partitions = [part for part in d_features["dataset_partitions"].keys()]
     partitions_fractions = [frac for frac in d_features["dataset_partitions"].values()]
 
+    # Files are firstly arragned by lang and school. We collect them in a common place
+    gather_files()
+    # Split files in train, validation and test partitions
     split_dataset(partitions, partitions_fractions)
     create_zip()

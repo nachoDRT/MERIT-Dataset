@@ -193,7 +193,8 @@ return_entity_level_metrics = False
 args = TrainingArguments(
     output_dir="".join(["app/", wandb_config["project"]]),
     max_steps=MAX_TRAIN_STEPS,
-    warmup_ratio=0.1,
+    # warmup_ratio=0.1,
+    learning_rate=5e-5,
     fp16=True,
     push_to_hub=False,
     # push_to_hub_model_id="CICLAB-Comillas/layoutlmv2-LSD",
@@ -203,6 +204,7 @@ args = TrainingArguments(
     eval_steps=EVAL_FRECUENCY,
     report_to="wandb",
     load_best_model_at_end=True,
+    save_total_limit=1,
 )
 
 # Initialize our Trainer
