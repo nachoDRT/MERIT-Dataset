@@ -283,6 +283,70 @@ def get_color_generic_palette(labels: list):
     return color_palette
 
 
+def plot_students_per_name_origin_lang_gender(df: pd.DataFrame, save_path: str):
+    languages = df["language"].unique()
+
+    color_palette = {
+        "Female": DARK_VIOLET,
+        "Male": DARK_GREEN,
+    }
+
+    for language in languages:
+
+        filtered_categories = df.drop_duplicates(
+            subset=["student_gender", "student_index"]
+        )
+        categories = filtered_categories["student_gender"].str.capitalize()
+        filtered_categories = categories[df["language"] == language]
+
+        filtered_category_items = df.drop_duplicates(
+            subset=["student_name_origin", "student_index"]
+        )
+        categories_items = filtered_category_items[
+            "student_name_origin"
+        ].str.capitalize()
+        filtered_category_items = categories_items[df["language"] == language]
+
+        plot_histogram(
+            cat_items=filtered_category_items,
+            cat_mapped=filtered_categories,
+            save_path=save_path,
+            title=f"Students per name origin in {language.capitalize()}",
+            x_label="Gender",
+            y_label="Number of Samples",
+            plot_name=f"students_per_name_origin_{language}_recount",
+            color_palette=color_palette,
+        )
+
+
+def plot_samples_per_name_origin_lang_gender(df: pd.DataFrame, save_path: str):
+    languages = df["language"].unique()
+
+    color_palette = {
+        "Female": DARK_VIOLET,
+        "Male": DARK_GREEN,
+    }
+
+    for language in languages:
+
+        categories = df["student_gender"].str.capitalize()
+        filtered_categories = categories[df["language"] == language]
+
+        categories_items = df["student_name_origin"].str.capitalize()
+        filtered_category_items = categories_items[df["language"] == language]
+
+        plot_histogram(
+            cat_items=filtered_category_items,
+            cat_mapped=filtered_categories,
+            save_path=save_path,
+            title=f"Samples per name origin in {language.capitalize()}",
+            x_label="Gender",
+            y_label="Number of Samples",
+            plot_name=f"samples_per_name_origin_{language}_recount",
+            color_palette=color_palette,
+        )
+
+
 def plot_samples_per_school(df: pd.DataFrame, save_path: str):
     categories = df["language"].str.capitalize()
     categories_items = df["school_name"].str.capitalize()
@@ -301,12 +365,15 @@ def plot_samples_per_school(df: pd.DataFrame, save_path: str):
 
 
 def plot_students_per_school(df: pd.DataFrame, save_path: str):
-    categories = df["language"].str.capitalize()
+
+    filtered_categories = df.drop_duplicates(subset=["language", "student_index"])
+    categories = filtered_categories["language"].str.capitalize()
+
     categories_items = df["school_name"].str.capitalize()
     filtered_categories_items = df.drop_duplicates(
         subset=["school_name", "student_index"]
     )
-    categories_items = filtered_categories_items["school_name"]
+    categories_items = filtered_categories_items["school_name"].str.capitalize()
 
     mapping = get_mapping_dict(categories_items, categories)
     cat_mapped = categories_items.map(mapping)
@@ -681,7 +748,7 @@ def plot_histogram(
     # Save the plot
     plot_save_path = os.path.join(save_path, "".join([plot_name, ".pdf"]))
     plt.savefig(plot_save_path, dpi=300, bbox_inches="tight")
-    plt.show()
+    # plt.show()
 
 
 if __name__ == "__main__":
@@ -719,7 +786,7 @@ if __name__ == "__main__":
     # Number os students per school
     plot_students_per_school(blueprint_df, save_path)
 
-    """ Visual appearence of samples"""
+    # """ Visual appearence of samples"""
     # Original vs. Blender Mod replicas
     plot_visual_categories_histogram(blueprint_df, save_path)
     # Rendering style
@@ -740,5 +807,9 @@ if __name__ == "__main__":
     plot_samples_per_layout_model_histogram(blueprint_df, save_path)
 
     """ Biases"""
+    # Number of student distribution per names origin, language and gender
+    plot_students_per_name_origin_lang_gender(blueprint_df, save_path)
+    # Number of samples distribution per names origin, language and gender
+    plot_samples_per_name_origin_lang_gender(blueprint_df, save_path)
     # Grade distributions per language, origin and gender
     # plot_grade_violins(blueprint_df, reqs, save_path)
