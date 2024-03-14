@@ -69,7 +69,7 @@
             },
             "eng_1": {
                 "nickname": "greenfields",
-                "students": 100,
+                "students": 1000,
                 "verbose_level": 1,
                 "return_grades_synonym": false,
                 "alphanumeric_separator": " | ",
@@ -86,7 +86,8 @@
                         ],
                         "academic_years": [
                             "year_10"
-                        ]
+                        ],
+                        "layout": "model_a_single_column"
                     },
                     "page_2": {
                         "num_subjects": [
@@ -94,7 +95,8 @@
                         ],
                         "academic_years": [
                             "year_11"
-                        ]
+                        ],
+                        "layout": "model_a_single_column"
                     },
                     "page_3": {
                         "num_subjects": [
@@ -102,14 +104,15 @@
                         ],
                         "academic_years": [
                             "year_12"
-                        ]
+                        ],
+                        "layout": "model_a_single_column"
                     }
                 },
                 "include": true
             },
             "eng_2": {
                 "nickname": "pinnacle",
-                "students": 1,
+                "students": 1000,
                 "verbose_level": 1,
                 "return_grades_synonym": false,
                 "alphanumeric_separator": " - ",
@@ -126,7 +129,8 @@
                         ],
                         "academic_years": [
                             "year_9"
-                        ]
+                        ],
+                        "layout": "model_a_single_column"
                     },
                     "page_2": {
                         "num_subjects": [
@@ -134,7 +138,8 @@
                         ],
                         "academic_years": [
                             "year_10"
-                        ]
+                        ],
+                        "layout": "model_a_single_column"
                     },
                     "page_3": {
                         "num_subjects": [
@@ -142,14 +147,15 @@
                         ],
                         "academic_years": [
                             "year_11"
-                        ]
+                        ],
+                        "layout": "model_a_single_column"
                     }
                 },
-                "include": false
+                "include": true
             },
             "eng_3": {
                 "nickname": "whitney",
-                "students": 1,
+                "students": 1000,
                 "verbose_level": 1,
                 "return_grades_synonym": false,
                 "alphanumeric_separator": " - ",
@@ -168,7 +174,8 @@
                         "academic_years": [
                             "year_9",
                             "year_10"
-                        ]
+                        ],
+                        "layout": "model_b_two_tables"
                     },
                     "page_2": {
                         "num_subjects": [
@@ -176,14 +183,15 @@
                         ],
                         "academic_years": [
                             "year_11"
-                        ]
+                        ],
+                        "layout": "model_a_single_column"
                     }
                 },
-                "include": false
+                "include": true
             },
             "eng_4": {
                 "nickname": "james",
-                "students": 1,
+                "students": 1000,
                 "verbose_level": 1,
                 "return_grades_synonym": false,
                 "alphanumeric_separator": " - ",
@@ -204,14 +212,15 @@
                             "year_9",
                             "year_10",
                             "year_11"
-                        ]
+                        ],
+                        "layout": "model_b_three_tables"
                     }
                 },
-                "include": false
+                "include": true
             },
             "eng_5": {
                 "nickname": "freefields",
-                "students": 1,
+                "students": 1000,
                 "verbose_level": 0,
                 "return_grades_synonym": false,
                 "alphanumeric_separator": " - ",
@@ -228,7 +237,8 @@
                         ],
                         "academic_years": [
                             "year_9"
-                        ]
+                        ],
+                        "layout": "model_a_double_column"
                     },
                     "page_2": {
                         "num_subjects": [
@@ -236,7 +246,8 @@
                         ],
                         "academic_years": [
                             "year_10"
-                        ]
+                        ],
+                        "layout": "model_a_double_column"
                     },
                     "page_3": {
                         "num_subjects": [
@@ -244,10 +255,11 @@
                         ],
                         "academic_years": [
                             "year_11"
-                        ]
+                        ],
+                        "layout": "model_a_double_column"
                     }
                 },
-                "include": false
+                "include": true
             }
         },
         "spanish": {
@@ -294,7 +306,7 @@
             },
             "esp_1": {
                 "nickname": "liceo",
-                "students": 10,
+                "students": 1000,
                 "verbose_level": 1,
                 "return_grades_synonym": 0,
                 "alphanumeric_separator": " - ",
@@ -311,7 +323,8 @@
                         ],
                         "academic_years": [
                             "3_de_la_eso"
-                        ]
+                        ],
+                        "layout": "model_a_single_column"
                     },
                     "page_2": {
                         "num_subjects": [
@@ -319,7 +332,8 @@
                         ],
                         "academic_years": [
                             "4_de_la_eso"
-                        ]
+                        ],
+                        "layout": "model_a_single_column"
                     },
                     "page_3": {
                         "num_subjects": [
@@ -327,14 +341,15 @@
                         ],
                         "academic_years": [
                             "1_de_bachillerato"
-                        ]
+                        ],
+                        "layout": "model_a_single_column"
                     }
                 },
-                "include": false
+                "include": true
             },
             "esp_2": {
                 "nickname": "britanico",
-                "students": 1,
+                "students": 1000,
                 "verbose_level": 1,
                 "return_grades_synonym": false,
                 "alphanumeric_separator": " - ",
@@ -351,7 +366,8 @@
                         ],
                         "academic_years": [
                             "3_de_la_eso"
-                        ]
+                        ],
+                        "layout": "model_a_single_column"
                     },
                     "page_2": {
                         "num_subjects": [
@@ -359,7 +375,8 @@
                         ],
                         "academic_years": [
                             "4_de_la_eso"
-                        ]
+                        ],
+                        "layout": "model_a_single_column"
                     },
                     "page_3": {
                         "num_subjects": [
@@ -367,14 +384,15 @@
                         ],
                         "academic_years": [
                             "1_de_bachillerato"
-                        ]
+                        ],
+                        "layout": "model_a_single_column"
                     }
                 },
                 "include": false
             },
             "esp_3": {
                 "nickname": "deus",
-                "students": 1,
+                "students": 1000,
                 "verbose_level": 0,
                 "return_grades_synonym": false,
                 "alphanumeric_separator": " - ",
@@ -393,7 +411,8 @@
                         "academic_years": [
                             "3_de_la_eso",
                             "4_de_la_eso"
-                        ]
+                        ],
+                        "layout": "model_b_two_tables"
                     },
                     "page_2": {
                         "num_subjects": [
@@ -401,14 +420,15 @@
                         ],
                         "academic_years": [
                             "1_de_bachillerato"
-                        ]
+                        ],
+                        "layout": "model_a_single_column"
                     }
                 },
                 "include": false
             },
             "esp_4": {
                 "nickname": "monterraso",
-                "students": 1,
+                "students": 1000,
                 "verbose_level": 0,
                 "return_grades_synonym": false,
                 "alphanumeric_separator": " - ",
@@ -427,7 +447,8 @@
                         "academic_years": [
                             "3_de_la_eso",
                             "4_de_la_eso"
-                        ]
+                        ],
+                        "layout": "model_b_two_tables"
                     },
                     "page_2": {
                         "num_subjects": [
@@ -435,14 +456,15 @@
                         ],
                         "academic_years": [
                             "1_de_bachillerato"
-                        ]
+                        ],
+                        "layout": "model_a_single_column"
                     }
                 },
                 "include": false
             },
             "esp_5": {
                 "nickname": "aletamar",
-                "students": 1,
+                "students": 1000,
                 "verbose_level": 0,
                 "return_grades_synonym": false,
                 "alphanumeric_separator": " - ",
@@ -461,7 +483,8 @@
                         "academic_years": [
                             "3_de_la_eso",
                             "4_de_la_eso"
-                        ]
+                        ],
+                        "layout": "model_b_two_tables"
                     },
                     "page_2": {
                         "num_subjects": [
@@ -469,14 +492,15 @@
                         ],
                         "academic_years": [
                             "1_de_bachillerato"
-                        ]
+                        ],
+                        "layout": "model_a_single_column"
                     }
                 },
                 "include": false
             },
             "esp_6": {
                 "nickname": "lusitano",
-                "students": 1,
+                "students": 1000,
                 "verbose_level": 0,
                 "return_grades_synonym": false,
                 "alphanumeric_separator": " - ",
@@ -495,7 +519,8 @@
                         "academic_years": [
                             "3_de_la_eso",
                             "4_de_la_eso"
-                        ]
+                        ],
+                        "layout": "model_c"
                     },
                     "page_2": {
                         "num_subjects": [
@@ -503,14 +528,15 @@
                         ],
                         "academic_years": [
                             "1_de_bachillerato"
-                        ]
+                        ],
+                        "layout": "model_a_single_column"
                     }
                 },
                 "include": false
             },
             "esp_7": {
                 "nickname": "patria",
-                "students": 1,
+                "students": 1000,
                 "verbose_level": 0,
                 "return_grades_synonym": false,
                 "alphanumeric_separator": " - ",
@@ -527,7 +553,8 @@
                         ],
                         "academic_years": [
                             "3_de_la_eso"
-                        ]
+                        ],
+                        "layout": "model_a_single_column"
                     },
                     "page_2": {
                         "num_subjects": [
@@ -535,7 +562,8 @@
                         ],
                         "academic_years": [
                             "4_de_la_eso"
-                        ]
+                        ],
+                        "layout": "model_a_single_column"
                     },
                     "page_3": {
                         "num_subjects": [
@@ -543,14 +571,15 @@
                         ],
                         "academic_years": [
                             "1_de_bachillerato"
-                        ]
+                        ],
+                        "layout": "model_a_single_column"
                     }
                 },
                 "include": false
             }
         }
     },
-    "blender_modified": 1,
+    "blender_modified": 0.75,
     "female_proportion": 0.5,
     "male_proportion": 0.5,
     "font_path": "/home/msi/.config/Ultralytics/Arial.ttf",

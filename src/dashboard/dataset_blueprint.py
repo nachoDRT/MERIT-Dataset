@@ -53,10 +53,17 @@ def set_database_headers() -> dict:
     attributes["student_gender"] = []
     attributes["student_name_origin"] = []
     attributes["student_courses"] = []
+    attributes["layout"] = []
     attributes["academic_years_in_sample"] = []
     attributes["num_subjects"] = []
     attributes["average_grade"] = []
     attributes["blender_mod"] = []
+    attributes["rendering_style"] = []
+    attributes["shadow_casting"] = []
+    attributes["printer_stains"] = []
+    attributes["background_elements"] = []
+    attributes["modify_mesh"] = []
+    attributes["background_material"] = []
     attributes["replication_done"] = []
     attributes["modification_done"] = []
 
@@ -117,6 +124,104 @@ def compute_num_students_for_lang(reqs: dict, lang: str) -> int:
             pass
 
     return num_students
+
+
+def compute_render_styles_distribution(mods_distribution: list, b_props: dict) -> list:
+
+    # TODO
+    # rendering_styles = b_props["blender"]
+
+    render_styles = [
+        (
+            random.choices(["scanner", "natural", "office"], weights=[0.7, 0.2, 0.1])[0]
+            if mod == True
+            else "N/A"
+        )
+        for mod in mods_distribution
+    ]
+
+    return render_styles
+
+
+def compute_shadow_casting_distribution(rendering_styles: list) -> list:
+    shadows_distribution = []
+
+    for style in rendering_styles:
+
+        if style == "N/A":
+            shadows_distribution.append("N/A")
+        elif style == "scanner":
+            shadows_distribution.append(False)
+        else:
+            shadows_distribution.append(random.choice([True, False]))
+
+    return shadows_distribution
+
+
+def compute_printer_stains_distribution(mods_distribution: list) -> list:
+    printer_stains = [
+        (random.choices([True, False], weights=[0.7, 0.3])[0] if mod == True else "N/A")
+        for mod in mods_distribution
+    ]
+
+    return printer_stains
+
+
+def compute_background_elements_distribution(
+    rendering_styles: list, b_props: dict
+) -> list:
+    background_elements = []
+
+    objects = b_props["blender"]["background_objects"]
+    choice_options = [False]
+    choice_options.extend(objects)
+    choice_weights = [1 / len(choice_options) for _ in choice_options]
+
+    for style in rendering_styles:
+
+        if style == "N/A":
+            background_elements.append("N/A")
+        elif style == "scanner":
+            background_elements.append(False)
+        else:
+            background_elements.append(
+                random.choices(choice_options, choice_weights)[0]
+            )
+
+    return background_elements
+
+
+def compute_mesh_modification_distribution(background_elements: list) -> list:
+    mesh_mod = []
+
+    for back_objects in background_elements:
+        if back_objects == "N/A":
+            mesh_mod.append("N/A")
+        elif back_objects == False:
+            mesh_mod.append(False)
+        else:
+            mesh_mod.append(True)
+
+    return mesh_mod
+
+
+def compute_background_material_distribution(rendering_styles, b_props: dict) -> list:
+
+    background_materials = []
+
+    # TODO
+    materials = []
+
+    for style in rendering_styles:
+
+        if style == "N/A":
+            background_materials.append("N/A")
+        elif style == "scanner":
+            background_materials.append("white_plastic")
+        else:
+            background_materials.append(random.choice(["wood", "concrete"]))
+
+    return background_materials
 
 
 def compute_mods_distribution(reqs: dict) -> list:
@@ -242,8 +347,8 @@ def compute_grades_distributions(reqs: dict, gender: list, origin: list) -> list
 
 def get_tables_info(layout: dict):
     """
-    Get the list of academic years per page from the layout info and the number of
-    subjects per academic year.
+    Get the list of academic years per page from the layout info, the number of
+    subjects per academic year, and the layout style for every page.
 
     This method extracts the list of academic years for each page in the provided layout
     dictionary and checks if the number of academic years matches the number of subjects
@@ -253,20 +358,24 @@ def get_tables_info(layout: dict):
         layout (dict): A dictionary representing the layout of academic records.
 
     Returns:
+        list: A list of number of subjects per academic year.
         list: A list of academic years per page.
+        list: A list of layout style per page.
     """
     table_per_page = [page_value["academic_years"] for page_value in layout.values()]
     subjects_per_table = [page_value["num_subjects"] for page_value in layout.values()]
+    layout_style_per_page = [page_value["layout"] for page_value in layout.values()]
+
     for page_value in layout.values():
         if len(page_value["academic_years"]) != len(page_value["num_subjects"]):
             print("WARNING: every record TABLE should have ONE ACADEMIC YEAR:")
             print("Check your requirements.json file")
 
-    return table_per_page, subjects_per_table
+    return table_per_page, subjects_per_table, layout_style_per_page
 
 
 # TODO Make it more pythonic
-def fill_blueprint(attributes: dict, reqs: dict, props: dict) -> dict:
+def fill_blueprint(attributes: dict, reqs: dict, props: dict, b_props: dict) -> dict:
     """
     Populate a database with information from user requirements and dataset properties.
     The output dictionary contains the blueprint that the generator pipeline (replicator
@@ -291,6 +400,12 @@ def fill_blueprint(attributes: dict, reqs: dict, props: dict) -> dict:
     # General attributes
     # TODO "blender_mod" should be a dashboard input in the future
     blender_mod = compute_mods_distribution(reqs)
+    rendering_styles = compute_render_styles_distribution(blender_mod, b_props)
+    back_materials = compute_background_material_distribution(rendering_styles, b_props)
+    shadow_castings = compute_shadow_casting_distribution(rendering_styles)
+    printer_stains = compute_printer_stains_distribution(blender_mod)
+    back_elements = compute_background_elements_distribution(rendering_styles, b_props)
+    mesh_modifications = compute_mesh_modification_distribution(back_elements)
     gender = compute_gender_distribution(reqs)
     name_origins = compute_origins_distributions(reqs)
     grades_dists = compute_grades_distributions(reqs, gender, name_origins)
@@ -306,7 +421,7 @@ def fill_blueprint(attributes: dict, reqs: dict, props: dict) -> dict:
 
                     student_index = 0
                     student_page_index = 0
-                    table_per_page, subjects_per_table = get_tables_info(
+                    table_per_page, subjects_per_table, layout_style = get_tables_info(
                         school["template_layout"]
                     )
                     student_courses = [
@@ -349,6 +464,8 @@ def fill_blueprint(attributes: dict, reqs: dict, props: dict) -> dict:
                                 attributes[key].append(
                                     name_origins[general_student_index]
                                 )
+                            elif key == "layout":
+                                attributes[key].append(layout_style[student_page_index])
                             elif key == "academic_years_in_sample":
                                 attributes[key].append(
                                     str(table_per_page[student_page_index])
@@ -367,6 +484,18 @@ def fill_blueprint(attributes: dict, reqs: dict, props: dict) -> dict:
                                 attributes[key].append(False)
                             elif key == "blender_mod":
                                 attributes[key].append(blender_mod[index])
+                            elif key == "rendering_style":
+                                attributes[key].append(rendering_styles[index])
+                            elif key == "background_material":
+                                attributes[key].append(back_materials[index])
+                            elif key == "shadow_casting":
+                                attributes[key].append(shadow_castings[index])
+                            elif key == "printer_stains":
+                                attributes[key].append(printer_stains[index])
+                            elif key == "background_elements":
+                                attributes[key].append(back_elements[index])
+                            elif key == "modify_mesh":
+                                attributes[key].append(mesh_modifications[index])
                             elif key == "modification_done":
                                 if attributes["blender_mod"][index] == True:
                                     attributes[key].append(False)
@@ -401,7 +530,7 @@ def write_csv(attributes: dict) -> None:
     df.to_csv(csv_path, index=False)
 
 
-def generate_blueprint(reqs: dict, props: dict) -> None:
+def generate_blueprint(reqs: dict, props: dict, b_props: dict) -> None:
     """
     Generates a CSV file containing data with information from user requirements and
     dataset properties.
@@ -413,13 +542,14 @@ def generate_blueprint(reqs: dict, props: dict) -> None:
     the database to a CSV file.
 
     Args:
-        reqs (dict):  User requirements and nested info about samples distribution (lan-
-                      guages, schools, or students).
-        props (dict): Properties.
+        reqs (dict):    User requirements and nested info about samples distribution
+                        (languages, schools, or students).
+        props (dict):   Properties.
+        b_props (dict): Blender properties.
     """
 
     attributes = set_database_headers()
-    attributes = fill_blueprint(attributes, reqs, props)
+    attributes = fill_blueprint(attributes, reqs, props, b_props)
     write_csv(attributes)
 
 
@@ -429,7 +559,11 @@ if __name__ == "__main__":
     )
     reqs_path = os.path.join(root, "requirements.json")
     props_path = os.path.join(root, "properties.json")
+    blender_props_path = os.path.join(
+        Path(__file__).resolve().parents[1], "blender_mod", "assets", "properties.json"
+    )
     reqs = read_json(name=reqs_path)
     props = read_json(name=props_path)
+    blender_props = read_json(name=blender_props_path)
 
-    generate_blueprint(reqs, props)
+    generate_blueprint(reqs, props, blender_props)

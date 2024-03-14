@@ -12,8 +12,9 @@ from matplotlib.colors import to_hex, rgb_to_hsv, to_rgb, hsv_to_rgb
 
 DARK_VIOLET = "#7030A0"
 DARK_GREEN = "#006337"
+BRIGHT_GREEN = "#68E807"
 LIGHT_VIOLET = "#bc71f5"
-LIGHT_GREEN = "#02F186"
+LIGHT_GREEN = "#02F256"
 GREY = "#b3b3b3"
 
 violin_color_palette = {
@@ -208,6 +209,7 @@ def config_histogram_columns(
         column["total_height"] = sum(
             bar.get_height() for bar in bars.patches if bar.get_x() == column["x_pos"]
         )
+        column["total_height_plotted"] = False
 
     return columns_dict
 
@@ -229,6 +231,22 @@ def get_column_height(columns: dict, x: float):
             break
 
     return height
+
+
+def get_flag_column_total_num_samples_plotted(columns: dict, x: float):
+    for column in columns.values():
+        if column["x_pos"] == x:
+            flag = column["total_height_plotted"]
+            break
+
+    return flag
+
+
+def set_flag_column_total_num_samples_plotted(columns: dict, x: float):
+    for column in columns.values():
+        if column["x_pos"] == x:
+            column["total_height_plotted"] = True
+            break
 
 
 def adjust_color_intensity(color, intensity, min_intensity=0.35):
@@ -265,7 +283,7 @@ def get_color_generic_palette(labels: list):
     return color_palette
 
 
-def plot_school_statistics(df: pd.DataFrame, save_path: str):
+def plot_samples_per_school(df: pd.DataFrame, save_path: str):
     categories = df["language"].str.capitalize()
     categories_items = df["school_name"].str.capitalize()
     mapping = get_mapping_dict(categories_items, categories)
@@ -275,10 +293,32 @@ def plot_school_statistics(df: pd.DataFrame, save_path: str):
         cat_items=categories_items,
         cat_mapped=cat_mapped,
         save_path=save_path,
-        title="Schools Recount",
+        title="Samples per School",
         x_label="Languages",
         y_label="Number of Samples",
-        plot_name="school_recount",
+        plot_name="samples_per_school_recount",
+    )
+
+
+def plot_students_per_school(df: pd.DataFrame, save_path: str):
+    categories = df["language"].str.capitalize()
+    categories_items = df["school_name"].str.capitalize()
+    filtered_categories_items = df.drop_duplicates(
+        subset=["school_name", "student_index"]
+    )
+    categories_items = filtered_categories_items["school_name"]
+
+    mapping = get_mapping_dict(categories_items, categories)
+    cat_mapped = categories_items.map(mapping)
+
+    plot_histogram(
+        cat_items=categories_items,
+        cat_mapped=cat_mapped,
+        save_path=save_path,
+        title="Students per School",
+        x_label="Languages",
+        y_label="Number of Students",
+        plot_name="students_per_school_recount",
     )
 
 
@@ -311,6 +351,235 @@ def plot_visual_categories_histogram(df: pd.DataFrame, save_path: str):
     )
 
 
+def plot_samples_per_layout_model_histogram(df: pd.DataFrame, save_path: str):
+    categories = df["layout"]
+    categories_items = df["language"].str.capitalize()
+
+    mapping = {
+        "model_a_single_column": "Model A.1",
+        "model_a_double_column": "Model A.2",
+        "model_b_two_tables": "Model B.1",
+        "model_b_three_tables": "Model B.2",
+        "model_c": "Model C",
+    }
+    cat_mapped = categories.map(mapping)
+
+    plot_histogram(
+        cat_items=categories_items,
+        cat_mapped=cat_mapped,
+        save_path=save_path,
+        title="Layout Styles",
+        x_label="Languages",
+        y_label="Number of Samples",
+        plot_name="layout_styles_recount",
+    )
+
+
+def plot_rendering_styles_histogram(df: pd.DataFrame, save_path: str, b_props: dict):
+    categories = df["rendering_style"]
+    categories_items = df["language"].str.capitalize()
+
+    # TODO: read styles from b_prop
+    color_palette = {
+        "Scanner": DARK_VIOLET,
+        "Natural": DARK_GREEN,
+        "Office": BRIGHT_GREEN,
+        "Non Processed": GREY,
+    }
+
+    mapping = {
+        "scanner": "Scanner",
+        "natural": "Natural",
+        "office": "Office",
+        np.nan: "Non Processed",
+    }
+
+    cat_mapped = categories.map(mapping)
+
+    plot_histogram(
+        cat_items=categories_items,
+        cat_mapped=cat_mapped,
+        save_path=save_path,
+        title="Rendering Styles",
+        x_label="Rendering Styles",
+        y_label="Number of Samples",
+        plot_name="documents_render_styles_recount",
+        color_palette=color_palette,
+    )
+
+
+def plot_modified_meshes_histogram(df: pd.DataFrame, save_path: str):
+    categories = df["modify_mesh"]
+    categories_items = df["language"].str.capitalize()
+    color_palette = {
+        "Cloth Simulation": DARK_VIOLET,
+        "Simple Plane": DARK_GREEN,
+        "Non Processed": GREY,
+    }
+
+    mapping = {
+        True: "Cloth Simulation",
+        False: "Simple Plane",
+        np.nan: "Non Processed",
+    }
+
+    cat_mapped = categories.map(mapping)
+
+    plot_histogram(
+        cat_items=categories_items,
+        cat_mapped=cat_mapped,
+        save_path=save_path,
+        title="Meshes",
+        x_label="Mesh Modifications",
+        y_label="Number of Samples",
+        plot_name="documents_meshes_recount",
+        color_palette=color_palette,
+    )
+
+
+def plot_shadow_samples_histogram(df: pd.DataFrame, save_path: str):
+    categories = df["shadow_casting"]
+    categories_items = df["language"].str.capitalize()
+    color_palette = {
+        "Shadow Object": DARK_VIOLET,
+        "No Shadow Object": DARK_GREEN,
+        "Non Processed": GREY,
+    }
+
+    mapping = {
+        True: "Shadow Object",
+        False: "No Shadow Object",
+        np.nan: "Non Processed",
+    }
+
+    cat_mapped = categories.map(mapping)
+
+    plot_histogram(
+        cat_items=categories_items,
+        cat_mapped=cat_mapped,
+        save_path=save_path,
+        title="Shadows",
+        x_label="Shadows",
+        y_label="Number of Samples",
+        plot_name="documents_shadows_recount",
+        color_palette=color_palette,
+    )
+
+
+def plot_stain_samples_histogram(df: pd.DataFrame, save_path: str):
+    categories = df["printer_stains"]
+    categories_items = df["language"].str.capitalize()
+    color_palette = {
+        "Printer Stains": DARK_VIOLET,
+        "Clean Printout": DARK_GREEN,
+        "Non Processed": GREY,
+    }
+
+    mapping = {
+        True: "Printer Stains",
+        False: "Clean Printout",
+        np.nan: "Non Processed",
+    }
+
+    cat_mapped = categories.map(mapping)
+
+    plot_histogram(
+        cat_items=categories_items,
+        cat_mapped=cat_mapped,
+        save_path=save_path,
+        title="Printer Stains",
+        x_label="Stains in Printout",
+        y_label="Number of Samples",
+        plot_name="documents_stains_recount",
+        color_palette=color_palette,
+    )
+
+
+def plot_background_elements_histogram(df: pd.DataFrame, save_path: str, b_props: dict):
+    categories = df["background_elements"]
+    categories_items = df["language"].str.capitalize()
+
+    mapping = {np.nan: "Non Processed", "False": "No object"}
+
+    for object in b_props["blender"]["background_objects"]:
+        mapping[object] = object.replace("_", " ").capitalize()
+
+    color_palette = {"Non Processed": GREY, "No object": GREY}
+
+    for i, map in enumerate(mapping.values()):
+
+        if i % 2 == 0:
+            color = DARK_GREEN
+        else:
+            color = DARK_VIOLET
+
+        color_palette[map.capitalize()] = color
+
+    cat_mapped = categories.map(mapping)
+
+    plot_histogram(
+        cat_items=categories_items,
+        cat_mapped=cat_mapped,
+        save_path=save_path,
+        title="Background Objects",
+        x_label="Object",
+        y_label="Number of Samples",
+        plot_name="documents_backgroun_objects_recount",
+        color_palette=color_palette,
+    )
+
+
+def plot_background_materials_histogram(
+    df: pd.DataFrame, save_path: str, b_props: dict
+):
+    categories = df["background_material"]
+    categories_items = df["language"].str.capitalize()
+
+    # TODO: read background materials from b_prop
+    """mapping = {np.nan: "Non Processed"}
+
+    # for object in b_props["blender"]["background_objects"]:
+    #     mapping[object] = object.replace("_", " ").capitalize()
+
+    # color_palette = {"Non Processed": GREY}
+
+    # for i, map in enumerate(mapping.values()):
+
+    #     if i % 2 == 0:
+    #         color = DARK_GREEN
+    #     else:
+    #         color = DARK_VIOLET
+
+    #     color_palette[map.capitalize()] = color"""
+
+    # TODO: delete these lines when updated with b_prop
+    mapping = {
+        "white_plastic": "White Plastic",
+        "wood": "Concrete",
+        np.nan: "Non Processed",
+    }
+
+    color_palette = {
+        "White Plastic": DARK_VIOLET,
+        "Concrete": DARK_GREEN,
+        "Non Processed": GREY,
+    }
+    #
+
+    cat_mapped = categories.map(mapping)
+
+    plot_histogram(
+        cat_items=categories_items,
+        cat_mapped=cat_mapped,
+        save_path=save_path,
+        title="Background Material",
+        x_label="Material",
+        y_label="Number of Samples",
+        plot_name="documents_background_material_recount",
+        color_palette=color_palette,
+    )
+
+
 def plot_histogram(
     cat_items,
     cat_mapped: dict,
@@ -324,19 +593,18 @@ def plot_histogram(
 
     adhoc_df = pd.DataFrame({"Items": cat_items, "Categories": cat_mapped})
 
-    language_modification_count = (
-        adhoc_df.groupby(["Categories", "Items"]).size().unstack(fill_value=0)
-    )
+    # This is to order the columns from left to right in descending order
+    sum_per_category = adhoc_df.groupby("Categories").sum()
+    ordered_categories = sum_per_category.sort_values(by="Items", ascending=True).index
 
-    normalized_counts = language_modification_count.div(
-        language_modification_count.sum(axis=1), axis=0
-    )
+    count = adhoc_df.groupby(["Categories", "Items"]).size().unstack(fill_value=0)
+
+    normalized_counts = count.div(count.sum(axis=1), axis=0)
+    ordered_count = count.reindex(ordered_categories)
 
     # Define plot
     _, ax = plt.subplots(figsize=(10, 6))
-    bars = language_modification_count.plot(
-        kind="bar", stacked=True, ax=ax, legend=None
-    )
+    bars = ordered_count.plot(kind="bar", stacked=True, ax=ax, legend=None)
 
     labels = [item.get_text() for item in ax.get_xticklabels()]
 
@@ -346,6 +614,16 @@ def plot_histogram(
     # Config the columns based on their x_pos
     columns_dict = config_histogram_columns(color_palette, labels, bars)
 
+    # Get the height of the highest column
+    max_bar_height = 0
+    for bar in bars.patches:
+        patch_height = bar.get_y() + bar.get_height()
+
+        if max_bar_height < patch_height:
+            max_bar_height = patch_height
+
+    max_bar_height = int(max_bar_height * 1.0225)
+
     # Draw the blocks that compose every column
     for bar, lang in zip(
         bars.patches,
@@ -353,17 +631,46 @@ def plot_histogram(
     ):
         bar_x = bar.get_x()
         base_color = get_base_color(columns=columns_dict, x=bar_x)
-        intensity = bar.get_height() / get_column_height(columns=columns_dict, x=bar_x)
+        column_height = get_column_height(columns=columns_dict, x=bar_x)
+        intensity = bar.get_height() / column_height
         adjusted_color = adjust_color_intensity(base_color, intensity)
         bar.set_facecolor(adjusted_color)
 
         # Add text
         if bar.get_height() != 0:
             text_x = bar.get_x() + bar.get_width() / 2
-            bar_height = bar.get_y() + bar.get_height() / 2
+            text_y = bar.get_y() + bar.get_height() / 2
+            num_x = bar.get_x() + bar.get_width()
+            num_y = bar.get_y() + bar.get_height()
+            num_samples = int(bar.get_height())
+            plt.text(text_x, text_y, f"{lang}", ha="center", va="center", color="white")
             plt.text(
-                text_x, bar_height, f"{lang}", ha="center", va="center", color="white"
+                num_x,
+                num_y,
+                f" + {num_samples}",
+                ha="left",
+                va="center",
+                color="grey",
+                fontsize=9,
             )
+
+        # Add total number of samples if it has not been done earlier
+        if (
+            not get_flag_column_total_num_samples_plotted(columns=columns_dict, x=bar_x)
+            and bar.get_height() != 0
+        ):
+            # text_x = bar.get_x() + bar.get_width() / 2
+            plt.text(
+                text_x,
+                max_bar_height,
+                f"{int(column_height)}",
+                ha="center",
+                va="center",
+                color="white",
+                fontsize=10,
+                bbox=dict(facecolor=base_color, edgecolor="none", pad=1.0),
+            )
+            set_flag_column_total_num_samples_plotted(columns=columns_dict, x=bar_x)
 
     # Tune the plot
     plt.title(title, fontsize=14, fontweight="bold")
@@ -387,21 +694,51 @@ if __name__ == "__main__":
         "assets",
         "requirements.json",
     )
+    blender_props_path = os.path.join(
+        Path(__file__).resolve().parents[1],
+        "src",
+        "blender_mod",
+        "assets",
+        "properties.json",
+    )
+
     save_path = os.path.join(
         Path(__file__).resolve().parents[0], "dataset_figs", "metrics"
     )
 
     # Load data
     reqs = read_json(requirements_path)
+    blender_props = read_json(blender_props_path)
     blueprint_df = get_blueprint()
 
     """PLOTS"""
 
+    """ General information"""
+    # Number of samples per school
+    plot_samples_per_school(blueprint_df, save_path)
+    # Number os students per school
+    plot_students_per_school(blueprint_df, save_path)
+
+    """ Visual appearence of samples"""
     # Original vs. Blender Mod replicas
     plot_visual_categories_histogram(blueprint_df, save_path)
+    # Rendering style
+    plot_rendering_styles_histogram(blueprint_df, save_path, blender_props)
+    # Samples with modified meshes
+    plot_modified_meshes_histogram(blueprint_df, save_path)
+    # Samples with shadows
+    plot_shadow_samples_histogram(blueprint_df, save_path)
+    # Samples with printer stains
+    plot_stain_samples_histogram(blueprint_df, save_path)
+    # Samples with elements in background
+    plot_background_elements_histogram(blueprint_df, save_path, blender_props)
+    # Background materials in sample
+    plot_background_materials_histogram(blueprint_df, save_path, blender_props)
 
-    # Number of samples from every school
-    plot_school_statistics(blueprint_df, save_path)
+    """ Layout of samples"""
+    # Number of samples per layout model
+    plot_samples_per_layout_model_histogram(blueprint_df, save_path)
 
+    """ Biases"""
     # Grade distributions per language, origin and gender
     # plot_grade_violins(blueprint_df, reqs, save_path)
