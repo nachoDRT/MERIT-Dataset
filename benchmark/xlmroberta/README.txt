@@ -16,6 +16,7 @@ docker build -f dockerfiles/rtx3090/Dockerfile -t xlmroberta .
 
 
 # In both cases, you can run the docker in all available GPUs as:
+# UPDATE: the model is not prepared for paralel cumputing, so please, use the bottom command
 docker run -it --gpus all xlmroberta
 
 # In both cases, if you want to run the docker in an specific device (0, 1, ..., n):

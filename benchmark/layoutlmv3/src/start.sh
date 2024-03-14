@@ -3,5 +3,5 @@ chmod +x src/train.py
 
 python src/format_dataset.py
 # transformers-cli login
-find . | sed -e 's;[^/]*/;|____;g;s;____|; |;g'
+# find . | sed -e 's;[^/]*/;|____;g;s;____|; |;g'
 python src/train.py

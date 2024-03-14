@@ -7,6 +7,7 @@ import os
 from PIL import Image
 import datasets
 from pathlib import Path
+from tqdm import tqdm
 
 FUNSD_LABELS = [
     "O",
@@ -190,6 +191,10 @@ class Funsd(datasets.GeneratorBasedBuilder):
             datasets.SplitGenerator(
                 name=datasets.Split.TRAIN,
                 gen_kwargs={"filepath": f"{downloaded_file}/training_data/"},
+            ),
+            datasets.SplitGenerator(
+                name=datasets.Split.VALIDATION,
+                gen_kwargs={"filepath": f"{downloaded_file}/validating_data/"},
             ),
             datasets.SplitGenerator(
                 name=datasets.Split.TEST,

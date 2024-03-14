@@ -9,13 +9,16 @@ from transformers import TrainingArguments, Trainer
 from transformers.data.data_collator import default_data_collator
 import json
 import wandb
+import os
+
+os.environ["WANDB_SILENT"] = "true"
 
 LOAD_DATASET_FROM_PY = "/app/src/load_dataset.py"
 WANDB_LOGGING_PATH = "/app/config/wandb_logging.json"
 
-MAX_TRAIN_STEPS = 500
-EVAL_FRECUENCY = 100
-LOGGING_STEPS = 50
+MAX_TRAIN_STEPS = 15000
+EVAL_FRECUENCY = 250
+LOGGING_STEPS = 1
 
 
 def prepare_examples(examples):
@@ -144,8 +147,14 @@ train_dataset = dataset["train"].map(
     remove_columns=column_names,
     features=features,
 )
+eval_dataset = dataset["validation"].map(
+    prepare_examples,
+    batched=True,
+    remove_columns=column_names,
+    features=features,
+)
 
-eval_dataset = dataset["test"].map(
+test_dataset = dataset["test"].map(
     prepare_examples,
     batched=True,
     remove_columns=column_names,
@@ -160,11 +169,11 @@ model = LayoutLMv3ForTokenClassification.from_pretrained(
 )
 
 training_args = TrainingArguments(
-    output_dir=wandb_config["project"],
+    output_dir="".join(["app/", wandb_config["project"]]),
     max_steps=MAX_TRAIN_STEPS,
     per_device_train_batch_size=2,
     per_device_eval_batch_size=2,
-    learning_rate=1e-5,
+    learning_rate=2.5e-5,
     push_to_hub=False,
     # push_to_hub_model_id="CICLAB-Comillas/layoutlmv3-LSD",
     logging_strategy="steps",
@@ -174,6 +183,7 @@ training_args = TrainingArguments(
     report_to="wandb",
     load_best_model_at_end=True,
     metric_for_best_model="f1",
+    save_total_limit=1,
 )
 
 trainer = Trainer(
@@ -186,5 +196,20 @@ trainer = Trainer(
     compute_metrics=compute_metrics,
 )
 
+# Train
 trainer.train()
+
+# Test
+test_results = trainer.predict(test_dataset)
+
+wandb.log(
+    {
+        "test_loss": test_results.metrics["test_loss"],
+        "test_accuracy": test_results.metrics["test_accuracy"],
+        "test_precision": test_results.metrics["test_precision"],
+        "test_recall": test_results.metrics["test_recall"],
+        "test_f1": test_results.metrics["test_f1"],
+    }
+)
+
 wandb.finish()
