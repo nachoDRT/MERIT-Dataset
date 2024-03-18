@@ -108,7 +108,7 @@
                         "layout": "model_a_single_column"
                     }
                 },
-                "include": true
+                "include": false
             },
             "eng_2": {
                 "nickname": "pinnacle",
@@ -151,7 +151,7 @@
                         "layout": "model_a_single_column"
                     }
                 },
-                "include": true
+                "include": false
             },
             "eng_3": {
                 "nickname": "whitney",
@@ -187,7 +187,7 @@
                         "layout": "model_a_single_column"
                     }
                 },
-                "include": true
+                "include": false
             },
             "eng_4": {
                 "nickname": "james",
@@ -216,7 +216,7 @@
                         "layout": "model_b_three_tables"
                     }
                 },
-                "include": true
+                "include": false
             },
             "eng_5": {
                 "nickname": "freefields",
@@ -257,6 +257,78 @@
                             "year_11"
                         ],
                         "layout": "model_a_double_column"
+                    }
+                },
+                "include": false
+            },
+            "eng_6": {
+                "nickname": "salesianum",
+                "students": 1000,
+                "verbose_level": 0,
+                "return_grades_synonym": false,
+                "alphanumeric_separator": " - ",
+                "decimals_allowed": false,
+                "possible_courses_global": [
+                    "Year 9",
+                    "Year 10",
+                    "Year 11"
+                ],
+                "template_layout": {
+                    "page_1": {
+                        "num_subjects": [
+                            12,
+                            11
+                        ],
+                        "academic_years": [
+                            "year_9",
+                            "year_10"
+                        ],
+                        "layout": "model_b_two_tables"
+                    },
+                    "page_2": {
+                        "num_subjects": [
+                            11
+                        ],
+                        "academic_years": [
+                            "year_11"
+                        ],
+                        "layout": "model_a_single_column"
+                    }
+                },
+                "include": true
+            },
+            "eng_7": {
+                "nickname": "paloalto",
+                "students": 1000,
+                "verbose_level": 0,
+                "return_grades_synonym": true,
+                "alphanumeric_separator": " - ",
+                "decimals_allowed": false,
+                "possible_courses_global": [
+                    "10th year",
+                    "11th year",
+                    "YEAR 12"
+                ],
+                "template_layout": {
+                    "page_1": {
+                        "num_subjects": [
+                            11,
+                            9
+                        ],
+                        "academic_years": [
+                            "year_10",
+                            "year_11"
+                        ],
+                        "layout": "model_c"
+                    },
+                    "page_2": {
+                        "num_subjects": [
+                            10
+                        ],
+                        "academic_years": [
+                            "year_12"
+                        ],
+                        "layout": "model_a_single_column"
                     }
                 },
                 "include": true
@@ -345,7 +417,7 @@
                         "layout": "model_a_single_column"
                     }
                 },
-                "include": true
+                "include": false
             },
             "esp_2": {
                 "nickname": "britanico",
