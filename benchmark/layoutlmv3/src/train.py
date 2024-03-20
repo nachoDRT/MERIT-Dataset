@@ -16,7 +16,7 @@ os.environ["WANDB_SILENT"] = "true"
 LOAD_DATASET_FROM_PY = "/app/src/load_dataset.py"
 WANDB_LOGGING_PATH = "/app/config/wandb_logging.json"
 
-MAX_TRAIN_STEPS = 15000
+MAX_TRAIN_STEPS = 10000
 EVAL_FRECUENCY = 250
 LOGGING_STEPS = 1
 
