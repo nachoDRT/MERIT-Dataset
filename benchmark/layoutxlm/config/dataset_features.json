@@ -12,6 +12,7 @@
     "dataset_language": "es",
     "dataset_partitions": {
         "train": 0.7,
-        "eval": 0.3
+        "eval": 0.2,
+        "test": 0.1
     }
 }

@@ -4,6 +4,9 @@ from datasets import load_metric, load_dataset
 import numpy as np
 import json
 import wandb
+import os
+
+os.environ["WANDB_SILENT"] = "true"
 
 from transformers import (
     LayoutLMv2ForTokenClassification,
@@ -22,9 +25,9 @@ LOAD_DATASET_FROM_PY = "/app/src/load_dataset.py"
 WANDB_LOGGING_PATH = "/app/config/wandb_logging.json"
 HUGGINGFACE_LOGGING_PATH = "/app/config/huggingface_logging.json"
 
-MAX_TRAIN_STEPS = 150
-EVAL_FRECUENCY = 100
-LOGGING_STEPS = 50
+MAX_TRAIN_STEPS = 1000
+EVAL_FRECUENCY = 250
+LOGGING_STEPS = 1
 
 torch.cuda.empty_cache()
 
@@ -122,7 +125,8 @@ data_collator = DataCollatorForTokenClassification(
 )
 
 train_dataset = dataset["train"]
-test_dataset = dataset["validation"]
+validation_dataset = dataset["validation"]
+test_dataset = dataset["test"]
 
 dataloader = DataLoader(train_dataset, batch_size=4, collate_fn=data_collator)
 
@@ -132,7 +136,7 @@ model = LayoutLMv2ForTokenClassification.from_pretrained(
 
 # Metrics
 metric = load_metric("seqeval")
-return_entity_level_metrics = True
+return_entity_level_metrics = False
 
 
 def compute_metrics(p):
@@ -169,24 +173,10 @@ def compute_metrics(p):
         }
 
 
-# args = TrainingArguments(
-#     output_dir="layoutxlm-finetuned-es_trunds",  # name of directory to store the checkpoints
-#     overwrite_output_dir=True,
-#     max_steps=TOTAL_STEPS,  # we train for a maximum of 1,000 batches
-#     warmup_ratio=0.1,  # we warmup a bit
-#     # fp16=True, # we use mixed precision (less memory consumption)
-#     per_device_train_batch_size=2,
-#     per_device_eval_batch_size=2,
-#     learning_rate=1e-5,
-#     remove_unused_columns=False,
-#     push_to_hub=False,  # we'd like to push our model to the hub during training
-#     save_steps=SAVE_STEPS,
-#     save_total_limit=1,
-# )
-
 args = TrainingArguments(
-    output_dir=wandb_config["project"],
+    output_dir="".join(["app/", wandb_config["project"]]),
     max_steps=MAX_TRAIN_STEPS,
+    learning_rate=2.5e-5,
     warmup_ratio=0.1,
     fp16=True,
     per_device_train_batch_size=2,
@@ -200,6 +190,7 @@ args = TrainingArguments(
     eval_steps=EVAL_FRECUENCY,
     report_to="wandb",
     load_best_model_at_end=True,
+    save_total_limit=1,
 )
 
 # Initialize our Trainer
@@ -207,12 +198,25 @@ trainer = Trainer(
     model=model,
     args=args,
     train_dataset=train_dataset,
-    eval_dataset=test_dataset,
+    eval_dataset=validation_dataset,
     tokenizer=tokenizer,
     data_collator=data_collator,
     compute_metrics=compute_metrics,
 )
 
-# trainer.train(frequency_to_evaluate=F_TO_EVALUATE)
+# Train
 trainer.train()
+
+# Test
+test_results = trainer.predict(test_dataset)
+
+wandb.log(
+    {
+        "test_loss": test_results.metrics["test_loss"],
+        "test_accuracy": test_results.metrics["test_accuracy"],
+        "test_precision": test_results.metrics["test_precision"],
+        "test_recall": test_results.metrics["test_recall"],
+        "test_f1": test_results.metrics["test_f1"],
+    }
+)
 wandb.finish()

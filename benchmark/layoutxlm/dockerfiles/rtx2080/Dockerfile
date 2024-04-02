@@ -17,7 +17,7 @@ RUN pip install torch==1.8.0+cu101 torchvision==0.9.0+cu101 -f https://download.
 RUN pip install -q detectron2 -f https://dl.fbaipublicfiles.com/detectron2/wheels/cu101/torch1.8/index.html
 
 # Copy and install requirements
-COPY requirements.txt .
+COPY dockerfiles/rtx2080/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the rest of the project

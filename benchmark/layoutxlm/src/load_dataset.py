@@ -129,9 +129,14 @@ class XFUN(datasets.GeneratorBasedBuilder):
             os.path.join(downloaded_zip, "es_eval_json"),
             os.path.join(downloaded_zip, "es_eval"),
         ]
+        downloaded_files["test"] = [
+            os.path.join(downloaded_zip, "es_test_json"),
+            os.path.join(downloaded_zip, "es_test"),
+        ]
 
         train_files_for_many_langs = [downloaded_files["train"]]
         val_files_for_many_langs = [downloaded_files["eval"]]
+        test_files_for_many_langs = [downloaded_files["test"]]
 
         logger.info(
             f"Training on {self.config.lang} with additional langs({self.config.additional_langs})"
@@ -148,7 +153,10 @@ class XFUN(datasets.GeneratorBasedBuilder):
                 name=datasets.Split.VALIDATION,
                 gen_kwargs={"filepaths": val_files_for_many_langs},
             ),
-            # datasets.SplitGenerator(name=datasets.Split.TEST, gen_kwargs={"filepaths": test_files_for_many_langs}),
+            datasets.SplitGenerator(
+                name=datasets.Split.TEST,
+                gen_kwargs={"filepaths": test_files_for_many_langs},
+            ),
         ]
 
     def _get_dataset_labels(self):
