@@ -4,11 +4,19 @@
         "de",
         "es",
         "fr",
-        "en",
         "it",
         "ja",
         "pt"
     ],
+    "xlm_languages_map": {
+        "zh": "chinese",
+        "ja": "japanese",
+        "es": "spanish",
+        "fr": "french",
+        "it": "italian",
+        "de": "german",
+        "pt": "portugese"
+    },
     "dataset_language": "es",
     "dataset_partitions": {
         "train": 0.7,
