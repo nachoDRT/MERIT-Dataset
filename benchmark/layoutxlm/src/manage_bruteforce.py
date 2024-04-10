@@ -110,8 +110,9 @@ def move_out_data(comb: tuple, combinations: list, index: int, paths_map: dict):
 def check_elements_in_target_folder(n: int, paths_map: dict):
     target_path = paths_map["target_path"]
 
-    for element in os.listdir(target_path):
-        print(f"{element} is in the target folder")
+    for file in os.listdir(target_path):
+        print(f"{file} IS IN THE TARGET FOLDER: {target_path}")
+    print("")
 
     if len(os.listdir(target_path)) != n:
         raise Warning(f"There are more elements in the target folder than expected")
@@ -119,12 +120,36 @@ def check_elements_in_target_folder(n: int, paths_map: dict):
 
 def manage_training_session(combs: list, paths_map: dict, n: int):
     for i, combination in enumerate(combs):
-        print(combination)
+        print(f"Training {combination}: \n")
         move_in_data(combination, paths_map)
         check_elements_in_target_folder(n, paths_map)
-        # Launch data processing and training
+        subprocess.run(
+            [
+                "python",
+                "src/format_dataset.py",
+                "--test_data_folder",
+                "True",
+                "--gather_train_val_data_from",
+                "app/data/train-val/",
+                "--gather_test_data_from",
+                "app/data/test/",
+            ]
+        )
+        subprocess.run(["python", "src/train.py"])
         move_out_data(combination, combinations, i, paths_map)
-        print("")
+
+        # Delete cache memory
+        delete_hf_cache_memory()
+
+
+def delete_hf_cache_memory():
+
+    cache_dir = Path.home() / ".cache/huggingface/datasets"
+    if cache_dir.exists():
+        shutil.rmtree(cache_dir)
+        print("HuggingFace cache was deleted")
+    else:
+        raise Warning("HuggingFace cache was not found")
 
 
 if __name__ == "__main__":

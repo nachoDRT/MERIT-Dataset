@@ -1,18 +1,16 @@
 import json
 import os
-from tqdm import tqdm
 import random
 import string
-from typing import List
 import shutil
+import argparse
+from typing import List
+from pathlib import Path
 from glob import glob
 from tqdm import tqdm
-import argparse
 
 LANGUAGE = "spanish"
 DATASET_FEATURES_JSON = "/app/config/dataset_features.json"
-
-GATHER_FILES_PATH = "/app/data/"
 
 # Folders where data is stored after gathering
 ROOT = "/app/data/"
@@ -142,49 +140,55 @@ def create_zip():
     shutil.make_archive(base_name=save_here, format="zip", root_dir=zip_this)
 
 
-def gather_files():
+def gather_files(gathering_paths: list):
     """Gather all the files (stored by language and school) in a common place"""
 
     # Loop over partitions (train/val and test)
-    for partition in tqdm(os.listdir(GATHER_FILES_PATH)):
+    for partition in tqdm(os.listdir(ROOT)):
 
-        images_dir = "".join([ROOT, partition, IMGS_DIR_SUFIX])
-        annotations_dir = "".join([ROOT, partition, ANNOTATIONS_DIR_SUFIX])
+        if partition in gathering_paths:
 
-        # Folders to place gathered data
-        os.makedirs(images_dir, exist_ok=True)
-        os.makedirs(annotations_dir, exist_ok=True)
+            images_dir = "".join([ROOT, partition, IMGS_DIR_SUFIX])
+            annotations_dir = "".join([ROOT, partition, ANNOTATIONS_DIR_SUFIX])
 
-        partition_path = os.path.join(GATHER_FILES_PATH, partition)
+            # Folders to place gathered data
+            os.makedirs(images_dir, exist_ok=True)
+            os.makedirs(annotations_dir, exist_ok=True)
 
-        # Loop over languages
-        for language in tqdm(os.listdir(partition_path)):
+            partition_path = os.path.join(ROOT, partition)
 
-            if language == LANGUAGE:
-                language_path = os.path.join(partition_path, language)
+            # Loop over languages
+            for language in tqdm(os.listdir(partition_path)):
 
-                # Loop over schools
-                for school in tqdm(os.listdir(language_path)):
-                    print(f"Gathering samples for {school} in {language}")
-                    school_path = os.path.join(language_path, school)
-                    annotations_path = os.path.join(
-                        school_path, "dataset_output", "annotations"
-                    )
-                    images_path = os.path.join(school_path, "dataset_output", "images")
+                if language == LANGUAGE:
+                    language_path = os.path.join(partition_path, language)
 
-                    # Gather annotations
-                    for file in tqdm(os.listdir(annotations_path)):
-                        source_file = os.path.join(annotations_path, file)
-                        dest_file = os.path.join(annotations_dir, file)
-                        shutil.move(source_file, dest_file)
+                    # Loop over schools
+                    for school in tqdm(os.listdir(language_path)):
+                        print(f"Gathering samples for {school} in {language}")
+                        school_path = os.path.join(language_path, school)
+                        annotations_path = os.path.join(
+                            school_path, "dataset_output", "annotations"
+                        )
+                        images_path = os.path.join(
+                            school_path, "dataset_output", "images"
+                        )
 
-                    # Gather images
-                    for file in tqdm(os.listdir(images_path)):
-                        source_file = os.path.join(images_path, file)
-                        dest_file = os.path.join(images_dir, file)
-                        shutil.move(source_file, dest_file)
-            else:
-                pass
+                        # Gather annotations
+                        for file in tqdm(os.listdir(annotations_path)):
+                            source_file = os.path.join(annotations_path, file)
+                            dest_file = os.path.join(annotations_dir, file)
+                            shutil.move(source_file, dest_file)
+
+                        # Gather images
+                        for file in tqdm(os.listdir(images_path)):
+                            source_file = os.path.join(images_path, file)
+                            dest_file = os.path.join(images_dir, file)
+                            shutil.move(source_file, dest_file)
+                else:
+                    pass
+        else:
+            pass
 
 
 def get_partitions_and_fractions(d_features: dict):
@@ -198,12 +202,29 @@ def get_partitions_and_fractions(d_features: dict):
     return partitions, partitions_fractions
 
 
+def get_where_to_gather(gathering_paths: list) -> list:
+    folders = []
+
+    for path in gathering_paths:
+        folders.append(Path(path).name)
+
+    return folders
+
+
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--test_data_folder", type=str)
+    parser.add_argument("--gather_train_val_data_from", type=str)
+    parser.add_argument("--gather_test_data_from", type=str)
     args = parser.parse_args()
 
+    # Get where the user wants to get the data from
+    gathering_folders = get_where_to_gather(
+        [args.gather_train_val_data_from, args.gather_test_data_from]
+    )
+
+    # Dataset features
     d_features = read_datset_features_json()
 
     if eval(args.test_data_folder) != None:
@@ -213,7 +234,7 @@ if __name__ == "__main__":
     language = d_features["dataset_language"]
 
     # Files are firstly arranged by lang and school. We collect them in a common place
-    gather_files()
+    gather_files(gathering_folders)
     # Split files in train, validation and test partitions
     split_dataset(
         partitions, partitions_fractions, language, eval(args.test_data_folder)
