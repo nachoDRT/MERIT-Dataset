@@ -22,6 +22,11 @@ docker run -it --gpus '"device=0"' layoutxlm
 ____________________________________________________________
 # B. IF YOU WANT TO RUN A BRUTEFORCE TRAINING SESSION WITH 'N' SUBSETS COMBINATIONS DATASET
 
+# For Nvidia RTX2080:
+
+# Create the docker
+docker build -f dockerfiles/rtx2080_bruteforce/Dockerfile -t layoutxlm_bruteforce .
+
 # For Nvidia RTX3090:
 
 # Create the docker
