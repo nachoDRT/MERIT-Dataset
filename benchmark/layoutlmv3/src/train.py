@@ -15,10 +15,30 @@ os.environ["WANDB_SILENT"] = "true"
 
 LOAD_DATASET_FROM_PY = "/app/src/load_dataset.py"
 WANDB_LOGGING_PATH = "/app/config/wandb_logging.json"
+DATASET_FOLDER = "/app/data/train-val/spanish/"
 
 MAX_TRAIN_STEPS = 10000
 EVAL_FRECUENCY = 250
 LOGGING_STEPS = 1
+
+
+def get_dataset_name() -> str:
+    dataset_name = ""
+
+    for subset in os.listdir(DATASET_FOLDER):
+        if dataset_name != "":
+            dataset_name += "-"
+        dataset_name += subset
+
+    return dataset_name
+
+
+def get_training_session_name(wandb_config: dict) -> str:
+
+    dataset_name = get_dataset_name()
+    name = "".join([wandb_config["name"], "_", dataset_name])
+
+    return name
 
 
 def prepare_examples(examples):
@@ -100,12 +120,14 @@ def compute_metrics(p):
 with open(WANDB_LOGGING_PATH) as f:
     wandb_config = json.load(f)
 
-    wandb.login()
-    wandb.init(
-        project=wandb_config["project"],
-        entity=wandb_config["entity"],
-        name=wandb_config["name"],
-    )
+training_session_name = get_training_session_name(wandb_config)
+
+wandb.login()
+wandb.init(
+    project=wandb_config["project"],
+    entity=wandb_config["entity"],
+    name=training_session_name,
+)
 
 dataset = load_dataset(LOAD_DATASET_FROM_PY)
 

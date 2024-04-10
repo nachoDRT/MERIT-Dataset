@@ -111,16 +111,27 @@ def check_elements_in_target_folder(n: int, paths_map: dict):
     target_path = paths_map["target_path"]
 
     for file in os.listdir(target_path):
-        print(f"{file} IS IN THE TARGET FOLDER: {target_path}")
+        print(f"{file.capitalize()} IS IN THE TARGET FOLDER: {target_path}")
     print("")
 
     if len(os.listdir(target_path)) != n:
         raise Warning(f"There are more elements in the target folder than expected")
 
 
+def get_combination_dataset_name(comb: tuple) -> str:
+    name = ""
+
+    for element in comb:
+        if name != "":
+            name += "-"
+        name += element
+
+    return name
+
+
 def manage_training_session(combs: list, paths_map: dict, n: int):
     for i, combination in enumerate(combs):
-        print(f"Training {combination}: \n")
+        dataset_name = get_combination_dataset_name(combination)
         move_in_data(combination, paths_map)
         check_elements_in_target_folder(n, paths_map)
         subprocess.run(
@@ -135,7 +146,7 @@ def manage_training_session(combs: list, paths_map: dict, n: int):
                 "app/data/test/",
             ]
         )
-        subprocess.run(["python", "src/train.py"])
+        subprocess.run(["python", "src/train.py", "--dataset_name", f"{dataset_name}"])
         move_out_data(combination, combinations, i, paths_map)
 
         # Delete cache memory

@@ -1,10 +1,11 @@
 import torch
-from typing import Optional, Union
-from datasets import load_metric, load_dataset
 import numpy as np
 import json
 import wandb
 import os
+import argparse
+from typing import Optional, Union
+from datasets import load_metric, load_dataset
 
 os.environ["WANDB_SILENT"] = "true"
 
@@ -24,23 +25,54 @@ from dataclasses import dataclass
 LOAD_DATASET_FROM_PY = "/app/src/load_dataset.py"
 WANDB_LOGGING_PATH = "/app/config/wandb_logging.json"
 HUGGINGFACE_LOGGING_PATH = "/app/config/huggingface_logging.json"
+DATASET_FOLDER = "/app/data/train-val/spanish/"
 
-MAX_TRAIN_STEPS = 1000
-EVAL_FRECUENCY = 250
+MAX_TRAIN_STEPS = 100
+EVAL_FRECUENCY = 25
 LOGGING_STEPS = 1
 
+
+def get_dataset_name() -> str:
+    dataset_name = ""
+
+    for subset in os.listdir(DATASET_FOLDER):
+        if dataset_name != "":
+            dataset_name += "-"
+        dataset_name += subset
+
+    return dataset_name
+
+
+def get_training_session_name(args: argparse.Namespace, wandb_config: dict) -> str:
+
+    if args.dataset_name:
+        name = "".join([wandb_config["name"], "_", args.dataset_name])
+    else:
+        dataset_name = get_dataset_name()
+        name = "".join([wandb_config["name"], "_", dataset_name])
+
+    return name
+
+
 torch.cuda.empty_cache()
+
+# Define parsing values
+parser = argparse.ArgumentParser()
+parser.add_argument("--dataset_name", type=str, default=False)
+args = parser.parse_args()
+
 
 # Logging in wandb
 with open(WANDB_LOGGING_PATH) as f:
     wandb_config = json.load(f)
 
-    wandb.login()
-    wandb.init(
-        project=wandb_config["project"],
-        entity=wandb_config["entity"],
-        name=wandb_config["name"],
-    )
+training_session_name = get_training_session_name(args, wandb_config)
+wandb.login()
+wandb.init(
+    project=wandb_config["project"],
+    entity=wandb_config["entity"],
+    name=training_session_name,
+)
 
 # Load dataset using a '.py' file
 dataset = load_dataset(LOAD_DATASET_FROM_PY, "xfun_es")
@@ -177,7 +209,7 @@ args = TrainingArguments(
     output_dir="".join(["app/", wandb_config["project"]]),
     max_steps=MAX_TRAIN_STEPS,
     learning_rate=2.5e-5,
-    warmup_ratio=0.1,
+    # warmup_ratio=0.1,
     fp16=True,
     per_device_train_batch_size=2,
     per_device_eval_batch_size=2,
