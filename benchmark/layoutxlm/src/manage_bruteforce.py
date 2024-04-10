@@ -96,14 +96,15 @@ def move_out_data(comb: tuple, combinations: list, index: int, paths_map: dict):
             if element not in next_comb:
                 move_out.append(element)
 
-        for element in move_out:
-            src_path = os.path.join(target_path, element)
-            dst_path = os.path.join(storing_path, element)
-
-            shutil.move(src_path, dst_path)
-
     except IndexError:
-        pass
+        for element in comb:
+            move_out.append(element)
+
+    for element in move_out:
+        src_path = os.path.join(target_path, element)
+        dst_path = os.path.join(storing_path, element)
+
+        shutil.move(src_path, dst_path)
 
 
 def check_elements_in_target_folder(n: int, paths_map: dict):
