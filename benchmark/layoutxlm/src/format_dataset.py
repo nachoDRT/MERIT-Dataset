@@ -73,12 +73,22 @@ def process_data(dicts_list: List, file_path: str):
     return dicts_list
 
 
-def move_files(file_names, lang, split):
+def copy_files(file_names, lang, split):
     # Create the destination folders
     split = "".join([lang, "_", split])
     imgs_path = os.path.join("/app/data/dataset", split)
+
+    try:
+        shutil.rmtree(imgs_path)
+    except FileNotFoundError:
+        pass
     os.makedirs(imgs_path, exist_ok=True)
+
     annoations_path = os.path.join("/app/data/dataset_output", split, "annotations")
+    try:
+        shutil.rmtree(annoations_path)
+    except FileNotFoundError:
+        pass
     os.makedirs(annoations_path, exist_ok=True)
 
     if split == "".join([lang, "_train"]) or split == "".join([lang, "_eval"]):
@@ -95,8 +105,8 @@ def move_files(file_names, lang, split):
         image_dst = os.path.join(imgs_path, name + ".png")
         annotation_dst = os.path.join(annoations_path, name + ".json")
 
-        shutil.move(image_src, image_dst)
-        shutil.move(annotation_src, annotation_dst)
+        shutil.copy(image_src, image_dst)
+        shutil.copy(annotation_src, annotation_dst)
 
 
 def split_dataset(partitions: List, fractions: List, lang: str, test_data: bool = None):
@@ -131,7 +141,7 @@ def split_dataset(partitions: List, fractions: List, lang: str, test_data: bool 
     files = [train_files, eval_files, test_files]
 
     for files_partition, partition in zip(files, partitions):
-        move_files(files_partition, lang, partition)
+        copy_files(files_partition, lang, partition)
 
 
 def create_zip():
@@ -144,13 +154,18 @@ def gather_files(gathering_paths: list):
     """Gather all the files (stored by language and school) in a common place"""
 
     # Loop over partitions (train/val and test)
-    for partition in tqdm(os.listdir(ROOT)):
+    for partition in os.listdir(ROOT):
 
         if partition in gathering_paths:
-
             images_dir = "".join([ROOT, partition, IMGS_DIR_SUFIX])
             annotations_dir = "".join([ROOT, partition, ANNOTATIONS_DIR_SUFIX])
 
+            # Make sure there is nothing from previous iteration
+            try:
+                shutil.rmtree(images_dir)
+                shutil.rmtree(annotations_dir)
+            except FileNotFoundError:
+                pass
             # Folders to place gathered data
             os.makedirs(images_dir, exist_ok=True)
             os.makedirs(annotations_dir, exist_ok=True)
@@ -158,14 +173,12 @@ def gather_files(gathering_paths: list):
             partition_path = os.path.join(ROOT, partition)
 
             # Loop over languages
-            for language in tqdm(os.listdir(partition_path)):
-
+            for language in os.listdir(partition_path):
                 if language == LANGUAGE:
                     language_path = os.path.join(partition_path, language)
 
                     # Loop over schools
-                    for school in tqdm(os.listdir(language_path)):
-                        print(f"Gathering samples for {school} in {language}")
+                    for school in os.listdir(language_path):
                         school_path = os.path.join(language_path, school)
                         annotations_path = os.path.join(
                             school_path, "dataset_output", "annotations"
@@ -175,16 +188,20 @@ def gather_files(gathering_paths: list):
                         )
 
                         # Gather annotations
+                        print(
+                            f"{partition.upper()}: Gathering annotations for {school} in {language}"
+                        )
                         for file in tqdm(os.listdir(annotations_path)):
                             source_file = os.path.join(annotations_path, file)
                             dest_file = os.path.join(annotations_dir, file)
-                            shutil.move(source_file, dest_file)
+                            shutil.copy(source_file, dest_file)
 
                         # Gather images
+                        print(f"Gathering images for {school} in {language}")
                         for file in tqdm(os.listdir(images_path)):
                             source_file = os.path.join(images_path, file)
                             dest_file = os.path.join(images_dir, file)
-                            shutil.move(source_file, dest_file)
+                            shutil.copy(source_file, dest_file)
                 else:
                     pass
         else:

@@ -27,8 +27,8 @@ WANDB_LOGGING_PATH = "/app/config/wandb_logging.json"
 HUGGINGFACE_LOGGING_PATH = "/app/config/huggingface_logging.json"
 DATASET_FOLDER = "/app/data/train-val/spanish/"
 
-MAX_TRAIN_STEPS = 100
-EVAL_FRECUENCY = 25
+MAX_TRAIN_STEPS = 4000
+EVAL_FRECUENCY = 250
 LOGGING_STEPS = 1
 
 
@@ -75,7 +75,9 @@ wandb.init(
 )
 
 # Load dataset using a '.py' file
-dataset = load_dataset(LOAD_DATASET_FROM_PY, "xfun_es")
+dataset = load_dataset(
+    LOAD_DATASET_FROM_PY, "xfun_es", download_mode="force_redownload"
+)
 dataset.shuffle()
 
 labels = dataset["train"].features["labels"].feature.names

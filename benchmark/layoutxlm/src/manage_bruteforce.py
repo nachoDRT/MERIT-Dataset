@@ -8,6 +8,7 @@ from pathlib import Path
 from tqdm import tqdm
 
 ROOT = Path(__file__).parents[1]
+ZIP_FILE_FOLDER_PATH = "/app/data/dataset"
 
 
 def get_dataset_language() -> str:
@@ -129,6 +130,21 @@ def get_combination_dataset_name(comb: tuple) -> str:
     return name
 
 
+def delete_hf_cache_memory():
+
+    cache_dir = Path.home() / ".cache/huggingface/datasets"
+    if cache_dir.exists():
+        shutil.rmtree(cache_dir)
+        print("HuggingFace cache was deleted")
+    else:
+        raise Warning("HuggingFace cache was not found")
+
+
+def delete_former_pre_zip_folder():
+    shutil.rmtree(ZIP_FILE_FOLDER_PATH)
+    os.makedirs(ZIP_FILE_FOLDER_PATH)
+
+
 def manage_training_session(combs: list, paths_map: dict, n: int):
     for i, combination in enumerate(combs):
         dataset_name = get_combination_dataset_name(combination)
@@ -149,18 +165,9 @@ def manage_training_session(combs: list, paths_map: dict, n: int):
         subprocess.run(["python", "src/train.py", "--dataset_name", f"{dataset_name}"])
         move_out_data(combination, combinations, i, paths_map)
 
-        # Delete cache memory
+        # Delete cache memory and previous dataset folder
         delete_hf_cache_memory()
-
-
-def delete_hf_cache_memory():
-
-    cache_dir = Path.home() / ".cache/huggingface/datasets"
-    if cache_dir.exists():
-        shutil.rmtree(cache_dir)
-        print("HuggingFace cache was deleted")
-    else:
-        raise Warning("HuggingFace cache was not found")
+        delete_former_pre_zip_folder()
 
 
 if __name__ == "__main__":
