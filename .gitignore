@@ -39,3 +39,5 @@ src/replication_pipeline/templates
 src/replication_pipeline/scripts/__pycache__
 
 src/blender_mod/assets/objects/blue_stabilo.blend1
+
+benchmark/results/training_results.csv

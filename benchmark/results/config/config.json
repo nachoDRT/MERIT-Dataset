@@ -1,0 +1,10 @@
+{
+    "project": "LLM-Layout-Generalization",
+    "entity": "iderodrigo",
+    "relevant_training_keys": [
+        "test_precision",
+        "test_accuracy",
+        "test_recall",
+        "test_f1"
+    ]
+}
