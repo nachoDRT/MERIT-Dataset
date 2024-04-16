@@ -168,53 +168,7 @@ def create_uv_map():
     bpy.ops.object.mode_set(mode="OBJECT")
 
 
-def apply_texture(document: str, paper: str):
-    """
-    Applies a texture to the active object by creating a new material and
-    setting up a node tree to handle the texture mapping, mixing, and shading.
-
-    Args:
-    document (str): The file path of the document texture image.
-    paper (str): The file path of the paper texture image.
-    """
-
-    # TODO Include normals map
-    # Get the active object
-    obj = bpy.context.active_object
-
-    # Create a new material
-    mat = bpy.data.materials.new(name="Document_Material")
-
-    # Ensure node use is enabled
-    mat.use_nodes = True
-    nodes = mat.node_tree.nodes
-
-    # Clear default nodes
-    for node in nodes:
-        nodes.remove(node)
-
-    # Create necessary nodes
-    doc_texture_node = nodes.new(type="ShaderNodeTexImage")
-    paper_texture_node = nodes.new(type="ShaderNodeTexImage")
-    mix_rgb_node = nodes.new(type="ShaderNodeMixRGB")
-    mix_rgb_node.inputs[0].default_value = 1.0
-    mapping_node = nodes.new(type="ShaderNodeMapping")
-    mapping_node.inputs["Scale"].default_value[0] = 1.39
-    mapping_node.inputs["Scale"].default_value[1] = 0.98
-    mapping_node.inputs["Rotation"].default_value[2] = math.radians(180)
-    coord_node = nodes.new(type="ShaderNodeTexCoord")
-    principled_node = nodes.new(type="ShaderNodeBsdfPrincipled")
-    principled_node_printer = nodes.new(type="ShaderNodeBsdfPrincipled")
-    principled_node_printer.inputs["Base Color"].default_value = (
-        0.092,
-        0.092,
-        0.092,
-        1,
-    )
-    mix_shader = nodes.new(type="ShaderNodeMixShader")
-    output_node = nodes.new(type="ShaderNodeOutputMaterial")
-
-    # Printer stain nodes
+def create_printer_stains(nodes, links, mix_shader):
 
     # Printer dots
     dots_coord_node = nodes.new(type="ShaderNodeTexCoord")
@@ -290,18 +244,6 @@ def apply_texture(document: str, paper: str):
     mixer_dots_lines.blend_type = "ADD"
     mixer_dots_lines.inputs[0].default_value = 1.0
 
-    # Set node locations to prevent overlapping: Document texture
-    doc_texture_node.location = (-300, 300)
-    paper_texture_node.location = (-300, 0)
-    mix_rgb_node.location = (200, 200)
-    mapping_node.location = (-600, 300)
-    coord_node.location = (-800, 300)
-    principled_node.location = (500, 300)
-    output_node.location = (900, 300)
-
-    # Set node locations to prevent overlapping: Second Principle BSDF
-    principled_node_printer.location = (500, -400)
-
     # Set node locations to prevent overlapping: Printer dots
     dots_coord_node.location = (-800, 1500)
     dots_mapping_node.location = (-600, 1500)
@@ -321,24 +263,6 @@ def apply_texture(document: str, paper: str):
     bands_mapping_node.location = (-600, 600)
     bands_gradient_texture.location = (-300, 600)
     bands_color_ramp.location = (0, 600)
-    mix_shader.location = (750, 300)
-
-    # Load images into the texture node
-    doc_image = bpy.data.images.load(document)
-    doc_texture_node.image = doc_image
-
-    paper_image = bpy.data.images.load(paper)
-    paper_texture_node.image = paper_image
-
-    mix_rgb_node.blend_type = "MULTIPLY"
-
-    # Connect the nodes: Document texture
-    links = mat.node_tree.links
-    links.new(coord_node.outputs["UV"], mapping_node.inputs["Vector"])
-    links.new(mapping_node.outputs["Vector"], doc_texture_node.inputs["Vector"])
-    links.new(doc_texture_node.outputs["Color"], mix_rgb_node.inputs["Color1"])
-    links.new(paper_texture_node.outputs["Color"], mix_rgb_node.inputs["Color2"])
-    links.new(mix_rgb_node.outputs["Color"], principled_node.inputs["Base Color"])
 
     # Connect the nodes: Printer dots
     links.new(dots_coord_node.outputs["UV"], dots_mapping_node.inputs["Vector"])
@@ -361,6 +285,93 @@ def apply_texture(document: str, paper: str):
     links.new(bands_color_ramp.outputs["Color"], mixer_lines_bands.inputs[2])
     links.new(mixer_lines_bands.outputs["Color"], mixer_dots_lines.inputs[2])
     links.new(mixer_dots_lines.outputs["Color"], mix_shader.inputs["Fac"])
+
+
+def apply_texture(document: str, paper: str, blueprint_df: pd.DataFrame, sample: str):
+    """
+    Applies a texture to the active object by creating a new material and
+    setting up a node tree to handle the texture mapping, mixing, and shading.
+
+    Args:
+    document (str): The file path of the document texture image.
+    paper (str): The file path of the paper texture image.
+    sample (): The blueprint sample data.
+    """
+
+    # TODO Include normals map
+    # Get the active object
+    obj = bpy.context.active_object
+
+    # Create a new material
+    mat = bpy.data.materials.new(name="Document_Material")
+
+    # Ensure node use is enabled
+    mat.use_nodes = True
+    nodes = mat.node_tree.nodes
+
+    # Clear default nodes
+    for node in nodes:
+        nodes.remove(node)
+
+    # Create necessary nodes
+    doc_texture_node = nodes.new(type="ShaderNodeTexImage")
+    paper_texture_node = nodes.new(type="ShaderNodeTexImage")
+    mix_rgb_node = nodes.new(type="ShaderNodeMixRGB")
+    mix_rgb_node.inputs[0].default_value = 1.0
+    mapping_node = nodes.new(type="ShaderNodeMapping")
+    mapping_node.inputs["Scale"].default_value[0] = 1.39
+    mapping_node.inputs["Scale"].default_value[1] = 0.98
+    mapping_node.inputs["Rotation"].default_value[2] = math.radians(180)
+    coord_node = nodes.new(type="ShaderNodeTexCoord")
+    principled_node = nodes.new(type="ShaderNodeBsdfPrincipled")
+    principled_node_printer = nodes.new(type="ShaderNodeBsdfPrincipled")
+    principled_node_printer.inputs["Base Color"].default_value = (
+        0.092,
+        0.092,
+        0.092,
+        1,
+    )
+    mix_shader = nodes.new(type="ShaderNodeMixShader")
+    output_node = nodes.new(type="ShaderNodeOutputMaterial")
+
+    # Set node locations to prevent overlapping: Document texture
+    doc_texture_node.location = (-300, 300)
+    paper_texture_node.location = (-300, 0)
+    mix_rgb_node.location = (200, 200)
+    mapping_node.location = (-600, 300)
+    coord_node.location = (-800, 300)
+    principled_node.location = (500, 300)
+    output_node.location = (900, 300)
+
+    # Set node locations to prevent overlapping: Second Principle BSDF
+    principled_node_printer.location = (500, -400)
+    mix_shader.location = (750, 300)
+
+    # Load images into the texture node
+    doc_image = bpy.data.images.load(document)
+    doc_texture_node.image = doc_image
+
+    paper_image = bpy.data.images.load(paper)
+    paper_texture_node.image = paper_image
+
+    mix_rgb_node.blend_type = "MULTIPLY"
+
+    # Connect the nodes: Document texture
+    links = mat.node_tree.links
+    links.new(coord_node.outputs["UV"], mapping_node.inputs["Vector"])
+    links.new(mapping_node.outputs["Vector"], doc_texture_node.inputs["Vector"])
+    links.new(doc_texture_node.outputs["Color"], mix_rgb_node.inputs["Color1"])
+    links.new(paper_texture_node.outputs["Color"], mix_rgb_node.inputs["Color2"])
+    links.new(mix_rgb_node.outputs["Color"], principled_node.inputs["Base Color"])
+
+    # Printer stain nodes
+    printer_stains_in_sample = blueprint_df.loc[
+        blueprint_df["file_name"] == sample[1], "printer_stains"
+    ].iloc[0]
+
+    if printer_stains_in_sample:
+        create_printer_stains(nodes, links, mix_shader)
+
     links.new(principled_node.outputs["BSDF"], mix_shader.inputs[1])
     links.new(principled_node_printer.outputs["BSDF"], mix_shader.inputs[2])
 
@@ -992,7 +1003,13 @@ def modify_samples(
         )
 
         # Textures
-        apply_texture(document=img_path, paper=paper_texture)
+        # TODO
+        apply_texture(
+            document=img_path,
+            paper=paper_texture,
+            blueprint_df=blueprint_df,
+            sample=sample,
+        )
 
         # Modify mesh
         mesh_data = properties["blender"]["document_mesh_mod"]
