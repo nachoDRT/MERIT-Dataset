@@ -966,6 +966,40 @@ def modify_document_mesh(mods_dict: dict):
         run_cloth_sim()
 
 
+def cast_shadow(mods_dict: dict):
+    if mods_dict["shadow_casting"]:
+        object_name = "rigged_male_body"
+        object_file_path = os.path.join(
+            bpy.path.abspath("//"),
+            "assets",
+            "shadows",
+            "".join([object_name, ".blend"]),
+        )
+
+        directory = os.path.join(object_file_path, "Collection")
+
+        bpy.ops.wm.append(
+            filepath=directory + object_name,
+            directory=directory,
+            filename=object_name,
+        )
+
+        # Select the object
+        obj = bpy.data.objects[object_name]
+        bpy.context.view_layer.objects.active = obj
+        bpy.ops.object.select_all(action="DESELECT")
+        obj.select_set(True)
+
+        # Tune pos/rot data
+        x = random.uniform(-0.1, 0.4)
+        y = random.uniform(0.8, 1)
+        z_angle = random.uniform(-30, 30)
+
+        # Change its position and rotation
+        obj.location = (x, y, -0.84)
+        obj.rotation_euler = (math.radians(90), 0, math.radians(z_angle))
+
+
 def modify_samples(
     samples_to_mod_df: pd.DataFrame,
     blueprint_df: pd.DataFrame,
@@ -1022,6 +1056,9 @@ def modify_samples(
 
         # Modify Document Mesh
         modify_document_mesh(mods_dict=mods)
+
+        # Cast shadow
+        cast_shadow(mods_dict=mods)
         print(a)
 
         # Render scene
