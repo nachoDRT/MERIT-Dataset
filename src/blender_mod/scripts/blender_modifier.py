@@ -287,7 +287,7 @@ def create_printer_stains(nodes, links, mix_shader):
     links.new(mixer_dots_lines.outputs["Color"], mix_shader.inputs["Fac"])
 
 
-def apply_texture(document: str, paper: str, blueprint_df: pd.DataFrame, sample: str):
+def apply_texture(document: str, paper: str, mods_dict: dict):
     """
     Applies a texture to the active object by creating a new material and
     setting up a node tree to handle the texture mapping, mixing, and shading.
@@ -365,10 +365,7 @@ def apply_texture(document: str, paper: str, blueprint_df: pd.DataFrame, sample:
     links.new(mix_rgb_node.outputs["Color"], principled_node.inputs["Base Color"])
 
     # Printer stain nodes
-    printer_stains_in_sample = blueprint_df.loc[
-        blueprint_df["file_name"] == sample[1], "printer_stains"
-    ].iloc[0]
-
+    printer_stains_in_sample = mods_dict["printer_stains"]
     if printer_stains_in_sample:
         create_printer_stains(nodes, links, mix_shader)
 
@@ -945,30 +942,60 @@ def run_cloth_sim():
     compute_skewness(obj)
 
 
-def import_object(file_path: str, object_name: str):
+def import_background_object(mods_dict: dict):
 
-    directory = os.path.join(file_path, "Object")
+    object_name = mods_dict["background_elements"]
+    if object_name:
 
-    bpy.ops.wm.append(
-        filepath=directory + object_name,
-        directory=directory,
-        filename=object_name,
-    )
+        object_file_path = os.path.join(
+            bpy.path.abspath("//"),
+            "assets",
+            "objects",
+            "".join([object_name, ".blend"]),
+        )
 
-    # Select the object
-    obj = bpy.data.objects[object_name]
-    bpy.context.view_layer.objects.active = obj
-    bpy.ops.object.select_all(action="DESELECT")
-    obj.select_set(True)
+        directory = os.path.join(object_file_path, "Object")
 
-    # Tune pos/rot data
-    x = random.uniform(-0.1, 0.3)
-    y = random.uniform(-0.1, 0.4)
-    z_angle = random.uniform(0, 360)
+        bpy.ops.wm.append(
+            filepath=directory + object_name,
+            directory=directory,
+            filename=object_name,
+        )
 
-    # Change its position and rotation
-    obj.location = (x, y, 0)
-    obj.rotation_euler = (0, 0, math.radians(z_angle))
+        # Select the object
+        obj = bpy.data.objects[object_name]
+        bpy.context.view_layer.objects.active = obj
+        bpy.ops.object.select_all(action="DESELECT")
+        obj.select_set(True)
+
+        # Tune pos/rot data
+        x = random.uniform(-0.1, 0.3)
+        y = random.uniform(-0.1, 0.4)
+        z_angle = random.uniform(0, 360)
+
+        # Change its position and rotation
+        obj.location = (x, y, 0)
+        obj.rotation_euler = (0, 0, math.radians(z_angle))
+
+
+def get_modifications_dict(blueprint_df: pd.DataFrame, sample: str) -> dict:
+    properties = [
+        "rendering_style",
+        "shadow_casting",
+        "printer_stains",
+        "background_elements",
+        "modify_mesh",
+        "background_material",
+    ]
+
+    mod_dict = {}
+
+    for sample_property in properties:
+        mod_dict[sample_property] = blueprint_df.loc[
+            blueprint_df["file_name"] == sample[1], sample_property
+        ].iloc[0]
+
+    return mod_dict
 
 
 def modify_samples(
@@ -989,6 +1016,8 @@ def modify_samples(
             segments_sample_name,
         ) = get_sample_paths_and_names(sample[1])
 
+        mods = get_modifications_dict(blueprint_df=blueprint_df, sample=sample)
+
         n_bboxes_vertices, all_vertices, delaunay_mesh = compute_mesh(
             sample_path=labels_path, properties=properties
         )
@@ -1004,12 +1033,7 @@ def modify_samples(
 
         # Textures
         # TODO
-        apply_texture(
-            document=img_path,
-            paper=paper_texture,
-            blueprint_df=blueprint_df,
-            sample=sample,
-        )
+        apply_texture(document=img_path, paper=paper_texture, mods_dict=mods)
 
         # Modify mesh
         mesh_data = properties["blender"]["document_mesh_mod"]
@@ -1032,14 +1056,7 @@ def modify_samples(
         config_camera(camera_data=camera_data)
 
         # Import Background Object
-        object_name = random.choice(properties["blender"]["background_objects"])
-        object_file_path = os.path.join(
-            bpy.path.abspath("//"),
-            "assets",
-            "objects",
-            "".join([object_name, ".blend"]),
-        )
-        import_object(file_path=object_file_path, object_name=object_name)
+        import_background_object(mods_dict=mods)
 
         prepare_for_cloth_sim()
         run_cloth_sim()
