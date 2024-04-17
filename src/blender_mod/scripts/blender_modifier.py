@@ -613,45 +613,6 @@ def render_scene(dst_folder: str, name: str, img_dims: dict):
     return rendered_img
 
 
-def modify_mesh(mesh_data: dict):
-    """
-    Modify a mesh object in Blender by subdividing it and smoothing the vertices.
-
-    This function takes a dictionary containing subdivision and vertex smoothing
-    information, selects the mesh object named "Document" in the current Blender scene,
-    and applies the specified modifications.
-
-    Args:
-        mesh_data (dict): A dictionary containing the following keys:
-
-            {
-                'subdivision': {
-                    'cuts': float
-                    'fractal': float
-                },
-                'vert_smooth': {
-                    'repeat': float
-                    'factor': float
-                }
-            }
-
-    """
-    bpy.data.objects["Document"].select_set(True)
-    bpy.ops.object.mode_set(mode="EDIT")
-
-    subdiv = mesh_data["subdivision"]
-    smooth = mesh_data["vert_smooth"]
-
-    # Mesh modifications
-    bpy.ops.mesh.subdivide(
-        number_cuts=subdiv["cuts"],
-        fractal=subdiv["fractal"],
-        seed=random.randint(1, 1000),
-    )
-    bpy.ops.mesh.vertices_smooth(repeat=smooth["repeat"], factor=smooth["factor"])
-    bpy.ops.object.mode_set(mode="OBJECT")
-
-
 def get_vertices_id_from_group(object_name: str, group_name: str):
     """
     Retrieve the indices of the vertices belonging to an specific vertex group of a
@@ -1034,10 +995,6 @@ def modify_samples(
         # Textures
         # TODO
         apply_texture(document=img_path, paper=paper_texture, mods_dict=mods)
-
-        # Modify mesh
-        mesh_data = properties["blender"]["document_mesh_mod"]
-        # modify_mesh(mesh_data=mesh_data)
 
         # Set background
         background_data = properties["blender"]["common"]["background"]

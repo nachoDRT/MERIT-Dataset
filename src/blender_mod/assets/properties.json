@@ -120,16 +120,6 @@
                 "scale_y": 0.5
             }
         },
-        "document_mesh_mod": {
-            "subdivision": {
-                "cuts": 4,
-                "fractal": 3.5
-            },
-            "vert_smooth": {
-                "repeat": 3,
-                "factor": 1
-            }
-        },
         "background_objects": [
             "book",
             "christmas_cards",
