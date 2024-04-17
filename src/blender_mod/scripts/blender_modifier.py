@@ -287,7 +287,7 @@ def create_printer_stains(nodes, links, mix_shader):
     links.new(mixer_dots_lines.outputs["Color"], mix_shader.inputs["Fac"])
 
 
-def apply_texture(document: str, paper: str, mods_dict: dict):
+def apply_document_texture(document: str, paper: str, mods_dict: dict):
     """
     Applies a texture to the active object by creating a new material and
     setting up a node tree to handle the texture mapping, mixing, and shading.
@@ -930,8 +930,8 @@ def import_background_object(mods_dict: dict):
         obj.select_set(True)
 
         # Tune pos/rot data
-        x = random.uniform(-0.1, 0.3)
-        y = random.uniform(-0.1, 0.4)
+        x = random.uniform(-0.1, 0.2)
+        y = random.uniform(-0.1, 0.3)
         z_angle = random.uniform(0, 360)
 
         # Change its position and rotation
@@ -957,6 +957,13 @@ def get_modifications_dict(blueprint_df: pd.DataFrame, sample: str) -> dict:
         ].iloc[0]
 
     return mod_dict
+
+
+def modify_document_mesh(mods_dict: dict):
+
+    if mods_dict["modify_mesh"]:
+        prepare_for_cloth_sim()
+        run_cloth_sim()
 
 
 def modify_samples(
@@ -993,8 +1000,7 @@ def modify_samples(
         )
 
         # Textures
-        # TODO
-        apply_texture(document=img_path, paper=paper_texture, mods_dict=mods)
+        apply_document_texture(document=img_path, paper=paper_texture, mods_dict=mods)
 
         # Set background
         background_data = properties["blender"]["common"]["background"]
@@ -1003,6 +1009,8 @@ def modify_samples(
             normals_path=background_normal,
             back_data=background_data,
         )
+        # Import Background Object
+        import_background_object(mods_dict=mods)
 
         # Set light
         lights_data = properties["blender"][requirements["styles"][0]]["lights"]
@@ -1012,11 +1020,8 @@ def modify_samples(
         camera_data = properties["blender"][requirements["styles"][0]]["camera"]
         config_camera(camera_data=camera_data)
 
-        # Import Background Object
-        import_background_object(mods_dict=mods)
-
-        prepare_for_cloth_sim()
-        run_cloth_sim()
+        # Modify Document Mesh
+        modify_document_mesh(mods_dict=mods)
         print(a)
 
         # Render scene
