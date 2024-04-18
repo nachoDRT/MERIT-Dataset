@@ -287,16 +287,19 @@ def create_printer_stains(nodes, links, mix_shader):
     links.new(mixer_dots_lines.outputs["Color"], mix_shader.inputs["Fac"])
 
 
-def apply_document_texture(document: str, paper: str, mods_dict: dict):
+def apply_document_texture(document: str, mods_dict: dict):
     """
     Applies a texture to the active object by creating a new material and
     setting up a node tree to handle the texture mapping, mixing, and shading.
 
     Args:
     document (str): The file path of the document texture image.
-    paper (str): The file path of the paper texture image.
-    sample (): The blueprint sample data.
+    mods_dict (dict): What to modify.
     """
+    paper_texture = "".join([mods_dict["paper_texture"], ".png"])
+    paper_texture_path = os.path.join(
+        bpy.path.abspath("//"), "assets", "textures", "papers", paper_texture
+    )
 
     # TODO Include normals map
     # Get the active object
@@ -357,7 +360,7 @@ def apply_document_texture(document: str, paper: str, mods_dict: dict):
     doc_image = bpy.data.images.load(document)
     doc_texture_node.image = doc_image
 
-    paper_image = bpy.data.images.load(paper)
+    paper_image = bpy.data.images.load(paper_texture_path)
     paper_texture_node.image = paper_image
 
     mix_rgb_node.blend_type = "MULTIPLY"
@@ -372,7 +375,7 @@ def apply_document_texture(document: str, paper: str, mods_dict: dict):
 
     # Printer stain nodes
     printer_stains = mods_dict["printer_stains"]
-    if printer_stains and printer_stains != "N/A":
+    if printer_stains and printer_stains != "N/A" and printer_stains != "False":
         create_printer_stains(nodes, links, mix_shader)
 
     links.new(principled_node.outputs["BSDF"], mix_shader.inputs[1])
@@ -931,7 +934,7 @@ def run_cloth_sim():
 def import_background_object(mods_dict: dict):
 
     object_name = mods_dict["background_elements"]
-    if object_name and object_name != "N/A":
+    if object_name and object_name != "N/A" and object_name != "False":
 
         object_file_path = os.path.join(
             bpy.path.abspath("//"),
@@ -972,6 +975,7 @@ def get_modifications_dict(blueprint_df: pd.DataFrame, sample: str) -> dict:
         "background_elements",
         "modify_mesh",
         "background_material",
+        "paper_texture",
     ]
 
     mod_dict = {}
@@ -1028,7 +1032,7 @@ def cast_shadow(mods_dict: dict):
 def set_lighting_syle(mods_dict):
     lighting_style = mods_dict["rendering_style"]
 
-    if lighting_style and lighting_style != "N/A":
+    if lighting_style and lighting_style != "N/A" and lighting_style != "False":
         # Load de HDR image
         hdr_file = "".join([lighting_style, ".hdr"])
         hdr_path = os.path.join(bpy.path.abspath("//"), "assets", "hdr", hdr_file)
@@ -1076,13 +1080,7 @@ def set_lighting_syle(mods_dict):
         bpy.context.view_layer.update()
 
 
-def modify_samples(
-    samples_to_mod_df: pd.DataFrame,
-    blueprint_df: pd.DataFrame,
-    paper_texture: str,
-    background_texture: str,
-    background_normal: str,
-):
+def modify_samples(samples_to_mod_df: pd.DataFrame, blueprint_df: pd.DataFrame):
     for sample in tqdm.tqdm(samples_to_mod_df["file_name"].items()):
         (
             img_path,
@@ -1110,13 +1108,12 @@ def modify_samples(
         )
 
         # Textures
-        apply_document_texture(document=img_path, paper=paper_texture, mods_dict=mods)
+        apply_document_texture(document=img_path, mods_dict=mods)
 
         # Set background
         background_data = properties["blender"]["common"]["background"]
         create_background(back_data=background_data, mods_dict=mods)
         # Import Background Object
-
         import_background_object(mods_dict=mods)
 
         # Set light
@@ -1203,27 +1200,4 @@ if __name__ == "__main__":
     mask = blueprint_df["modification_done"] == False
     filtered_df = blueprint_df[mask]
 
-    # Load Assets
-    paper_texture = os.path.join(
-        bpy.path.abspath("//"), "assets", "textures", "papers", "paper.png"
-    )
-    background_texture = os.path.join(
-        bpy.path.abspath("//"),
-        "assets",
-        "textures",
-        "backgrounds",
-        "white_oak",
-        "texture.png",
-    )
-    background_normal = os.path.join(
-        bpy.path.abspath("//"),
-        "assets",
-        "textures",
-        "backgrounds",
-        "white_oak",
-        "normals.png",
-    )
-
-    modify_samples(
-        filtered_df, blueprint_df, paper_texture, background_texture, background_normal
-    )
+    modify_samples(filtered_df, blueprint_df)
