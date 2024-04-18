@@ -64,6 +64,7 @@ def set_database_headers() -> dict:
     attributes["background_elements"] = []
     attributes["modify_mesh"] = []
     attributes["background_material"] = []
+    attributes["paper_texture"] = []
     attributes["replication_done"] = []
     attributes["modification_done"] = []
 
@@ -133,7 +134,9 @@ def compute_render_styles_distribution(mods_distribution: list, b_props: dict) -
 
     render_styles = [
         (
-            random.choices(["scanner", "natural", "office"], weights=[0.7, 0.2, 0.1])[0]
+            random.choices(
+                ["studio", "natural", "warm", "scanner"], weights=[0.25, 0.25, 0.2, 0.3]
+            )[0]
             if mod == True
             else "N/A"
         )
@@ -219,9 +222,35 @@ def compute_background_material_distribution(rendering_styles, b_props: dict) ->
         elif style == "scanner":
             background_materials.append("white_plastic")
         else:
-            background_materials.append(random.choice(["wood", "concrete"]))
+            background_materials.append(
+                random.choice(
+                    [
+                        "blue_tiles",
+                        "cream_terrazo",
+                        "multicolor_terrazo",
+                        "quartzite",
+                        "rusted_metal",
+                        "white_oak",
+                        "wood_planks",
+                    ]
+                )
+            )
 
     return background_materials
+
+
+def compute_paper_texture_distribution(rendering_styles) -> list:
+    papers_texture = []
+
+    for style in rendering_styles:
+        if style == "N/A":
+            papers_texture.append("N/A")
+        elif style == "scanner":
+            papers_texture.append("scanned")
+        else:
+            papers_texture.append(random.choice(["wrinkled_paper"]))
+
+    return papers_texture
 
 
 def compute_mods_distribution(reqs: dict) -> list:
@@ -402,6 +431,7 @@ def fill_blueprint(attributes: dict, reqs: dict, props: dict, b_props: dict) -> 
     blender_mod = compute_mods_distribution(reqs)
     rendering_styles = compute_render_styles_distribution(blender_mod, b_props)
     back_materials = compute_background_material_distribution(rendering_styles, b_props)
+    papers_texture = compute_paper_texture_distribution(rendering_styles)
     shadow_castings = compute_shadow_casting_distribution(rendering_styles)
     printer_stains = compute_printer_stains_distribution(blender_mod)
     back_elements = compute_background_elements_distribution(rendering_styles, b_props)
@@ -488,6 +518,8 @@ def fill_blueprint(attributes: dict, reqs: dict, props: dict, b_props: dict) -> 
                                 attributes[key].append(rendering_styles[index])
                             elif key == "background_material":
                                 attributes[key].append(back_materials[index])
+                            elif key == "paper_texture":
+                                attributes[key].append(papers_texture[index])
                             elif key == "shadow_casting":
                                 attributes[key].append(shadow_castings[index])
                             elif key == "printer_stains":
