@@ -324,6 +324,9 @@ def apply_document_texture(document: str, paper: str, mods_dict: dict):
     mapping_node.inputs["Rotation"].default_value[2] = math.radians(180)
     coord_node = nodes.new(type="ShaderNodeTexCoord")
     principled_node = nodes.new(type="ShaderNodeBsdfPrincipled")
+    principled_node.inputs["Specular"].default_value = 0.1
+    principled_node.inputs["Roughness"].default_value = 1.0
+    principled_node.inputs["Metallic"].default_value = 1.0
     principled_node_printer = nodes.new(type="ShaderNodeBsdfPrincipled")
     principled_node_printer.inputs["Base Color"].default_value = (
         0.092,
@@ -331,6 +334,9 @@ def apply_document_texture(document: str, paper: str, mods_dict: dict):
         0.092,
         1,
     )
+    principled_node_printer.inputs["Specular"].default_value = 0.1
+    principled_node_printer.inputs["Roughness"].default_value = 1.0
+    principled_node_printer.inputs["Metallic"].default_value = 1.0
     mix_shader = nodes.new(type="ShaderNodeMixShader")
     output_node = nodes.new(type="ShaderNodeOutputMaterial")
 
@@ -381,7 +387,7 @@ def apply_document_texture(document: str, paper: str, mods_dict: dict):
         obj.data.materials.append(mat)
 
 
-def create_background(texture_path: str, normals_path: str, back_data: dict):
+def create_background(back_data: dict, mods_dict: dict):
     """
     Creates a background plane in the Blender scene and applies a texture and normal map
     to it.
@@ -392,10 +398,10 @@ def create_background(texture_path: str, normals_path: str, back_data: dict):
     face on the plane.
 
     Args:
-        texture_path (str): The file path to the texture image.
-        normals_path (str): The file path to the normal map image.
         data (dict): A dictionary containing info about the position or scale of the
         plane background.
+        mods_dict (dict): The dictionary with the info about what to modify according to
+        the blueprint
     """
 
     # Create plane
@@ -416,8 +422,11 @@ def create_background(texture_path: str, normals_path: str, back_data: dict):
     for node in nodes:
         nodes.remove(node)
 
-    # Create necessary nodes
+    # Create necessary nodes and adjust values
     principled_node = nodes.new(type="ShaderNodeBsdfPrincipled")
+    principled_node.inputs["Specular"].default_value = 0.25
+    principled_node.inputs["Roughness"].default_value = 0.25
+    principled_node.inputs["Metallic"].default_value = 0.8
     texture_node = nodes.new(type="ShaderNodeTexImage")
     normals_node = nodes.new(type="ShaderNodeNormalMap")
     normals_node.inputs["Strength"].default_value = 0.5
@@ -431,6 +440,22 @@ def create_background(texture_path: str, normals_path: str, back_data: dict):
     normals_image_node.location = (-300, -50)
     output_node.location = (500, 300)
 
+    background_mat = mods_dict["background_material"]
+    background_mat_root = os.path.join(
+        bpy.path.abspath("//"),
+        "assets",
+        "textures",
+        "backgrounds",
+        background_mat,
+    )
+    texture_path = os.path.join(
+        background_mat_root,
+        "texture.png",
+    )
+    normals_path = os.path.join(
+        background_mat_root,
+        "normals.png",
+    )
     texture_node.image = bpy.data.images.load(texture_path)
     normals_image_node.image = bpy.data.images.load(normals_path)
 
@@ -1089,12 +1114,9 @@ def modify_samples(
 
         # Set background
         background_data = properties["blender"]["common"]["background"]
-        create_background(
-            texture_path=background_texture,
-            normals_path=background_normal,
-            back_data=background_data,
-        )
+        create_background(back_data=background_data, mods_dict=mods)
         # Import Background Object
+
         import_background_object(mods_dict=mods)
 
         # Set light

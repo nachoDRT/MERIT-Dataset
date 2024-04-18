@@ -221,7 +221,19 @@ def compute_background_material_distribution(rendering_styles, b_props: dict) ->
         elif style == "scanner":
             background_materials.append("white_plastic")
         else:
-            background_materials.append(random.choice(["wood", "concrete"]))
+            background_materials.append(
+                random.choice(
+                    [
+                        "blue_tiles",
+                        "cream_terrazo",
+                        "multicolor_terrazo",
+                        "quartzite",
+                        "rusted_metal",
+                        "white_oak",
+                        "wood_planks",
+                    ]
+                )
+            )
 
     return background_materials
 
