@@ -365,8 +365,8 @@ def apply_document_texture(document: str, paper: str, mods_dict: dict):
     links.new(mix_rgb_node.outputs["Color"], principled_node.inputs["Base Color"])
 
     # Printer stain nodes
-    printer_stains_in_sample = mods_dict["printer_stains"]
-    if printer_stains_in_sample:
+    printer_stains = mods_dict["printer_stains"]
+    if printer_stains and printer_stains != "N/A":
         create_printer_stains(nodes, links, mix_shader)
 
     links.new(principled_node.outputs["BSDF"], mix_shader.inputs[1])
@@ -906,7 +906,7 @@ def run_cloth_sim():
 def import_background_object(mods_dict: dict):
 
     object_name = mods_dict["background_elements"]
-    if object_name:
+    if object_name and object_name != "N/A":
 
         object_file_path = os.path.join(
             bpy.path.abspath("//"),
@@ -961,13 +961,13 @@ def get_modifications_dict(blueprint_df: pd.DataFrame, sample: str) -> dict:
 
 def modify_document_mesh(mods_dict: dict):
 
-    if mods_dict["modify_mesh"]:
+    if mods_dict["modify_mesh"] and mods_dict["modify_mesh"] != "N/A":
         prepare_for_cloth_sim()
         run_cloth_sim()
 
 
 def cast_shadow(mods_dict: dict):
-    if mods_dict["shadow_casting"]:
+    if mods_dict["shadow_casting"] and mods_dict["shadow_casting"] != "N/A":
         object_name = "rigged_male_body"
         object_file_path = os.path.join(
             bpy.path.abspath("//"),
@@ -998,6 +998,57 @@ def cast_shadow(mods_dict: dict):
         # Change its position and rotation
         obj.location = (x, y, -0.84)
         obj.rotation_euler = (math.radians(90), 0, math.radians(z_angle))
+
+
+def set_lighting_syle(mods_dict):
+    lighting_style = mods_dict["rendering_style"]
+
+    if lighting_style and lighting_style != "N/A":
+        # Load de HDR image
+        hdr_file = "".join([lighting_style, ".hdr"])
+        hdr_path = os.path.join(bpy.path.abspath("//"), "assets", "hdr", hdr_file)
+
+        hdr_img = bpy.data.images.load(hdr_path)
+
+        # Config World/Tree Nodes
+        world = bpy.context.scene.world
+        if not world.use_nodes:
+            world.use_nodes = True
+
+        node_tree = world.node_tree
+        nodes = node_tree.nodes
+
+        for node in nodes:
+            nodes.remove(node)
+
+        # Add Background an Texture Environment Nodes
+        bg_node = nodes.new(type="ShaderNodeBackground")
+        env_node = nodes.new(type="ShaderNodeTexEnvironment")
+
+        # Add Extra Nodes to Control HDR Orientation
+        mapping_node = nodes.new(type="ShaderNodeMapping")
+        tex_coord_node = nodes.new(type="ShaderNodeTexCoord")
+
+        # Rotate the HDR
+        z_rotation_value = math.radians(random.uniform(0, 360))
+        mapping_node.inputs["Rotation"].default_value[2] = z_rotation_value
+
+        # Connect Nodes
+        node_tree.links.new(
+            tex_coord_node.outputs["Generated"], mapping_node.inputs["Vector"]
+        )
+        node_tree.links.new(mapping_node.outputs["Vector"], env_node.inputs["Vector"])
+        node_tree.links.new(env_node.outputs["Color"], bg_node.inputs["Color"])
+        node_tree.links.new(
+            bg_node.outputs["Background"],
+            nodes.new(type="ShaderNodeOutputWorld").inputs["Surface"],
+        )
+
+        env_node.image = hdr_img
+
+        bpy.context.scene.eevee.use_ssr = True
+        bpy.context.scene.eevee.use_ssr_refraction = True
+        bpy.context.view_layer.update()
 
 
 def modify_samples(
@@ -1049,6 +1100,7 @@ def modify_samples(
         # Set light
         lights_data = properties["blender"][requirements["styles"][0]]["lights"]
         config_lights(lights_data=lights_data)
+        set_lighting_syle(mods_dict=mods)
 
         # Set camera
         camera_data = properties["blender"][requirements["styles"][0]]["camera"]

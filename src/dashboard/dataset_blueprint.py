@@ -133,7 +133,9 @@ def compute_render_styles_distribution(mods_distribution: list, b_props: dict) -
 
     render_styles = [
         (
-            random.choices(["scanner", "natural", "office"], weights=[0.7, 0.2, 0.1])[0]
+            random.choices(
+                ["studio", "natural", "warm", "scanner"], weights=[0.25, 0.25, 0.2, 0.3]
+            )[0]
             if mod == True
             else "N/A"
         )
