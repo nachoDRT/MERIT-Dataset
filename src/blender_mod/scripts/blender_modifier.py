@@ -25,7 +25,8 @@ if file_dir not in sys.path:
 import delaunay_helper as dhelp
 import general_helper as ghelp
 
-SHOW_PLOT = True
+SHOW_PLOT = False
+MERGE_BBX_PTS_TO_GRID = True
 
 
 def define_units(scale_length: float = 1.0, lenght_unit: str = "METERS"):
@@ -71,13 +72,16 @@ def compute_mesh(sample_path: str, properties: dict):
             mesh (it contains the document vertices + the grid vertices).
             - delaunay_mesh (Delaunay): The computed Delaunay mesh.
     """
-
+    grid_sampling = 50
     json_info = dhelp.read_json(name=sample_path)
     document_points = dhelp.get_bboxes_as_points(
         form=json_info["form"], properties=properties
     )
     n_document_points = len(document_points)
-    grid = dhelp.compute_grid(properties=properties)
+    grid, x_step, y_step, grid_marks = dhelp.compute_grid(
+        properties=properties, sampling_x=grid_sampling, sampling_y=grid_sampling
+    )
+    mesh_steps = {"x": x_step, "y": y_step}
     vertices = np.concatenate((document_points, grid), axis=0)
     delaunay_mesh = Delaunay(vertices)
     if SHOW_PLOT:
@@ -88,7 +92,7 @@ def compute_mesh(sample_path: str, properties: dict):
             name=sample_path[:-5],
         )
 
-    return n_document_points, vertices, delaunay_mesh
+    return n_document_points, vertices, delaunay_mesh, mesh_steps, grid_marks
 
 
 def create_mesh_object(
@@ -211,7 +215,7 @@ def create_printer_stains(nodes, links, mix_shader):
     # Printer lines vertical bands mask
     bands_coord_node = nodes.new(type="ShaderNodeTexCoord")
     bands_mapping_node = nodes.new(type="ShaderNodeMapping")
-    bands_mapping_node.inputs["Scale"].default_value[0] = 1.39
+    bands_mapping_node.inputs["Scale"].default_value[0] = 1.415
     bands_gradient_texture = nodes.new(type="ShaderNodeTexGradient")
     bands_gradient_texture.gradient_type = "LINEAR"
     bands_color_ramp = nodes.new(type="ShaderNodeValToRGB")
@@ -322,8 +326,9 @@ def apply_document_texture(document: str, mods_dict: dict):
     mix_rgb_node = nodes.new(type="ShaderNodeMixRGB")
     mix_rgb_node.inputs[0].default_value = 1.0
     mapping_node = nodes.new(type="ShaderNodeMapping")
-    mapping_node.inputs["Scale"].default_value[0] = 1.39
-    mapping_node.inputs["Scale"].default_value[1] = 0.98
+    mapping_node.inputs["Location"].default_value[0] = -0.001
+    mapping_node.inputs["Scale"].default_value[0] = 1.415
+    mapping_node.inputs["Scale"].default_value[1] = 1
     mapping_node.inputs["Rotation"].default_value[2] = math.radians(180)
     coord_node = nodes.new(type="ShaderNodeTexCoord")
     principled_node = nodes.new(type="ShaderNodeBsdfPrincipled")
@@ -544,9 +549,14 @@ def config_camera(camera_data: dict):
     """
 
     # Make sure a camera object exists
-    if not bpy.data.objects.get("Camera"):
-        bpy.ops.object.camera_add()
-    camera = bpy.data.objects["Camera"]
+    # if not bpy.data.objects.get("Camera"):
+    #     bpy.ops.object.camera_add()
+
+    # Create a new camera
+    bpy.ops.object.camera_add()
+    camera = bpy.context.active_object
+    camera.name = "Document_camera"
+    # camera = bpy.data.objects["Camera"]
 
     # Compute camera location
     pos = compute_pos(pos_data=camera_data["pos_meters"])
@@ -567,6 +577,7 @@ def config_camera(camera_data: dict):
     # Set location and rotation
     camera.location = (pos[0], pos[1], pos[2])
     camera.rotation_euler = (rot_x, rot_y, rot_z)
+    print("\n\nCamera:", camera.rotation_euler)
 
 
 def config_lights(lights_data: dict):
@@ -622,7 +633,7 @@ def render_scene(dst_folder: str, name: str, img_dims: dict):
         np.array: The rendered image as an cv2 image.
     """
 
-    camera = bpy.data.objects.get("Camera")
+    camera = bpy.data.objects.get("Document_camera")
     if camera:
         bpy.context.scene.camera = camera
     else:
@@ -699,7 +710,7 @@ def retrieve_bboxes_pixel_points(img: np.array, mesh_name: str):
             - img (np.array): The input image with the vertices drawn on it as points.
     """
 
-    camera_name = "Camera"
+    camera_name = "Document_camera"
     obj_name = "Document"
     mesh_name = mesh_name
 
@@ -722,9 +733,11 @@ def retrieve_bboxes_pixel_points(img: np.array, mesh_name: str):
     #         print(f"{obj.name}: {len(obj.data.vertices)}")
     # TODO
 
-    bboxes_vertices_px = []
+    vertices_px = []
 
     # Bboxes vertices: transform 3D world coordinates to 2D pixel coordinates
+    print("BBOX_VERTICES", len(bbox_vertices_indices))
+    print(bbox_vertices_indices)
     for index in bbox_vertices_indices:
         world_location = mesh.vertices[index].co
 
@@ -738,16 +751,38 @@ def retrieve_bboxes_pixel_points(img: np.array, mesh_name: str):
         )
 
         point = (point_x, point_y)
-        bboxes_vertices_px.append(point)
+        vertices_px.append(point)
+
+    all_vertices_indices = []
+    all_vertices_px = []
+    for index in range(len(mesh.vertices)):
+        all_vertices_indices.append(index)
+        world_location = mesh.vertices[index].co
+
+        render_coordinates = bpy_extras.object_utils.world_to_camera_view(
+            bpy.context.scene, camera, world_location
+        )
+
+        point_x = int(render_coordinates.x * bpy.context.scene.render.resolution_x)
+        point_y = int(
+            (1 - render_coordinates.y) * bpy.context.scene.render.resolution_y
+        )
+
+        point = (point_x, point_y)
+        all_vertices_px.append(point)
+
+    print("ALL VERTICES", len(all_vertices_indices))
+    print(all_vertices_indices)
 
     # Draw the bboxes over the rendered img for visual check
     rectangles = []
 
     # One bbox is defined by 4 points
-    for i in range(0, len(bboxes_vertices_px), 4):
-        rect_points = np.array(list(bboxes_vertices_px[i : i + 4]), dtype=np.int32)
+    for i in range(0, len(vertices_px), 4):
+        rect_points = np.array(list(vertices_px[i : i + 4]), dtype=np.int32)
         rectangles.append(rect_points)
 
+    img = ghelp.draw_mesh_points(img=img, pts=all_vertices_px, color=(255, 0, 0), r=2)
     img = ghelp.draw_bboxes(img=img, rectangles=rectangles, color=(0, 255, 0))
 
     return rectangles, img
@@ -818,7 +853,7 @@ def get_sample_paths_and_names(sample_name: str):
     )
 
 
-def prepare_for_cloth_sim():
+def move_doc_uppward(z: float):
     obj = bpy.data.objects["Document"]
     bpy.context.view_layer.objects.active = obj
     bpy.ops.object.select_all(action="DESELECT")
@@ -830,8 +865,12 @@ def prepare_for_cloth_sim():
     bpy.ops.mesh.tris_convert_to_quads()
     bpy.ops.object.mode_set(mode="OBJECT")
 
+    # Solidify the object
+    # solidify_modifier = obj.modifiers.new(name="DocumentSolidifier", type="SOLIDIFY")
+    # solidify_modifier.thickness = 0.001
+
     # Change its position
-    obj.location.z = 0.025
+    obj.location.z = z
 
 
 def compute_skewness(obj: bpy.data.objects):
@@ -988,11 +1027,66 @@ def get_modifications_dict(blueprint_df: pd.DataFrame, sample: str) -> dict:
     return mod_dict
 
 
+def hide_elements_except(object_name: str):
+
+    bpy.ops.object.mode_set(mode="OBJECT")
+    bpy.ops.object.select_all(action="DESELECT")
+
+    for obj in bpy.context.scene.objects:
+        if obj.name != object_name:
+            obj.hide_render = True
+        else:
+            obj.hide_render = False
+
+
 def modify_document_mesh(mods_dict: dict):
 
-    if mods_dict["modify_mesh"] and mods_dict["modify_mesh"] != "N/A":
-        prepare_for_cloth_sim()
+    if (
+        mods_dict["modify_mesh"]
+        and mods_dict["modify_mesh"] != "N/A"
+        and mods_dict["rendering_style"] != "scanner"
+    ):
+        move_doc_uppward(z=0.025)
         run_cloth_sim()
+        move_doc_uppward(z=0)
+        hide_elements_except("Document")
+
+    elif mods_dict["rendering_style"] == "scanner":
+        move_doc_uppward(z=0.1)
+
+
+def merge_bboxes_points_to_grid(
+    mesh_name: str, mesh_steps: dict, grid_marks: dict, props: dict
+):
+    bbox_vertices_indices = get_vertices_id_from_group(
+        object_name="Document", group_name="bboxes_v_group"
+    )
+
+    mesh = bpy.data.meshes[mesh_name]
+
+    for index in bbox_vertices_indices:
+        coord_x_px = dhelp.coord_m_to_pixel(mesh.vertices[index].co.x, props)
+        coord_y_px = dhelp.coord_m_to_pixel(mesh.vertices[index].co.y, props)
+        print(coord_x_px)
+        remapped_coord_x_px = remap_coordinate(
+            coord_x_px, mesh_steps["x"], grid_marks["x"]
+        )
+        remapped_coord_y_px = remap_coordinate(
+            coord_y_px, mesh_steps["y"], grid_marks["y"]
+        )
+        mesh.vertices[index].co.x = dhelp.coord_pixel_to_m(remapped_coord_x_px, props)
+        mesh.vertices[index].co.y = dhelp.coord_pixel_to_m(remapped_coord_y_px, props)
+
+
+def remap_coordinate(coord, step, grid_axis_marks):
+    division = coord // step
+    remainder = coord % step
+
+    if remainder < step / 2:
+        coord = grid_axis_marks[division]
+    else:
+        coord = grid_axis_marks[division + 1]
+    return coord
 
 
 def cast_shadow(mods_dict: dict):
@@ -1082,6 +1176,8 @@ def set_lighting_syle(mods_dict):
 
 def modify_samples(samples_to_mod_df: pd.DataFrame, blueprint_df: pd.DataFrame):
     for sample in tqdm.tqdm(samples_to_mod_df["file_name"].items()):
+        bpy.ops.object.select_all(action="SELECT")
+        bpy.ops.object.delete()
         (
             img_path,
             labels_path,
@@ -1094,8 +1190,8 @@ def modify_samples(samples_to_mod_df: pd.DataFrame, blueprint_df: pd.DataFrame):
 
         mods = get_modifications_dict(blueprint_df=blueprint_df, sample=sample)
 
-        n_bboxes_vertices, all_vertices, delaunay_mesh = compute_mesh(
-            sample_path=labels_path, properties=properties
+        n_bboxes_vertices, all_vertices, delaunay_mesh, mesh_sampling, grid_marks = (
+            compute_mesh(sample_path=labels_path, properties=properties)
         )
 
         mesh_name = "".join([sample[1], "_", datetime.now().isoformat()])
@@ -1106,6 +1202,11 @@ def modify_samples(samples_to_mod_df: pd.DataFrame, blueprint_df: pd.DataFrame):
             properties=properties,
             mesh_name=mesh_name,
         )
+
+        if MERGE_BBX_PTS_TO_GRID:
+            merge_bboxes_points_to_grid(
+                mesh_name, mesh_sampling, grid_marks, properties
+            )
 
         # Textures
         apply_document_texture(document=img_path, mods_dict=mods)
@@ -1130,7 +1231,6 @@ def modify_samples(samples_to_mod_df: pd.DataFrame, blueprint_df: pd.DataFrame):
 
         # Cast shadow
         cast_shadow(mods_dict=mods)
-        print(a)
 
         # Render scene
         rendered_img = render_scene(
@@ -1173,6 +1273,7 @@ def modify_samples(samples_to_mod_df: pd.DataFrame, blueprint_df: pd.DataFrame):
         )
 
         # Delete every object in the scene
+        print(a)
         bpy.ops.object.select_all(action="SELECT")
         bpy.ops.object.delete()
 

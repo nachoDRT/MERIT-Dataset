@@ -4,6 +4,7 @@ from scipy.spatial import Delaunay
 import matplotlib.pyplot as plt
 import json
 import os
+import math
 
 
 SHOW_PLOT = True
@@ -149,16 +150,22 @@ def compute_grid(properties: dict, sampling_x: int = 100, sampling_y: int = 100)
     a4_pixel_width = properties["delaunay"]["a4_pixel_dims"]["width"]
     a4_pixel_height = properties["delaunay"]["a4_pixel_dims"]["height"]
 
-    x = np.arange(0, a4_pixel_width, sampling_x)
-    y = np.arange(0, a4_pixel_height, sampling_y)
+    steps_x = math.ceil((a4_pixel_width) / sampling_x) + 1
+    steps_y = math.ceil((a4_pixel_height) / sampling_y) + 1
+
+    x = np.linspace(0, a4_pixel_width, num=steps_x, dtype=int)
+    x_step = x[1] + 1
+    y = np.linspace(0, a4_pixel_height, num=steps_y, dtype=int)
+    y_step = y[1] + 1
 
     x_grid, y_grid = np.meshgrid(x, y)
 
     points = np.vstack((x_grid.ravel(), y_grid.ravel())).T
 
     grid = [tuple(point) for point in points]
+    grid_marks = {"x": x, "y": y}
 
-    return np.array(grid)
+    return np.array(grid), x_step, y_step, grid_marks
 
 
 def read_json(name: str):
@@ -251,6 +258,23 @@ def pixel_to_m(vector: list, properties: dict):
         vertex = tuple(np.array(vertex) * pixel_to_m)
         transformed.append(vertex)
     return np.array(transformed)
+
+
+def coord_m_to_pixel(coord: float, properties: dict) -> int:
+    mm_2_pixel = properties["delaunay"]["mm_2_pixel"]
+    coord_mm = coord * 1000
+    coord_px = coord_mm * mm_2_pixel
+
+    return int(coord_px)
+
+
+def coord_pixel_to_m(coord: int, properties: dict) -> float:
+    mm_2_pixel = properties["delaunay"]["mm_2_pixel"]
+    pixel_to_mm = 1 / mm_2_pixel
+    pixel_to_m = pixel_to_mm / 1000
+    coord_m = coord * pixel_to_m
+
+    return coord_m
 
 
 def load_properties(root: str):
