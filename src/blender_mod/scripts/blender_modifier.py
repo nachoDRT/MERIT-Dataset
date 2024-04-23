@@ -826,24 +826,16 @@ def get_sample_paths_and_names(sample_name: str):
     )
 
 
-def move_doc_uppward(z: float):
-    obj = bpy.data.objects["Document"]
+def change_object_height(obj_name: str, height: float):
+    """Set a new height for an specific object
+
+    Args:
+        obj_name (str): Object name
+        height (float): New object's height
+    """
+    obj = bpy.data.objects[obj_name]
     bpy.context.view_layer.objects.active = obj
-    bpy.ops.object.select_all(action="DESELECT")
-    obj.select_set(True)
-
-    # Transform mesh triangles to quads where possible
-    bpy.ops.object.mode_set(mode="EDIT")
-    bpy.ops.mesh.select_all(action="SELECT")
-    bpy.ops.mesh.tris_convert_to_quads()
-    bpy.ops.object.mode_set(mode="OBJECT")
-
-    # Solidify the object
-    # solidify_modifier = obj.modifiers.new(name="DocumentSolidifier", type="SOLIDIFY")
-    # solidify_modifier.thickness = 0.001
-
-    # Change its position
-    obj.location.z = z
+    obj.location.z = height
 
 
 def compute_skewness(obj: bpy.data.objects):
@@ -1000,7 +992,22 @@ def get_modifications_dict(blueprint_df: pd.DataFrame, sample: str) -> dict:
     return mod_dict
 
 
+def prepare_doc_4_cloth_sim():
+    """Transform mesh triangles into quadrilateral elements"""
+    obj = bpy.data.objects["Document"]
+    bpy.context.view_layer.objects.active = obj
+    bpy.ops.object.mode_set(mode="EDIT")
+    bpy.ops.mesh.select_all(action="SELECT")
+    bpy.ops.mesh.tris_convert_to_quads()
+    bpy.ops.object.mode_set(mode="OBJECT")
+
+
 def hide_elements_except(object_name: str):
+    """Debugging method to hide object an ease the visual debugging process y Blender
+
+    Args:
+        object_name (str): Name of the object that needs to stay visible
+    """
 
     bpy.ops.object.mode_set(mode="OBJECT")
     bpy.ops.object.select_all(action="DESELECT")
@@ -1012,6 +1019,21 @@ def hide_elements_except(object_name: str):
             obj.hide_render = False
 
 
+def change_objects_height_except(object_name: str, height: float):
+    """Change objet height except one
+
+    Args:
+        object_name (str): Name of the object that needs to stay visible
+    """
+
+    bpy.ops.object.mode_set(mode="OBJECT")
+    bpy.ops.object.select_all(action="DESELECT")
+
+    for obj in bpy.context.scene.objects:
+        if obj.name != object_name and obj.type == "MESH":
+            change_object_height(obj.name, height)
+
+
 def modify_document_mesh(mods_dict: dict):
 
     if (
@@ -1019,13 +1041,15 @@ def modify_document_mesh(mods_dict: dict):
         and mods_dict["modify_mesh"] != "N/A"
         and mods_dict["rendering_style"] != "scanner"
     ):
-        move_doc_uppward(z=0.025)
+
+        change_object_height(obj_name="Document", height=0.025)
+        prepare_doc_4_cloth_sim()
         run_cloth_sim()
-        move_doc_uppward(z=0)
-        hide_elements_except("Document")
+        change_object_height(obj_name="Document", height=0)
+        change_objects_height_except("Document", -0.025)
 
     elif mods_dict["rendering_style"] == "scanner":
-        move_doc_uppward(z=0.1)
+        change_object_height(obj_name="Document", height=0.0001)
 
 
 def approx_bboxes_points_to_grid(
@@ -1259,7 +1283,6 @@ def modify_samples(samples_to_mod_df: pd.DataFrame, blueprint_df: pd.DataFrame):
         )
 
         # Delete every object in the scene
-        print(a)
         bpy.ops.object.select_all(action="SELECT")
         bpy.ops.object.delete()
 
