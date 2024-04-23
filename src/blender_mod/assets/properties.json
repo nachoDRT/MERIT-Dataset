@@ -6,8 +6,8 @@
             "height": 2339
         },
         "grid_sampling": {
-            "x": 50,
-            "y": 10
+            "x": 25,
+            "y": 25
         }
     },
     "blender": {

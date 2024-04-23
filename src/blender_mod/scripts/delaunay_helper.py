@@ -188,9 +188,7 @@ def read_json(name: str):
     return data
 
 
-def show_plot(
-    vertices: np.array, default_grid: np.array, mesh: Type[Delaunay], name: str
-):
+def show_plot(vertices: np.array, mesh: Type[Delaunay], name: str):
     """
     Display a plot showing a Delaunay triangulation (vertices come from both a default
     grid and the words' bounding boxes in the document of interest).
@@ -208,7 +206,6 @@ def show_plot(
     plt.title(label=name)
     plt.triplot(vertices[:, 0], vertices[:, 1], mesh.simplices)
     plt.plot(vertices[:, 0], vertices[:, 1], "o", markersize=2, color="purple")
-    plt.plot(default_grid[:, 0], default_grid[:, 1], "o", markersize=1)
     plt.xlabel("Horizontal pixels")
     plt.ylabel("Vertical pixels")
     plt.axis("equal")

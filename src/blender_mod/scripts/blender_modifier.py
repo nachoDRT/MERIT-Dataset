@@ -26,8 +26,6 @@ import delaunay_helper as dhelp
 import general_helper as ghelp
 
 SHOW_PLOT = False
-MERGE_BBX_PTS_TO_GRID = True
-REMAPPED = True
 
 
 def define_units(scale_length: float = 1.0, lenght_unit: str = "METERS"):
@@ -79,26 +77,29 @@ def compute_mesh(sample_path: str, properties: dict):
     document_points = dhelp.get_bboxes_as_points(
         form=json_info["form"], properties=properties
     )
-    n_document_points = len(document_points)
-    grid, x_step, y_step, grid_marks = dhelp.compute_grid(
+
+    grid_vertices, x_step, y_step, grid_marks = dhelp.compute_grid(
         properties=properties, sampling_x=grid_sampling_x, sampling_y=grid_sampling_y
     )
     mesh_steps = {"x": x_step, "y": y_step}
-    vertices = np.concatenate((document_points, grid), axis=0)
-    delaunay_mesh = Delaunay(vertices)
+    delaunay_mesh = Delaunay(grid_vertices)
     if SHOW_PLOT:
         dhelp.show_plot(
-            vertices=vertices,
-            default_grid=grid,
+            vertices=grid_vertices,
             mesh=delaunay_mesh,
             name=sample_path[:-5],
         )
 
-    return n_document_points, vertices, delaunay_mesh, mesh_steps, grid_marks
+    return (
+        grid_vertices,
+        delaunay_mesh,
+        mesh_steps,
+        grid_marks,
+        document_points,
+    )
 
 
 def create_mesh_object(
-    n_bboxes_vertices: int,
     vertices: np.array,
     mesh: Delaunay,
     properties: dict,
@@ -147,13 +148,6 @@ def create_mesh_object(
     # Fill the mesh data block with the vertices and faces
     mesh_data.from_pydata(three_d_vertices, [], faces)
     mesh_data.update()
-
-    # Create a group so we can easily track vertices later
-    bboxes_vertices_group = mesh_obj.vertex_groups.new(name="bboxes_v_group")
-    # We take advantage of the order of indices in "vertices": first those related to
-    # word bounding boxes, followed by the rest (grid)
-    indices_selection = [index for index in range(n_bboxes_vertices)]
-    bboxes_vertices_group.add(indices_selection, 1.0, "ADD")
 
     # Update the scene
     bpy.context.view_layer.update()
@@ -550,15 +544,10 @@ def config_camera(camera_data: dict):
             }
     """
 
-    # Make sure a camera object exists
-    # if not bpy.data.objects.get("Camera"):
-    #     bpy.ops.object.camera_add()
-
     # Create a new camera
     bpy.ops.object.camera_add()
     camera = bpy.context.active_object
     camera.name = "Document_camera"
-    # camera = bpy.data.objects["Camera"]
 
     # Compute camera location
     pos = compute_pos(pos_data=camera_data["pos_meters"])
@@ -579,7 +568,6 @@ def config_camera(camera_data: dict):
     # Set location and rotation
     camera.location = (pos[0], pos[1], pos[2])
     camera.rotation_euler = (rot_x, rot_y, rot_z)
-    print("\n\nCamera:", camera.rotation_euler)
 
 
 def config_lights(lights_data: dict):
@@ -720,48 +708,14 @@ def retrieve_bboxes_pixel_points(img: np.array, mesh_name: str, mapped_ids):
     doc_object = bpy.data.objects[obj_name]
     world_location = doc_object.location
 
-    bbox_vertices_indices = get_vertices_id_from_group(
-        object_name="Document", group_name="bboxes_v_group"
-    )
-
     mesh = bpy.data.meshes[mesh_name]
-
-    # TODO
-    # num_vertices = len(mesh.vertices)
-    # print(f"Vertices num: {num_vertices}")
-    # scene = bpy.context.scene
-    # for obj in scene.objects:
-    #     if obj.type == "MESH":
-    #         print(f"{obj.name}: {len(obj.data.vertices)}")
-    # TODO
-
     vertices_px = []
 
     # Bboxes vertices: transform 3D world coordinates to 2D pixel coordinates
-
-    if MERGE_BBX_PTS_TO_GRID and REMAPPED:
-        for word in mapped_ids:
-            for corner in word:
-                vertex_id = corner[1]
-                world_location = mesh.vertices[vertex_id].co
-
-                render_coordinates = bpy_extras.object_utils.world_to_camera_view(
-                    bpy.context.scene, camera, world_location
-                )
-
-                point_x = int(
-                    render_coordinates.x * bpy.context.scene.render.resolution_x
-                )
-                point_y = int(
-                    (1 - render_coordinates.y) * bpy.context.scene.render.resolution_y
-                )
-
-                point = (point_x, point_y)
-                vertices_px.append(point)
-
-    else:
-        for index in bbox_vertices_indices:
-            world_location = mesh.vertices[index].co
+    for word in mapped_ids:
+        for corner in word:
+            vertex_id = corner[1]
+            world_location = mesh.vertices[vertex_id].co
 
             render_coordinates = bpy_extras.object_utils.world_to_camera_view(
                 bpy.context.scene, camera, world_location
@@ -1074,35 +1028,20 @@ def modify_document_mesh(mods_dict: dict):
         move_doc_uppward(z=0.1)
 
 
-def merge_bboxes_points_to_grid(
-    mesh_name: str, mesh_steps: dict, grid_marks: dict, props: dict
+def approx_bboxes_points_to_grid(
+    mesh_steps: dict, grid_marks: dict, document_points: list
 ):
-    bbox_vertices_indices = get_vertices_id_from_group(
-        object_name="Document", group_name="bboxes_v_group"
-    )
-    # num_word_vertices = len(bbox_vertices_indices)
-
-    mesh = bpy.data.meshes[mesh_name]
     words_id_map = []
     bbox_map = []
     word_index = 0
-    num_word_vertices = len(bbox_vertices_indices)
 
-    for index in bbox_vertices_indices:
-        coord_x_px = dhelp.coord_m_to_pixel(mesh.vertices[index].co.x, props)
-        coord_y_px = dhelp.coord_m_to_pixel(mesh.vertices[index].co.y, props)
-        remapped_coord_x_px, index_column = remap_coordinate(
-            coord_x_px, mesh_steps["x"], grid_marks["x"]
-        )
-        remapped_coord_y_px, index_row = remap_coordinate(
-            coord_y_px, mesh_steps["y"], grid_marks["y"]
-        )
-        mesh.vertices[index].co.x = dhelp.coord_pixel_to_m(remapped_coord_x_px, props)
-        mesh.vertices[index].co.y = dhelp.coord_pixel_to_m(remapped_coord_y_px, props)
+    for index, point in enumerate(document_points):
+        coord_x_px = point[0]
+        coord_y_px = point[1]
+        _, index_column = remap_coordinate(coord_x_px, mesh_steps["x"], grid_marks["x"])
+        _, index_row = remap_coordinate(coord_y_px, mesh_steps["y"], grid_marks["y"])
 
-        mapped_index = num_word_vertices + (
-            index_row * len(grid_marks["x"]) + index_column
-        )
+        mapped_index = index_row * len(grid_marks["x"]) + index_column
 
         # Update the mapping
         bbox_map.append((index, mapped_index))
@@ -1233,23 +1172,25 @@ def modify_samples(samples_to_mod_df: pd.DataFrame, blueprint_df: pd.DataFrame):
 
         mods = get_modifications_dict(blueprint_df=blueprint_df, sample=sample)
 
-        n_bboxes_vertices, all_vertices, delaunay_mesh, mesh_sampling, grid_marks = (
-            compute_mesh(sample_path=labels_path, properties=properties)
-        )
+        (
+            grid_vertices,
+            delaunay_mesh,
+            mesh_sampling,
+            grid_marks,
+            document_points,
+        ) = compute_mesh(sample_path=labels_path, properties=properties)
 
         mesh_name = "".join([sample[1], "_", datetime.now().isoformat()])
         create_mesh_object(
-            n_bboxes_vertices=n_bboxes_vertices,
-            vertices=all_vertices,
+            vertices=grid_vertices,
             mesh=delaunay_mesh,
             properties=properties,
             mesh_name=mesh_name,
         )
 
-        if MERGE_BBX_PTS_TO_GRID:
-            bboxes_mapped_ids = merge_bboxes_points_to_grid(
-                mesh_name, mesh_sampling, grid_marks, properties
-            )
+        bboxes_mapped_ids = approx_bboxes_points_to_grid(
+            mesh_sampling, grid_marks, document_points
+        )
 
         # Textures
         apply_document_texture(document=img_path, mods_dict=mods)
