@@ -4,6 +4,10 @@
         "a4_pixel_dims": {
             "width": 1654,
             "height": 2339
+        },
+        "grid_sampling": {
+            "x": 25,
+            "y": 25
         }
     },
     "blender": {
@@ -19,11 +23,11 @@
                 },
                 "rot_degrees": {
                     "x": 0,
-                    "dx": 1,
+                    "dx": 0,
                     "y": 0,
-                    "dy": 4,
+                    "dy": 0,
                     "z": 180,
-                    "dz": 5
+                    "dz": 0
                 }
             },
             "lights": {

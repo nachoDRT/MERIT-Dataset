@@ -81,7 +81,7 @@ def load_requirements(root: str):
     return read_json(requiremetns_path)
 
 
-def draw_point(img: np.array, point: tuple, color: tuple):
+def draw_point(img: np.array, point: tuple, color: tuple, r: int = 1):
     """
     Draw a point on a given image using OpenCV.
 
@@ -93,14 +93,23 @@ def draw_point(img: np.array, point: tuple, color: tuple):
         img (np.array): A np array (image) on which the point will be drawn.
         point (tuple): A tuple with (x, y) coordinates of the point to be drawn.
         color (tuple): A BGR color.
+        r (float): The circle radio
 
     Returns:
         np.array: The input image with the point drawn on it.
     """
     x, y = point
-    img_with_point = cv2.circle(img, (x, y), 2, color, -1)
+    img_with_point = cv2.circle(img, (x, y), r, color, -1)
 
     return img_with_point
+
+
+def draw_mesh_points(img: np.array, pts: list, color: tuple, r: float) -> np.array:
+
+    for pt in pts:
+        img = draw_point(img, pt, color, r)
+
+    return img
 
 
 def draw_bboxes(
