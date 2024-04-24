@@ -324,7 +324,7 @@ def apply_document_texture(document: str, mods_dict: dict):
     mix_rgb_node.inputs[0].default_value = 1.0
     mapping_node = nodes.new(type="ShaderNodeMapping")
     mapping_node.inputs["Location"].default_value[0] = -0.001
-    mapping_node.inputs["Location"].default_value[1] = random.uniform(0, 0.005)
+    # mapping_node.inputs["Location"].default_value[1] = random.uniform(0, 0.005)
     mapping_node.inputs["Scale"].default_value[0] = 1.415
     mapping_node.inputs["Scale"].default_value[1] = 1
     mapping_node.inputs["Rotation"].default_value[2] = math.radians(0)
@@ -582,12 +582,13 @@ def config_lights(lights_data: dict):
     """
 
     # TODO Random light style
-    n_lights = lights_data["number"]
+    n_max_lights = lights_data["number"]
+    n_lights = random.randint(1, n_max_lights)
 
     for light_i in range(n_lights):
         # Create a new light datablock
         light = bpy.data.lights.new(name=f"Light_{light_i}", type="POINT")
-        light.energy = lights_data["power"]
+        light.energy = random.randint(lights_data["power"][0], lights_data["power"][1])
         light.diffuse_factor = lights_data["diffuse"]
         light.specular_factor = lights_data["specular"]
         light.shadow_soft_size = lights_data["radius"]
@@ -1176,9 +1177,32 @@ def cast_shadow(mods_dict: dict):
         y = random.uniform(0.8, 1)
         z_angle = random.uniform(-30, 30)
 
-        # Change its position and rotation
-        obj.location = (x, y, -0.84)
+        # Change its body position and rotation, and articulation rotations
+        obj.location = (x, y, -0.64)
         obj.rotation_euler = (math.radians(90), 0, math.radians(z_angle))
+        move_articulations_shadow_caster()
+
+
+def move_articulations_shadow_caster():
+    obj = bpy.data.objects["rigged_male_body"]
+    bones_data = {
+        "mixamorig:Spine1": [["X"], [60]],
+        "mixamorig:LeftArm": [["Z", "X"], [100, -60]],
+        "mixamorig:RightArm": [["Z", "X"], [-100, -60]],
+    }
+    bpy.context.view_layer.objects.active = obj
+    bpy.ops.object.mode_set(mode="POSE")
+
+    for bone_name, bone_data in bones_data.items():
+        bone = obj.pose.bones[bone_name]
+        bone.rotation_mode = "XYZ"
+
+        for i, bone_axis in enumerate(bone_data[0]):
+            angle = bone_data[1][i] + random.randint(-5, 5)
+            bone.rotation_euler.rotate_axis(bone_axis, math.radians(angle))
+            bone.keyframe_insert(data_path="rotation_euler", frame=1)
+
+    bpy.ops.object.mode_set(mode="OBJECT")
 
 
 def set_lighting_syle(mods_dict):
