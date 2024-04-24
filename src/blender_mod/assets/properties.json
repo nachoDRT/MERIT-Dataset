@@ -130,13 +130,11 @@
         },
         "background_objects": [
             "book",
+            "charger",
             "christmas_cards",
             "keyboard",
-            "keys",
-            "mail",
             "mobile",
             "pencil",
-            "ps5_game",
             "stabilo",
             "tablet"
         ]
