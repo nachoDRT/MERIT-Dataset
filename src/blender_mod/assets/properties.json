@@ -5,9 +5,13 @@
             "width": 1654,
             "height": 2339
         },
+        "a4_m_dims": {
+            "width": 0.21,
+            "height": 0.297
+        },
         "grid_sampling": {
-            "x": 25,
-            "y": 25
+            "x": 15,
+            "y": 15
         }
     },
     "blender": {
@@ -23,11 +27,11 @@
                 },
                 "rot_degrees": {
                     "x": 0,
-                    "dx": 0,
+                    "dx": 1,
                     "y": 0,
-                    "dy": 0,
+                    "dy": 4,
                     "z": 180,
-                    "dz": 0
+                    "dz": 5
                 }
             },
             "lights": {

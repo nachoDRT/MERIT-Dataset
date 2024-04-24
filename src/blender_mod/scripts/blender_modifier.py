@@ -1,18 +1,19 @@
 import bpy
-import numpy as np
-from scipy.spatial import Delaunay
 import sys
 import os
 import math
 import colorsys
-from pathlib import Path
 import random
 import bpy_extras
 import cv2
 import copy
-import pandas as pd
 import tqdm
 import bmesh
+import numpy as np
+import pandas as pd
+from pathlib import Path
+from scipy.spatial import Delaunay
+from typing import Tuple
 from mathutils import Vector
 from datetime import datetime
 
@@ -323,6 +324,7 @@ def apply_document_texture(document: str, mods_dict: dict):
     mix_rgb_node.inputs[0].default_value = 1.0
     mapping_node = nodes.new(type="ShaderNodeMapping")
     mapping_node.inputs["Location"].default_value[0] = -0.001
+    mapping_node.inputs["Location"].default_value[1] = random.uniform(0, 0.005)
     mapping_node.inputs["Scale"].default_value[0] = 1.415
     mapping_node.inputs["Scale"].default_value[1] = 1
     mapping_node.inputs["Rotation"].default_value[2] = math.radians(0)
@@ -962,13 +964,63 @@ def import_background_object(mods_dict: dict):
         obj.select_set(True)
 
         # Tune pos/rot data
-        x = random.uniform(-0.1, 0.2)
-        y = random.uniform(-0.1, 0.3)
+        x, y = compute_background_object_pos()
+        # x = random.uniform(-0.1, 0.2)
+        # y = random.uniform(-0.1, 0.3)
         z_angle = random.uniform(0, 360)
 
         # Change its position and rotation
         obj.location = (x, y, 0)
         obj.rotation_euler = (0, 0, math.radians(z_angle))
+
+
+def compute_background_object_pos() -> Tuple[float, float]:
+    """A method to get 'x' and 'y' background object position exactly in the contour of
+    the document.
+
+    Returns:
+        Tuple[float, float]: x and y coordinates of the background object.
+    """
+
+    # Get paper dimensions in m
+    width_m = properties["delaunay"]["a4_m_dims"]["width"]
+    height_m = properties["delaunay"]["a4_m_dims"]["height"]
+
+    # Compute the corner equivalent positions in a straight line
+    corner_1 = width_m
+    corner_2 = width_m + height_m
+    corner_3 = 2 * width_m + height_m
+    length = 2 * height_m + 2 * width_m
+
+    # Define segments
+    segments = [corner_1, corner_2, corner_3, length]
+
+    # Get the position in the contour
+    pos = random.uniform(0, length)
+
+    for i, segment_limit in enumerate(segments):
+        if pos < segment_limit:
+            break
+
+    # Compute for the different cases
+    if i == 0:
+        x = corner_1 - pos
+        y = 0
+    elif i == 1:
+        x = width_m
+        y = corner_2 - pos
+    elif i == 2:
+        x = width_m - (corner_3 - pos)
+        y = height_m
+    else:
+        x = 0
+        y = height_m - (length - pos)
+
+    # Add some noise
+    x += random.uniform(-0.015, 0.015)
+    y += random.uniform(-0.015, 0.015)
+
+    return x, y
 
 
 def get_modifications_dict(blueprint_df: pd.DataFrame, sample: str) -> dict:
