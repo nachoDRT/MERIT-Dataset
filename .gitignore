@@ -29,7 +29,6 @@ src/dashboard/__pycache__
 src/dashboard/dataset_blueprint.csv
 src/dashboard/.~lock.dataset_blueprint.csv#
 src/dashboard/dataset_blueprint_29K.csv
-src/blender_mod/mod.blend
 src/blender_mod/mod.blend1
 src/blender_mod/scripts/__pycache__
 src/blender_mod/assets/textures/backgrounds/white_oak

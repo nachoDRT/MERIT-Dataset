@@ -325,7 +325,7 @@ def apply_document_texture(document: str, mods_dict: dict):
     mapping_node.inputs["Location"].default_value[0] = -0.001
     mapping_node.inputs["Scale"].default_value[0] = 1.415
     mapping_node.inputs["Scale"].default_value[1] = 1
-    mapping_node.inputs["Rotation"].default_value[2] = math.radians(180)
+    mapping_node.inputs["Rotation"].default_value[2] = math.radians(0)
     coord_node = nodes.new(type="ShaderNodeTexCoord")
     principled_node = nodes.new(type="ShaderNodeBsdfPrincipled")
     principled_node.inputs["Specular"].default_value = 0.1
@@ -915,7 +915,7 @@ def run_cloth_sim():
     # cloth_modifier.collision_settings.self_distance_min = 0.001
 
     # Run the simulation step by step to obtain a proper deformed mesh
-    bpy.context.scene.frame_end = 75
+    bpy.context.scene.frame_end = 90
     for frame in range(1, bpy.context.scene.frame_end + 1):
         bpy.context.scene.frame_set(frame)
 
@@ -1042,11 +1042,11 @@ def modify_document_mesh(mods_dict: dict):
         and mods_dict["rendering_style"] != "scanner"
     ):
 
-        change_object_height(obj_name="Document", height=0.025)
+        change_object_height(obj_name="Document", height=0.03)
         prepare_doc_4_cloth_sim()
         run_cloth_sim()
         change_object_height(obj_name="Document", height=0)
-        change_objects_height_except("Document", -0.025)
+        change_objects_height_except("Document", -0.03)
 
     elif mods_dict["rendering_style"] == "scanner":
         change_object_height(obj_name="Document", height=0.0001)
