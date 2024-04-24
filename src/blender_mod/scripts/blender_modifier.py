@@ -327,7 +327,7 @@ def apply_document_texture(document: str, mods_dict: dict):
     # mapping_node.inputs["Location"].default_value[1] = random.uniform(0, 0.005)
     mapping_node.inputs["Scale"].default_value[0] = 1.415
     mapping_node.inputs["Scale"].default_value[1] = 1
-    mapping_node.inputs["Rotation"].default_value[2] = math.radians(0)
+    mapping_node.inputs["Rotation"].default_value[2] = math.radians(180)
     coord_node = nodes.new(type="ShaderNodeTexCoord")
     principled_node = nodes.new(type="ShaderNodeBsdfPrincipled")
     principled_node.inputs["Specular"].default_value = 0.1
@@ -1174,11 +1174,11 @@ def cast_shadow(mods_dict: dict):
 
         # Tune pos/rot data
         x = random.uniform(-0.1, 0.4)
-        y = random.uniform(0.8, 1)
-        z_angle = random.uniform(-30, 30)
+        y = random.uniform(0.80, 0.85)
+        z_angle = random.uniform(-15, 15)
 
         # Change its body position and rotation, and articulation rotations
-        obj.location = (x, y, -0.64)
+        obj.location = (x, y, -0.725)
         obj.rotation_euler = (math.radians(90), 0, math.radians(z_angle))
         move_articulations_shadow_caster()
 
@@ -1256,10 +1256,46 @@ def set_lighting_syle(mods_dict):
         bpy.context.view_layer.update()
 
 
+def delete_elements():
+    """Delete elements in the scene as objects, lights, cameras, etc."""
+    if bpy.context.active_object is not None:
+        bpy.ops.object.mode_set(mode="OBJECT")
+
+    bpy.ops.object.select_all(action="SELECT")
+    bpy.ops.object.delete()
+
+    for mesh in bpy.data.meshes:
+        bpy.data.meshes.remove(mesh)
+
+    for light in bpy.data.lights:
+        bpy.data.lights.remove(light)
+
+    for camera in bpy.data.cameras:
+        bpy.data.cameras.remove(camera)
+
+    for armature in bpy.data.armatures:
+        bpy.data.armatures.remove(armature)
+
+    for img in bpy.data.images:
+        bpy.data.images.remove(img)
+
+    delete_collections()
+
+
+def delete_collections():
+    scene_collections = list(bpy.context.scene.collection.children)
+    for coll in bpy.data.collections[:]:
+        for obj in coll.objects:
+            bpy.data.objects.remove(obj)
+        if coll not in scene_collections:
+            bpy.data.collections.remove(coll)
+
+
 def modify_samples(samples_to_mod_df: pd.DataFrame, blueprint_df: pd.DataFrame):
     for sample in tqdm.tqdm(samples_to_mod_df["file_name"].items()):
-        bpy.ops.object.select_all(action="SELECT")
-        bpy.ops.object.delete()
+        # Delete elements from previous iterations
+        delete_elements()
+
         (
             img_path,
             labels_path,
@@ -1361,6 +1397,7 @@ def modify_samples(samples_to_mod_df: pd.DataFrame, blueprint_df: pd.DataFrame):
         # Delete every object in the scene
         bpy.ops.object.select_all(action="SELECT")
         bpy.ops.object.delete()
+        delete_elements()
 
         # Update blueprint
         blueprint_df.loc[
