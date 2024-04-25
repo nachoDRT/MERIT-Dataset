@@ -897,8 +897,7 @@ def change_object_height(obj_name: str, height: float):
     obj.location.z = height
 
 
-def compute_skewness(obj: bpy.data.objects):
-    print("Computing mesh skewness")
+def compute_surface_skewness(obj: bpy.types.Object):
 
     bpy.context.view_layer.objects.active = obj
     bpy.ops.object.mode_set(mode="EDIT")
@@ -928,8 +927,53 @@ def compute_skewness(obj: bpy.data.objects):
         sum(smoothness_scores) / len(smoothness_scores) if smoothness_scores else 0
     )
 
-    print(f"Mesh skewness: {average_dev_skewness}")
     return average_dev_skewness
+
+
+def compute_surface_waviness(obj: bpy.types.Object):
+
+    bpy.context.view_layer.objects.active = obj
+    bpy.ops.object.mode_set(mode="EDIT")
+    bpy.ops.mesh.select_all(action="DESELECT")
+    bpy.ops.object.mode_set(mode="OBJECT")
+
+    mesh = bmesh.new()
+    mesh.from_mesh(obj.data)
+    mesh.verts.ensure_lookup_table()
+
+    # Compute the waviness for every vertex
+    waviness = [calculate_mean_waviness(vert) for vert in mesh.verts]
+
+    # Compute the average as the waviness mesh KPI
+    mean_waviness = sum(waviness) / len(waviness) if waviness else 0
+    mesh.free()
+
+    return mean_waviness
+
+
+def calculate_mean_waviness(vert):
+    linked_faces = vert.link_faces
+
+    # In case we encounter a border
+    if len(linked_faces) < 2:
+        return 0.0
+
+    total_waviness = 0.0
+    count = 0
+
+    # Compute the angle between two adjacent faces
+    for i, face in enumerate(linked_faces):
+        for j in range(i + 1, len(linked_faces)):
+            face2 = linked_faces[j]
+            angle = math.acos(max(-1.0, min(1.0, face.normal.dot(face2.normal))))
+            angle = math.degrees(angle)
+            total_waviness += angle
+            count += 1
+
+    # Waviness is approx. to the mean value
+    mean_waviness = total_waviness / count if count > 0 else 0.0
+
+    return mean_waviness
 
 
 def run_cloth_sim():
@@ -990,8 +1034,11 @@ def run_cloth_sim():
     # Smooth the mesh
     bpy.ops.object.shade_smooth()
 
-    # Compute skewness
-    compute_skewness(obj)
+    # Compute skewness and waviness
+    skewness = compute_surface_skewness(obj)
+    waviness = compute_surface_waviness(obj)
+
+    return skewness, waviness
 
 
 def import_background_object(mods_dict: dict):
@@ -1145,6 +1192,8 @@ def change_objects_height_except(object_name: str, height: float):
 
 def modify_document_mesh(mods_dict: dict):
 
+    mesh_data = {"skewness": 0, "waviness": 0}
+
     if (
         mods_dict["modify_mesh"]
         and mods_dict["modify_mesh"] != "N/A"
@@ -1153,12 +1202,14 @@ def modify_document_mesh(mods_dict: dict):
 
         change_object_height(obj_name="Document", height=0.03)
         prepare_doc_4_cloth_sim()
-        run_cloth_sim()
+        mesh_data["skewness"], mesh_data["waviness"] = run_cloth_sim()
         change_object_height(obj_name="Document", height=0)
         change_objects_height_except("Document", -0.03)
 
     elif mods_dict["rendering_style"] == "scanner":
         change_object_height(obj_name="Document", height=0.0001)
+
+    return mesh_data
 
 
 def approx_bboxes_points_to_grid(
@@ -1314,6 +1365,7 @@ def set_lighting_syle(mods_dict):
 
 def delete_elements():
     """Delete elements in the scene as objects, lights, cameras, etc."""
+
     if bpy.context.active_object is not None:
         bpy.ops.object.mode_set(mode="OBJECT")
 
@@ -1334,6 +1386,9 @@ def delete_elements():
 
     for material in bpy.data.materials:
         bpy.data.materials.remove(material)
+
+    for action in bpy.data.actions:
+        bpy.data.actions.remove(action)
 
     for img in bpy.data.images:
         if img.name != "Render Result":
@@ -1407,7 +1462,7 @@ def modify_samples(samples_to_mod_df: pd.DataFrame, blueprint_df: pd.DataFrame):
         config_camera(camera_data=camera_data)
 
         # Modify Document Mesh
-        modify_document_mesh(mods_dict=mods)
+        mesh_data = modify_document_mesh(mods_dict=mods)
 
         # Cast shadow
         cast_shadow(mods_dict=mods)
