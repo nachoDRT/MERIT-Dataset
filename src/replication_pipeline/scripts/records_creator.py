@@ -54,6 +54,11 @@ def compute_pos_from_map(map: np.array):
 
     x, y, _ = np.unravel_index(choice, probs.shape)
 
+    # TODO Maps are positioned a little too low. As a temporal mesurement, we offset
+    # the 'y' coordinate. Alternatives: modify the transparent superposition method
+    # 'add_transparent_image()' or modify all the signature and stamping maps
+    y -= 300
+
     return x, y
 
 

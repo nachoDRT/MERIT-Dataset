@@ -332,7 +332,7 @@ def compute_origins_distributions(reqs: dict) -> list:
                 cum_weights.append(1)
             else:
                 cum_weights.append(last_weight + weight)
-                last_weight = weight
+                last_weight += weight
 
         cum_weights = [round(weight, 1) for weight in cum_weights]
         # The distribtuion for the considered main language

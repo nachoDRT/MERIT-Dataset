@@ -108,7 +108,7 @@
                         "layout": "model_a_single_column"
                     }
                 },
-                "include": false
+                "include": true
             },
             "eng_2": {
                 "nickname": "pinnacle",
@@ -151,7 +151,7 @@
                         "layout": "model_a_single_column"
                     }
                 },
-                "include": false
+                "include": true
             },
             "eng_3": {
                 "nickname": "whitney",
@@ -187,7 +187,7 @@
                         "layout": "model_a_single_column"
                     }
                 },
-                "include": false
+                "include": true
             },
             "eng_4": {
                 "nickname": "james",
@@ -216,7 +216,7 @@
                         "layout": "model_b_three_tables"
                     }
                 },
-                "include": false
+                "include": true
             },
             "eng_5": {
                 "nickname": "freefields",
@@ -259,7 +259,7 @@
                         "layout": "model_a_double_column"
                     }
                 },
-                "include": false
+                "include": true
             },
             "eng_6": {
                 "nickname": "salesianum",
@@ -417,7 +417,7 @@
                         "layout": "model_a_single_column"
                     }
                 },
-                "include": false
+                "include": true
             },
             "esp_2": {
                 "nickname": "britanico",
@@ -460,7 +460,7 @@
                         "layout": "model_a_single_column"
                     }
                 },
-                "include": false
+                "include": true
             },
             "esp_3": {
                 "nickname": "deus",
@@ -496,7 +496,7 @@
                         "layout": "model_a_single_column"
                     }
                 },
-                "include": false
+                "include": true
             },
             "esp_4": {
                 "nickname": "monterraso",
@@ -532,7 +532,7 @@
                         "layout": "model_a_single_column"
                     }
                 },
-                "include": false
+                "include": true
             },
             "esp_5": {
                 "nickname": "aletamar",
@@ -568,7 +568,7 @@
                         "layout": "model_a_single_column"
                     }
                 },
-                "include": false
+                "include": true
             },
             "esp_6": {
                 "nickname": "lusitano",
@@ -604,7 +604,7 @@
                         "layout": "model_a_single_column"
                     }
                 },
-                "include": false
+                "include": true
             },
             "esp_7": {
                 "nickname": "patria",
@@ -647,11 +647,11 @@
                         "layout": "model_a_single_column"
                     }
                 },
-                "include": false
+                "include": true
             }
         }
     },
-    "blender_modified": 0.75,
+    "blender_modified": 1,
     "female_proportion": 0.5,
     "male_proportion": 0.5,
     "font_path": "/home/msi/.config/Ultralytics/Arial.ttf",
@@ -659,44 +659,49 @@
         "english": {
             "english": {
                 "proportion": 70.0,
-                "average": 5,
-                "deviation": 1
+                "average": 6.8,
+                "deviation": 2
             },
             "spanish": {
                 "proportion": 10.0,
-                "average": 7,
-                "deviation": 1
+                "average": 4.60,
+                "deviation": 2
             },
             "chinese": {
                 "proportion": 10.0,
-                "average": 8,
-                "deviation": 1
+                "average": 7.56,
+                "deviation": 2
             },
             "indian": {
                 "proportion": 10.0,
-                "average": 7,
-                "deviation": 1
+                "average": 4.36,
+                "deviation": 2
             }
         },
         "spanish": {
             "spanish": {
-                "proportion": 77.0,
-                "average": 5,
-                "deviation": 1
+                "proportion": 70.0,
+                "average": 6.54,
+                "deviation": 2
             },
             "arabic": {
-                "proportion": 23.0,
-                "average": 7,
-                "deviation": 1
+                "proportion": 20.0,
+                "average": 4.56,
+                "deviation": 2
+            },
+            "subsaharian_africa": {
+                "proportion": 10.0,
+                "average": 4.06,
+                "deviation": 2
             }
         }
     },
     "female_bias_distribution": {
-        "average": 9,
-        "deviation": 0.61
+        "average": 6.60,
+        "deviation": 2
     },
     "male_bias_distribution": {
-        "average": 1,
-        "deviation": 0.61
+        "average": 6.50,
+        "deviation": 2
     }
 }

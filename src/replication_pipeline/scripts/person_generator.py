@@ -186,7 +186,7 @@ class Person:
                         ]
                     )
                     grade = np.random.multivariate_normal(mean, cov)
-                    grade = 0.5 * grade[0] + 0.5 * grade[1]
+                    grade = 0.75 * grade[0] + 0.25 * grade[1]
                     grade = remap_grade_to_educative_system(
                         grade, academic_system, requirements, grade_decimals
                     )
