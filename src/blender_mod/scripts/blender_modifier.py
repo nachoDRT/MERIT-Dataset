@@ -1515,10 +1515,25 @@ def modify_samples(samples_to_mod_df: pd.DataFrame, blueprint_df: pd.DataFrame):
         delete_elements()
 
         # Update blueprint
-        blueprint_df.loc[
-            blueprint_df["file_name"] == sample[1], "modification_done"
-        ] = True
-        blueprint_df.to_csv(blueprint_path, index=False)
+        update_blueprint(blueprint_df, sample[1], mesh_data)
+
+
+def update_blueprint(dp_df: pd.DataFrame, sample_name: str, mesh_data: dict):
+    """Update the blueprint with relevant information of the modification process for
+    a given sample
+
+    Args:
+        dp_df (pd.DataFrame): The blueprint dataframe
+        sample_name (str): The modified sample name
+        mesh_data (dict): The mesh geometry data
+    """
+    # Update the KPIs of the mesh
+    dp_df.loc[dp_df["file_name"] == sample_name, "skewness"] = mesh_data["skewness"]
+    dp_df.loc[dp_df["file_name"] == sample_name, "waviness"] = mesh_data["waviness"]
+
+    # Update the sample modification check
+    dp_df.loc[dp_df["file_name"] == sample_name, "modification_done"] = True
+    dp_df.to_csv(blueprint_path, index=False)
 
 
 if __name__ == "__main__":
