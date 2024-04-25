@@ -756,12 +756,68 @@ def retrieve_bboxes_pixel_points(img: np.array, mesh_name: str, mapped_ids):
     # One bbox is defined by 4 points
     for i in range(0, len(vertices_px), 4):
         rect_points = np.array(list(vertices_px[i : i + 4]), dtype=np.int32)
+        rect_points = check_bbox_area(rect_points)
+        rect_points = check_bbox_in_rendering_area(rect_points)
         rectangles.append(rect_points)
 
     img = ghelp.draw_mesh_points(img=img, pts=all_vertices_px, color=(255, 0, 0), r=2)
     img = ghelp.draw_bboxes(img=img, rectangles=rectangles, color=(0, 255, 0))
 
     return rectangles, img
+
+
+def check_bbox_area(points: np.array) -> np.array:
+    """Check (and modify if needed) that a bbox has area != 0. Bboxes with area = 0 are
+    a possibility if meshes are too coarse (since bbox vertices are mapped to grid verti
+    ces)
+
+    Args:
+        points (np.array): The four vertices (x,y) defining a bbox.
+
+    Returns:
+        np.array: The (modified) four vertices (x,y) defining a bbox.
+    """
+    box_width = points[3][0] - points[0][0]
+    box_height = points[1][1] - points[0][1]
+
+    if box_width == 0:
+        points[2][0] += 10
+        points[3][0] += 10
+    if box_height == 0:
+        points[1][1] += 10
+        points[2][1] += 10
+
+    return points
+
+
+def check_bbox_in_rendering_area(points: np.array) -> np.array:
+    """Check that any point is inside the rendering area (img dimensions)
+
+    Args:
+        points (np.array): The four vertices (x,y) defining a bbox.
+
+    Returns:
+        np.array: The (modified) four vertices (x,y) defining a bbox.
+    """
+
+    x_limit = requirements["img_output"]["height"]
+    y_limit = requirements["img_output"]["width"]
+
+    for point in points:
+
+        # Check 'x' value
+        if point[0] < 0:
+            point[0] = 0
+        elif point[0] > x_limit:
+            point[0] = x_limit
+
+        # Check 'y' value
+        if point[1] < 0:
+            point[1] = 0
+        elif point[1] > y_limit:
+            point[1] = y_limit
+
+    return points
 
 
 def get_blueprint():
@@ -1276,8 +1332,12 @@ def delete_elements():
     for armature in bpy.data.armatures:
         bpy.data.armatures.remove(armature)
 
+    for material in bpy.data.materials:
+        bpy.data.materials.remove(material)
+
     for img in bpy.data.images:
-        bpy.data.images.remove(img)
+        if img.name != "Render Result":
+            bpy.data.images.remove(img)
 
     delete_collections()
 
