@@ -5,6 +5,10 @@
             "width": 1654,
             "height": 2339
         },
+        "a4_m_dims": {
+            "width": 0.21,
+            "height": 0.297
+        },
         "grid_sampling": {
             "x": 25,
             "y": 25
@@ -23,29 +27,32 @@
                 },
                 "rot_degrees": {
                     "x": 0,
-                    "dx": 0,
+                    "dx": 1,
                     "y": 0,
-                    "dy": 0,
+                    "dy": 4,
                     "z": 180,
-                    "dz": 0
+                    "dz": 5
                 }
             },
             "lights": {
-                "number": 1,
+                "number": 4,
                 "pos_meters": {
-                    "x": 0.105,
-                    "dx": 0.1,
-                    "y": 0.01485,
-                    "dy": 0.2,
-                    "z": 0.2,
-                    "dz": 0.05
+                    "x": 0.1,
+                    "dx": 0.55,
+                    "y": 0.55,
+                    "dy": 0.5,
+                    "z": 0.8,
+                    "dz": 0.2
                 },
                 "color": {
                     "hue": 0.618,
                     "saturation": 0.557,
                     "value": 0.7
                 },
-                "power": 100,
+                "power": [
+                    2500,
+                    5000
+                ],
                 "diffuse": 0.08,
                 "specular": 0,
                 "radius": 0.13
@@ -126,13 +133,11 @@
         },
         "background_objects": [
             "book",
+            "charger",
             "christmas_cards",
             "keyboard",
-            "keys",
-            "mail",
             "mobile",
             "pencil",
-            "ps5_game",
             "stabilo",
             "tablet"
         ]

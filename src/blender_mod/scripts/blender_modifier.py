@@ -1,18 +1,19 @@
 import bpy
-import numpy as np
-from scipy.spatial import Delaunay
 import sys
 import os
 import math
 import colorsys
-from pathlib import Path
 import random
 import bpy_extras
 import cv2
 import copy
-import pandas as pd
 import tqdm
 import bmesh
+import numpy as np
+import pandas as pd
+from pathlib import Path
+from scipy.spatial import Delaunay
+from typing import Tuple
 from mathutils import Vector
 from datetime import datetime
 
@@ -323,6 +324,7 @@ def apply_document_texture(document: str, mods_dict: dict):
     mix_rgb_node.inputs[0].default_value = 1.0
     mapping_node = nodes.new(type="ShaderNodeMapping")
     mapping_node.inputs["Location"].default_value[0] = -0.001
+    # mapping_node.inputs["Location"].default_value[1] = random.uniform(0, 0.005)
     mapping_node.inputs["Scale"].default_value[0] = 1.415
     mapping_node.inputs["Scale"].default_value[1] = 1
     mapping_node.inputs["Rotation"].default_value[2] = math.radians(180)
@@ -580,12 +582,13 @@ def config_lights(lights_data: dict):
     """
 
     # TODO Random light style
-    n_lights = lights_data["number"]
+    n_max_lights = lights_data["number"]
+    n_lights = random.randint(1, n_max_lights)
 
     for light_i in range(n_lights):
         # Create a new light datablock
         light = bpy.data.lights.new(name=f"Light_{light_i}", type="POINT")
-        light.energy = lights_data["power"]
+        light.energy = random.randint(lights_data["power"][0], lights_data["power"][1])
         light.diffuse_factor = lights_data["diffuse"]
         light.specular_factor = lights_data["specular"]
         light.shadow_soft_size = lights_data["radius"]
@@ -753,12 +756,68 @@ def retrieve_bboxes_pixel_points(img: np.array, mesh_name: str, mapped_ids):
     # One bbox is defined by 4 points
     for i in range(0, len(vertices_px), 4):
         rect_points = np.array(list(vertices_px[i : i + 4]), dtype=np.int32)
+        rect_points = check_bbox_area(rect_points)
+        rect_points = check_bbox_in_rendering_area(rect_points)
         rectangles.append(rect_points)
 
     img = ghelp.draw_mesh_points(img=img, pts=all_vertices_px, color=(255, 0, 0), r=2)
     img = ghelp.draw_bboxes(img=img, rectangles=rectangles, color=(0, 255, 0))
 
     return rectangles, img
+
+
+def check_bbox_area(points: np.array) -> np.array:
+    """Check (and modify if needed) that a bbox has area != 0. Bboxes with area = 0 are
+    a possibility if meshes are too coarse (since bbox vertices are mapped to grid verti
+    ces)
+
+    Args:
+        points (np.array): The four vertices (x,y) defining a bbox.
+
+    Returns:
+        np.array: The (modified) four vertices (x,y) defining a bbox.
+    """
+    box_width = points[3][0] - points[0][0]
+    box_height = points[1][1] - points[0][1]
+
+    if box_width == 0:
+        points[2][0] += 10
+        points[3][0] += 10
+    if box_height == 0:
+        points[1][1] += 10
+        points[2][1] += 10
+
+    return points
+
+
+def check_bbox_in_rendering_area(points: np.array) -> np.array:
+    """Check that any point is inside the rendering area (img dimensions)
+
+    Args:
+        points (np.array): The four vertices (x,y) defining a bbox.
+
+    Returns:
+        np.array: The (modified) four vertices (x,y) defining a bbox.
+    """
+
+    x_limit = requirements["img_output"]["height"]
+    y_limit = requirements["img_output"]["width"]
+
+    for point in points:
+
+        # Check 'x' value
+        if point[0] < 0:
+            point[0] = 0
+        elif point[0] > x_limit:
+            point[0] = x_limit
+
+        # Check 'y' value
+        if point[1] < 0:
+            point[1] = 0
+        elif point[1] > y_limit:
+            point[1] = y_limit
+
+    return points
 
 
 def get_blueprint():
@@ -826,28 +885,19 @@ def get_sample_paths_and_names(sample_name: str):
     )
 
 
-def move_doc_uppward(z: float):
-    obj = bpy.data.objects["Document"]
+def change_object_height(obj_name: str, height: float):
+    """Set a new height for an specific object
+
+    Args:
+        obj_name (str): Object name
+        height (float): New object's height
+    """
+    obj = bpy.data.objects[obj_name]
     bpy.context.view_layer.objects.active = obj
-    bpy.ops.object.select_all(action="DESELECT")
-    obj.select_set(True)
-
-    # Transform mesh triangles to quads where possible
-    bpy.ops.object.mode_set(mode="EDIT")
-    bpy.ops.mesh.select_all(action="SELECT")
-    bpy.ops.mesh.tris_convert_to_quads()
-    bpy.ops.object.mode_set(mode="OBJECT")
-
-    # Solidify the object
-    # solidify_modifier = obj.modifiers.new(name="DocumentSolidifier", type="SOLIDIFY")
-    # solidify_modifier.thickness = 0.001
-
-    # Change its position
-    obj.location.z = z
+    obj.location.z = height
 
 
-def compute_skewness(obj: bpy.data.objects):
-    print("Computing mesh skewness")
+def compute_surface_skewness(obj: bpy.types.Object):
 
     bpy.context.view_layer.objects.active = obj
     bpy.ops.object.mode_set(mode="EDIT")
@@ -877,8 +927,53 @@ def compute_skewness(obj: bpy.data.objects):
         sum(smoothness_scores) / len(smoothness_scores) if smoothness_scores else 0
     )
 
-    print(f"Mesh skewness: {average_dev_skewness}")
     return average_dev_skewness
+
+
+def compute_surface_waviness(obj: bpy.types.Object):
+
+    bpy.context.view_layer.objects.active = obj
+    bpy.ops.object.mode_set(mode="EDIT")
+    bpy.ops.mesh.select_all(action="DESELECT")
+    bpy.ops.object.mode_set(mode="OBJECT")
+
+    mesh = bmesh.new()
+    mesh.from_mesh(obj.data)
+    mesh.verts.ensure_lookup_table()
+
+    # Compute the waviness for every vertex
+    waviness = [calculate_mean_waviness(vert) for vert in mesh.verts]
+
+    # Compute the average as the waviness mesh KPI
+    mean_waviness = sum(waviness) / len(waviness) if waviness else 0
+    mesh.free()
+
+    return mean_waviness
+
+
+def calculate_mean_waviness(vert):
+    linked_faces = vert.link_faces
+
+    # In case we encounter a border
+    if len(linked_faces) < 2:
+        return 0.0
+
+    total_waviness = 0.0
+    count = 0
+
+    # Compute the angle between two adjacent faces
+    for i, face in enumerate(linked_faces):
+        for j in range(i + 1, len(linked_faces)):
+            face2 = linked_faces[j]
+            angle = math.acos(max(-1.0, min(1.0, face.normal.dot(face2.normal))))
+            angle = math.degrees(angle)
+            total_waviness += angle
+            count += 1
+
+    # Waviness is approx. to the mean value
+    mean_waviness = total_waviness / count if count > 0 else 0.0
+
+    return mean_waviness
 
 
 def run_cloth_sim():
@@ -923,7 +1018,7 @@ def run_cloth_sim():
     # cloth_modifier.collision_settings.self_distance_min = 0.001
 
     # Run the simulation step by step to obtain a proper deformed mesh
-    bpy.context.scene.frame_end = 75
+    bpy.context.scene.frame_end = 90
     for frame in range(1, bpy.context.scene.frame_end + 1):
         bpy.context.scene.frame_set(frame)
 
@@ -939,8 +1034,11 @@ def run_cloth_sim():
     # Smooth the mesh
     bpy.ops.object.shade_smooth()
 
-    # Compute skewness
-    compute_skewness(obj)
+    # Compute skewness and waviness
+    skewness = compute_surface_skewness(obj)
+    waviness = compute_surface_waviness(obj)
+
+    return skewness, waviness
 
 
 def import_background_object(mods_dict: dict):
@@ -970,13 +1068,63 @@ def import_background_object(mods_dict: dict):
         obj.select_set(True)
 
         # Tune pos/rot data
-        x = random.uniform(-0.1, 0.2)
-        y = random.uniform(-0.1, 0.3)
+        x, y = compute_background_object_pos()
+        # x = random.uniform(-0.1, 0.2)
+        # y = random.uniform(-0.1, 0.3)
         z_angle = random.uniform(0, 360)
 
         # Change its position and rotation
         obj.location = (x, y, 0)
         obj.rotation_euler = (0, 0, math.radians(z_angle))
+
+
+def compute_background_object_pos() -> Tuple[float, float]:
+    """A method to get 'x' and 'y' background object position exactly in the contour of
+    the document.
+
+    Returns:
+        Tuple[float, float]: x and y coordinates of the background object.
+    """
+
+    # Get paper dimensions in m
+    width_m = properties["delaunay"]["a4_m_dims"]["width"]
+    height_m = properties["delaunay"]["a4_m_dims"]["height"]
+
+    # Compute the corner equivalent positions in a straight line
+    corner_1 = width_m
+    corner_2 = width_m + height_m
+    corner_3 = 2 * width_m + height_m
+    length = 2 * height_m + 2 * width_m
+
+    # Define segments
+    segments = [corner_1, corner_2, corner_3, length]
+
+    # Get the position in the contour
+    pos = random.uniform(0, length)
+
+    for i, segment_limit in enumerate(segments):
+        if pos < segment_limit:
+            break
+
+    # Compute for the different cases
+    if i == 0:
+        x = corner_1 - pos
+        y = 0
+    elif i == 1:
+        x = width_m
+        y = corner_2 - pos
+    elif i == 2:
+        x = width_m - (corner_3 - pos)
+        y = height_m
+    else:
+        x = 0
+        y = height_m - (length - pos)
+
+    # Add some noise
+    x += random.uniform(-0.015, 0.015)
+    y += random.uniform(-0.015, 0.015)
+
+    return x, y
 
 
 def get_modifications_dict(blueprint_df: pd.DataFrame, sample: str) -> dict:
@@ -1000,7 +1148,22 @@ def get_modifications_dict(blueprint_df: pd.DataFrame, sample: str) -> dict:
     return mod_dict
 
 
+def prepare_doc_4_cloth_sim():
+    """Transform mesh triangles into quadrilateral elements"""
+    obj = bpy.data.objects["Document"]
+    bpy.context.view_layer.objects.active = obj
+    bpy.ops.object.mode_set(mode="EDIT")
+    bpy.ops.mesh.select_all(action="SELECT")
+    bpy.ops.mesh.tris_convert_to_quads()
+    bpy.ops.object.mode_set(mode="OBJECT")
+
+
 def hide_elements_except(object_name: str):
+    """Debugging method to hide object an ease the visual debugging process y Blender
+
+    Args:
+        object_name (str): Name of the object that needs to stay visible
+    """
 
     bpy.ops.object.mode_set(mode="OBJECT")
     bpy.ops.object.select_all(action="DESELECT")
@@ -1012,20 +1175,41 @@ def hide_elements_except(object_name: str):
             obj.hide_render = False
 
 
+def change_objects_height_except(object_name: str, height: float):
+    """Change objet height except one
+
+    Args:
+        object_name (str): Name of the object that needs to stay visible
+    """
+
+    bpy.ops.object.mode_set(mode="OBJECT")
+    bpy.ops.object.select_all(action="DESELECT")
+
+    for obj in bpy.context.scene.objects:
+        if obj.name != object_name and obj.type == "MESH":
+            change_object_height(obj.name, height)
+
+
 def modify_document_mesh(mods_dict: dict):
+
+    mesh_data = {"skewness": 0, "waviness": 0}
 
     if (
         mods_dict["modify_mesh"]
         and mods_dict["modify_mesh"] != "N/A"
         and mods_dict["rendering_style"] != "scanner"
     ):
-        move_doc_uppward(z=0.025)
-        run_cloth_sim()
-        move_doc_uppward(z=0)
-        hide_elements_except("Document")
+
+        change_object_height(obj_name="Document", height=0.03)
+        prepare_doc_4_cloth_sim()
+        mesh_data["skewness"], mesh_data["waviness"] = run_cloth_sim()
+        change_object_height(obj_name="Document", height=0)
+        change_objects_height_except("Document", -0.03)
 
     elif mods_dict["rendering_style"] == "scanner":
-        move_doc_uppward(z=0.1)
+        change_object_height(obj_name="Document", height=0.0001)
+
+    return mesh_data
 
 
 def approx_bboxes_points_to_grid(
@@ -1097,12 +1281,35 @@ def cast_shadow(mods_dict: dict):
 
         # Tune pos/rot data
         x = random.uniform(-0.1, 0.4)
-        y = random.uniform(0.8, 1)
-        z_angle = random.uniform(-30, 30)
+        y = random.uniform(0.80, 0.85)
+        z_angle = random.uniform(-15, 15)
 
-        # Change its position and rotation
-        obj.location = (x, y, -0.84)
+        # Change its body position and rotation, and articulation rotations
+        obj.location = (x, y, -0.725)
         obj.rotation_euler = (math.radians(90), 0, math.radians(z_angle))
+        move_articulations_shadow_caster()
+
+
+def move_articulations_shadow_caster():
+    obj = bpy.data.objects["rigged_male_body"]
+    bones_data = {
+        "mixamorig:Spine1": [["X"], [60]],
+        "mixamorig:LeftArm": [["Z", "X"], [100, -60]],
+        "mixamorig:RightArm": [["Z", "X"], [-100, -60]],
+    }
+    bpy.context.view_layer.objects.active = obj
+    bpy.ops.object.mode_set(mode="POSE")
+
+    for bone_name, bone_data in bones_data.items():
+        bone = obj.pose.bones[bone_name]
+        bone.rotation_mode = "XYZ"
+
+        for i, bone_axis in enumerate(bone_data[0]):
+            angle = bone_data[1][i] + random.randint(-5, 5)
+            bone.rotation_euler.rotate_axis(bone_axis, math.radians(angle))
+            bone.keyframe_insert(data_path="rotation_euler", frame=1)
+
+    bpy.ops.object.mode_set(mode="OBJECT")
 
 
 def set_lighting_syle(mods_dict):
@@ -1156,10 +1363,54 @@ def set_lighting_syle(mods_dict):
         bpy.context.view_layer.update()
 
 
+def delete_elements():
+    """Delete elements in the scene as objects, lights, cameras, etc."""
+
+    if bpy.context.active_object is not None:
+        bpy.ops.object.mode_set(mode="OBJECT")
+
+    bpy.ops.object.select_all(action="SELECT")
+    bpy.ops.object.delete()
+
+    for mesh in bpy.data.meshes:
+        bpy.data.meshes.remove(mesh)
+
+    for light in bpy.data.lights:
+        bpy.data.lights.remove(light)
+
+    for camera in bpy.data.cameras:
+        bpy.data.cameras.remove(camera)
+
+    for armature in bpy.data.armatures:
+        bpy.data.armatures.remove(armature)
+
+    for material in bpy.data.materials:
+        bpy.data.materials.remove(material)
+
+    for action in bpy.data.actions:
+        bpy.data.actions.remove(action)
+
+    for img in bpy.data.images:
+        if img.name != "Render Result":
+            bpy.data.images.remove(img)
+
+    delete_collections()
+
+
+def delete_collections():
+    scene_collections = list(bpy.context.scene.collection.children)
+    for coll in bpy.data.collections[:]:
+        for obj in coll.objects:
+            bpy.data.objects.remove(obj)
+        if coll not in scene_collections:
+            bpy.data.collections.remove(coll)
+
+
 def modify_samples(samples_to_mod_df: pd.DataFrame, blueprint_df: pd.DataFrame):
     for sample in tqdm.tqdm(samples_to_mod_df["file_name"].items()):
-        bpy.ops.object.select_all(action="SELECT")
-        bpy.ops.object.delete()
+        # Delete elements from previous iterations
+        delete_elements()
+
         (
             img_path,
             labels_path,
@@ -1211,7 +1462,7 @@ def modify_samples(samples_to_mod_df: pd.DataFrame, blueprint_df: pd.DataFrame):
         config_camera(camera_data=camera_data)
 
         # Modify Document Mesh
-        modify_document_mesh(mods_dict=mods)
+        mesh_data = modify_document_mesh(mods_dict=mods)
 
         # Cast shadow
         cast_shadow(mods_dict=mods)
@@ -1259,15 +1510,30 @@ def modify_samples(samples_to_mod_df: pd.DataFrame, blueprint_df: pd.DataFrame):
         )
 
         # Delete every object in the scene
-        print(a)
         bpy.ops.object.select_all(action="SELECT")
         bpy.ops.object.delete()
+        delete_elements()
 
         # Update blueprint
-        blueprint_df.loc[
-            blueprint_df["file_name"] == sample[1], "modification_done"
-        ] = True
-        blueprint_df.to_csv(blueprint_path, index=False)
+        update_blueprint(blueprint_df, sample[1], mesh_data)
+
+
+def update_blueprint(dp_df: pd.DataFrame, sample_name: str, mesh_data: dict):
+    """Update the blueprint with relevant information of the modification process for
+    a given sample
+
+    Args:
+        dp_df (pd.DataFrame): The blueprint dataframe
+        sample_name (str): The modified sample name
+        mesh_data (dict): The mesh geometry data
+    """
+    # Update the KPIs of the mesh
+    dp_df.loc[dp_df["file_name"] == sample_name, "skewness"] = mesh_data["skewness"]
+    dp_df.loc[dp_df["file_name"] == sample_name, "waviness"] = mesh_data["waviness"]
+
+    # Update the sample modification check
+    dp_df.loc[dp_df["file_name"] == sample_name, "modification_done"] = True
+    dp_df.to_csv(blueprint_path, index=False)
 
 
 if __name__ == "__main__":

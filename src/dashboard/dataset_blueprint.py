@@ -248,7 +248,24 @@ def compute_paper_texture_distribution(rendering_styles) -> list:
         elif style == "scanner":
             papers_texture.append("scanned")
         else:
-            papers_texture.append(random.choice(["wrinkled_paper"]))
+            papers_texture.append(
+                random.choice(
+                    [
+                        "blank",
+                        "blank_grain",
+                        "blank_recycled",
+                        "coffee_stain",
+                        "folded",
+                        "folded_recycled",
+                        "food_stain",
+                        "marker_stain",
+                        "teared",
+                        "wrinkled",
+                        "wrinkled_recycled",
+                        "written_back",
+                    ]
+                )
+            )
 
     return papers_texture
 
