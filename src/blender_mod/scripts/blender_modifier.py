@@ -1193,6 +1193,8 @@ def change_objects_height_except(object_name: str, height: float):
 def modify_document_mesh(mods_dict: dict):
 
     mesh_data = {"skewness": 0, "waviness": 0}
+    print(mods_dict["modify_mesh"])
+    print(mods_dict["rendering_style"])
 
     if (
         mods_dict["modify_mesh"]
@@ -1207,6 +1209,13 @@ def modify_document_mesh(mods_dict: dict):
         change_objects_height_except("Document", -0.03)
 
     elif mods_dict["rendering_style"] == "scanner":
+        change_object_height(obj_name="Document", height=0.0001)
+
+    elif not mods_dict["modify_mesh"] and (
+        mods_dict["rendering_style"] == "natural"
+        or mods_dict["rendering_style"] == "studio"
+        or mods_dict["rendering_style"] == "warm"
+    ):
         change_object_height(obj_name="Document", height=0.0001)
 
     return mesh_data
