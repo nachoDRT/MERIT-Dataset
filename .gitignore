@@ -1,7 +1,5 @@
 terminal_commands.txt
-
-benchmark/original_29k_eng.zip
-benchmark/original_29k
+OOL_dataset.zip
 
 benchmark/layoutlmv2/data
 benchmark/layoutlmv3/data
@@ -27,14 +25,11 @@ data/modified/english
 src/dashboard/__pycache__
 src/dashboard/dataset_blueprint.csv
 src/dashboard/.~lock.dataset_blueprint.csv#
-src/dashboard/dataset_blueprint_29K.csv
 src/blender_mod/mod.blend1
 src/blender_mod/assets/objects/*.blend1
 src/blender_mod/scripts/__pycache__
 src/blender_mod/assets/blender_executable_path.json
 src/replication_pipeline/default
 src/replication_pipeline/scripts/__pycache__
-
-src/blender_mod/assets/objects/blue_stabilo.blend1
 
 benchmark/results/training_results.csv
