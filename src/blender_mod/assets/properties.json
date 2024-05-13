@@ -140,6 +140,16 @@
             "pencil",
             "stabilo",
             "tablet"
+        ],
+        "background_materials": [
+            "blue_tiles",
+            "cream_terrazo",
+            "multicolor_terrazo",
+            "quartzite",
+            "rusted_metal",
+            "white_oak",
+            "white_plastic",
+            "wood_planks"
         ]
     }
 }

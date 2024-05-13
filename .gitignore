@@ -20,7 +20,6 @@ benchmark/layoutlmv2/config/huggingface_logging.json
 benchmark/layoutlmv3/config/huggingface_logging.json
 benchmark/layoutxlm/config/huggingface_logging.json
 
-figs
 data/original/spanish
 data/original/english
 data/modified/spanish

@@ -162,7 +162,7 @@ def plot_grade_violins(dataframe: pd.DataFrame, reqs: json, save_path: str):
             save_path, "".join(["grades_distribution_", language, ".pdf"])
         )
         plt.savefig(plot_save_path, dpi=300, bbox_inches="tight")
-        plt.show()
+        # plt.show()
 
 
 def get_blueprint():
@@ -450,14 +450,16 @@ def plot_rendering_styles_histogram(df: pd.DataFrame, save_path: str, b_props: d
     color_palette = {
         "Scanner": DARK_VIOLET,
         "Natural": DARK_GREEN,
-        "Office": BRIGHT_GREEN,
+        "Studio": BRIGHT_GREEN,
+        "Warm": LIGHT_VIOLET,
         "Non Processed": GREY,
     }
 
     mapping = {
         "scanner": "Scanner",
         "natural": "Natural",
-        "office": "Office",
+        "studio": "Studio",
+        "warm": "Warm",
         np.nan: "Non Processed",
     }
 
@@ -620,17 +622,21 @@ def plot_background_materials_histogram(
     #     color_palette[map.capitalize()] = color"""
 
     # TODO: delete these lines when updated with b_prop
-    mapping = {
-        "white_plastic": "White Plastic",
-        "wood": "Concrete",
-        np.nan: "Non Processed",
-    }
+    mapping = {np.nan: "Non Processed", "False": "No object"}
 
-    color_palette = {
-        "White Plastic": DARK_VIOLET,
-        "Concrete": DARK_GREEN,
-        "Non Processed": GREY,
-    }
+    for object in b_props["blender"]["background_materials"]:
+        mapping[object] = object.replace("_", " ").capitalize()
+
+    color_palette = {"Non Processed": GREY, "No object": GREY}
+
+    for i, map in enumerate(mapping.values()):
+
+        if i % 2 == 0:
+            color = DARK_GREEN
+        else:
+            color = DARK_VIOLET
+
+        color_palette[map.capitalize()] = color
     #
 
     cat_mapped = categories.map(mapping)
@@ -812,4 +818,4 @@ if __name__ == "__main__":
     # Number of samples distribution per names origin, language and gender
     plot_samples_per_name_origin_lang_gender(blueprint_df, save_path)
     # Grade distributions per language, origin and gender
-    # plot_grade_violins(blueprint_df, reqs, save_path)
+    plot_grade_violins(blueprint_df, reqs, save_path)
