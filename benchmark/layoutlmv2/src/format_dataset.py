@@ -125,6 +125,14 @@ def create_zip():
     shutil.make_archive(base_name=save_here, format="zip", root_dir=zip_this)
 
 
+def check_file_name(name: str) -> str:
+    flag = name[-1].isdigit()
+    if flag:
+        return name
+    else:
+        return name[:-12]
+
+
 def gather_files():
     """Gather all the files (stored by language and school) in a common place"""
 
@@ -169,28 +177,35 @@ def gather_files():
                     # Gather annotations
                     for file in tqdm(os.listdir(annotations_path)):
                         file_name = file.split(".")[0]
+                        file_name = check_file_name(file_name)
                         waviness_value = float(
                             blueprint_df.loc[
                                 blueprint_df["file_name"] == file_name, "waviness"
                             ].iloc[0]
                         )
-                        # TODO Check if you want to include the sample based on the waviness
+                        words_out = blueprint_df.loc[
+                            blueprint_df["file_name"] == file_name, "words_out"
+                        ].iloc[0]
                         source_file = os.path.join(annotations_path, file)
                         dest_file = os.path.join(annotations_dir, file)
-                        if waviness_value < MAX_WAVINESS:
+                        if waviness_value < MAX_WAVINESS and not words_out:
                             shutil.move(source_file, dest_file)
 
                     # Gather images
                     for file in tqdm(os.listdir(images_path)):
                         file_name = file.split(".")[0]
+                        file_name = check_file_name(file_name)
                         waviness_value = float(
                             blueprint_df.loc[
                                 blueprint_df["file_name"] == file_name, "waviness"
                             ].iloc[0]
                         )
+                        words_out = blueprint_df.loc[
+                            blueprint_df["file_name"] == file_name, "words_out"
+                        ].iloc[0]
                         source_file = os.path.join(images_path, file)
                         dest_file = os.path.join(images_dir, file)
-                        if waviness_value < MAX_WAVINESS:
+                        if waviness_value < MAX_WAVINESS and not words_out:
                             shutil.move(source_file, dest_file)
             else:
                 pass
