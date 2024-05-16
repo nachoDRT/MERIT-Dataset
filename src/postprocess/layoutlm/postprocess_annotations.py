@@ -122,6 +122,19 @@ def check_bbox(bbox_vertices: list):
     return bbox_flag
 
 
+def inscribed_rect_coords(box_coords: list) -> list:
+
+    x_coords = [box_coords[i] for i in range(0, 8, 2)]
+    y_coords = [box_coords[i + 1] for i in range(0, 8, 2)]
+
+    min_x = min(x_coords)
+    max_x = max(x_coords)
+    min_y = min(y_coords)
+    max_y = max(y_coords)
+
+    return [min_x, min_y, max_x, max_y]
+
+
 def postprocess_bboxes(name: str, data: dict, b_df: pd.DataFrame):
     postprocessed_data = copy.deepcopy(data)
     form = postprocessed_data["form"]
@@ -133,12 +146,13 @@ def postprocess_bboxes(name: str, data: dict, b_df: pd.DataFrame):
         # Process the segment box
         segment_bbox = segment["box"]
 
-        processed_segment_bbox = [
-            segment_bbox[0],
-            segment_bbox[1],
-            segment_bbox[4],
-            segment_bbox[5],
-        ]
+        # processed_segment_bbox = [
+        #     segment_bbox[0],
+        #     segment_bbox[1],
+        #     segment_bbox[4],
+        #     segment_bbox[5],
+        # ]
+        processed_segment_bbox = inscribed_rect_coords(segment_bbox)
 
         segment["box"] = processed_segment_bbox
         segment_flag = check_bbox(segment["box"])
@@ -147,12 +161,13 @@ def postprocess_bboxes(name: str, data: dict, b_df: pd.DataFrame):
         words_flag = False
         for word in segment["words"]:
             word_bbox = word["box"]
-            processed_word_bbox = [
-                word_bbox[0],
-                word_bbox[1],
-                word_bbox[4],
-                word_bbox[5],
-            ]
+            # processed_word_bbox = [
+            #     word_bbox[0],
+            #     word_bbox[1],
+            #     word_bbox[4],
+            #     word_bbox[5],
+            # ]
+            processed_word_bbox = inscribed_rect_coords(word_bbox)
             word["box"] = processed_word_bbox
             # Check that the word is not out of the img
             word_flag = check_bbox(processed_word_bbox)
