@@ -1,11 +1,13 @@
 import json
 import os
 import random
-from typing import List
+import argparse
 import shutil
+import pandas as pd
+from typing import List
 from glob import glob
 from tqdm import tqdm
-import argparse
+from pathlib import Path
 
 LANGUAGE = "english"
 DATASET_FEATURES_JSON = "/app/config/dataset_features.json"
@@ -14,6 +16,8 @@ DATASET_FEATURES_JSON = "/app/config/dataset_features.json"
 ROOT = "/app/data/"
 IMGS_DIR_SUFIX = "/images/"
 ANNOTATIONS_DIR_SUFIX = "/annotations/"
+
+MAX_WAVINESS = 4.5
 
 ASSERT_TOLERANCE = 1e-3
 
@@ -54,9 +58,29 @@ def move_files(file_names, split):
         shutil.move(annotation_src, annotation_dst)
 
 
+def get_blueprint():
+    """
+    Retrieves the dataset blueprint from a CSV file.
+
+    This method builds the path to the CSV blueprint ('dataset_blueprint.csv'),
+    located in the 'dashboard' directory. It then reads the CSV file into a pandas
+    DataFrame.
+
+    Returns:
+        tuple: A tuple containing two elements:
+            - pandas.DataFrame: The DataFrame created from the CSV file.
+            - str: The file path to the CSV file.
+    """
+
+    blueprint_path = "/app/config/dataset_blueprint.csv"
+    blueprint_df = pd.read_csv(blueprint_path)
+
+    return blueprint_df, blueprint_path
+
+
 def split_dataset(partitions: List, fractions: List, test_data: bool = None):
     train_validation_dir = "".join([ROOT, "train-val", IMGS_DIR_SUFIX, "*.png"])
-
+    print("\nSplitting Dataset\n")
     # Obtain the file names
     file_names = [
         os.path.splitext(os.path.basename(x))[0] for x in glob(train_validation_dir)
@@ -89,17 +113,31 @@ def split_dataset(partitions: List, fractions: List, test_data: bool = None):
     files = [train_files, eval_files, test_files]
 
     for files_partition, partition in zip(files, partitions):
+        print(f"{partition.upper()} SAMPLES: {len(files_partition)}")
         move_files(files_partition, "".join([partition, "_data"]))
 
 
 def create_zip():
     zip_this = "/app/data/dataset/"
-    save_here = "/app/data/dataset/"
+    save_here = "/app/data/dataset"
     shutil.make_archive(base_name=save_here, format="zip", root_dir=zip_this)
+
+
+def check_file_name(name: str) -> str:
+    flag = name[-1].isdigit()
+    if flag:
+        return name
+    else:
+        return name[:-12]
 
 
 def gather_files():
     """Gather all the files (stored by language and school) in a common place"""
+    # Read the blueprint and convert waviness values to float
+    blueprint_df, _ = get_blueprint()
+    blueprint_df["waviness"] = (
+        blueprint_df["waviness"].str.replace(",", ".").astype(float)
+    )
 
     # Loop over partitions (train/val and test)
     for partition in tqdm(os.listdir(GATHER_FILES_PATH)):
@@ -121,7 +159,9 @@ def gather_files():
 
                 # Loop over schools
                 for school in tqdm(os.listdir(language_path)):
-                    print(f"Gathering samples for {school} in {language}")
+                    print(
+                        f"Gathering samples for {school.capitalize()} in {language.capitalize()}"
+                    )
                     school_path = os.path.join(language_path, school)
                     annotations_path = os.path.join(
                         school_path, "dataset_output", "annotations"
@@ -130,15 +170,37 @@ def gather_files():
 
                     # Gather annotations
                     for file in tqdm(os.listdir(annotations_path)):
+                        file_name = file.split(".")[0]
+                        file_name = check_file_name(file_name)
+                        waviness_value = float(
+                            blueprint_df.loc[
+                                blueprint_df["file_name"] == file_name, "waviness"
+                            ].iloc[0]
+                        )
+                        words_out = blueprint_df.loc[
+                            blueprint_df["file_name"] == file_name, "words_out"
+                        ].iloc[0]
                         source_file = os.path.join(annotations_path, file)
                         dest_file = os.path.join(annotations_dir, file)
-                        shutil.move(source_file, dest_file)
+                        if waviness_value < MAX_WAVINESS and not words_out:
+                            shutil.move(source_file, dest_file)
 
                     # Gather images
                     for file in tqdm(os.listdir(images_path)):
+                        file_name = file.split(".")[0]
+                        file_name = check_file_name(file_name)
+                        waviness_value = float(
+                            blueprint_df.loc[
+                                blueprint_df["file_name"] == file_name, "waviness"
+                            ].iloc[0]
+                        )
+                        words_out = blueprint_df.loc[
+                            blueprint_df["file_name"] == file_name, "words_out"
+                        ].iloc[0]
                         source_file = os.path.join(images_path, file)
                         dest_file = os.path.join(images_dir, file)
-                        shutil.move(source_file, dest_file)
+                        if waviness_value < MAX_WAVINESS and not words_out:
+                            shutil.move(source_file, dest_file)
             else:
                 pass
 
