@@ -121,7 +121,7 @@ def split_dataset(partitions: List, fractions: List, test_data: bool = None):
 
 def create_zip():
     zip_this = "/app/data/dataset/"
-    save_here = "/app/data/dataset/"
+    save_here = "/app/data/dataset"
     shutil.make_archive(base_name=save_here, format="zip", root_dir=zip_this)
 
 
