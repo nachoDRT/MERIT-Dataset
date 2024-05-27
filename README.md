@@ -3,9 +3,33 @@
 
 The MERIT Dataset is a multimodal dataset (image + text + layout) designed for training and benchmarking Large Language Models (LLMs) on Visually Rich Document Understanding (VrDU) tasks.
 
+**You can find more about our work here:**
++ **[Paper]():** Read all the details of our pipeline and dataset.Under revision :hammer_and_wrench:
++ **The [MERIT Dataset]()**: explore the raw data. Under development :hammer_and_wrench:
++ **Plug-and-play [subsets]()**. The subsets that we have used in our benchmark by using the HuggingFace pipeline 🤗. Under development :hammer_and_wrench:
++ **Our [benchmark](https://wandb.ai/iderodrigo/MERIT_Dataset?nw=nwuseriderodrigo)**. We include all the details of our benchmark with result metrics.
+
+
+
 ## Introduction :information_source:
 
+<p align="center">
+  <img src="figs/dataset_figs/config/visualAbstract.png" alt="Visual Abstract" width="600" />
+</p>
+
 ## Pipeline :arrows_counterclockwise:
+<p align="center">
+  <img src="figs/pipeline_figs/pipeline_overview.png" alt="Pipeline Overview" width="600" />
+</p>
+
+## Dataset :bookmark_tabs::camera:
+
+<p align="center">
+  <img src="figs/dataset_figs/config/dataset_structure.png" alt="Dataset Structure" width="600" />
+</p>
+
+
+You can fin [here]() our raw dataset (please notice the complete dataset weights +200GB). You can train with our plug-and-play [subsets]() by using the HuggingFace 🤗 pipeline. (Under development :hammer_and_wrench:)
 
 ## Software :woman_technologist:
 
@@ -35,13 +59,19 @@ We benchmark on three scenarios with an increasing presence of Blender-modified 
 | LayoutLMv3       | 0.3452         | 0.2681         | 0.6370         | 0.9029     | Eng.      | 7324/1831/4349       |
 | LayoutXLM        | 0.5977         | 0.3295         | 0.4489         | 0.7550     | Spa.      | 8115/2028/4426       |
 
+**Access our [paper]() to read our conclusions**. 
+
+## Biases :detective:
+Although synthetic, we acknowledge that our data generation involves sensitive topics. A solution to avoid biases might be to randomize students' grades. However, this approach would be useless if we want to detect biases in LLMs. Therefore, we have decided to associate students' grades based on [PISA](https://www.oecd-ilibrary.org/content/publication/53f23881-en) reports. You can discover more information in the paper.
 
 ## Team
 
-We are researchers from **Comillas Pontifical University**
- - **Ignacio de Rodrigo [@nachoDRT](https://github.com/nachoDRT)**: PhD Student. Benchmark Design, Software Development, and Data Analysis.
- - **Alberto Sánchez [@ascuadrado](https://github.com/ascuadrado)**: Research Assistant. Benchmark Design and  Data Analysis.
+We are researchers from **[Comillas Pontifical University](https://www.iit.comillas.edu/)**
+ - **Ignacio de Rodrigo [@nachoDRT](https://github.com/nachoDRT)**: PhD Student. Software Development, Dataset Curation, Benchmark Design.
+ - **Alberto Sánchez [@ascuadrado](https://github.com/ascuadrado)**: Research Assistant. Software Development.
  - **Mauro Liz [@mauroliz](https://github.com/mauroliz)**: Research Assistant. Software Assistance.
+ - **Jaime Boal [@jboal](https://github.com/jboalml)**: Supervisor.
+ - **Álvaro López [@allopez](https://www.iit.comillas.edu/personas/allopez)**: Supervisor.
 
 ## Citation
 If you find our research interesting, please cite our work. :page_with_curl::black_nib:
