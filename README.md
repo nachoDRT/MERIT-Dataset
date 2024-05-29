@@ -4,10 +4,10 @@
 The MERIT Dataset is a multimodal dataset (image + text + layout) designed for training and benchmarking Large Language Models (LLMs) on Visually Rich Document Understanding (VrDU) tasks.
 
 **You can find more about our work here:**
-+ **[Paper]():** Read all the details of our pipeline and dataset.Under revision :hammer_and_wrench:
-+ **The [MERIT Dataset]()**: explore the raw data. Under development :hammer_and_wrench:
++ **[Paper]()**: Read all the details of our pipeline and dataset. Under revision :hammer_and_wrench:
++ **The [MERIT Dataset](http://merit-dataset.s3-website.eu-north-1.amazonaws.com )**: Explore the raw data.
 + **Plug-and-play [subsets]()**. The subsets that we have used in our benchmark by using the HuggingFace pipeline 🤗. Under development :hammer_and_wrench:
-+ **Our [benchmark](https://wandb.ai/iderodrigo/MERIT_Dataset?nw=nwuseriderodrigo)**. We include all the details of our benchmark with result metrics.
++ **Our [benchmark](https://wandb.ai/iderodrigo/MERIT-Dataset)**. We include all the details of our benchmark with result metrics.
 + **You can find our data generation pipeline in this repo.**
 
 
@@ -55,7 +55,7 @@ Each sample has two versions: one with Blender modifications and another without
 </p>
 
 
-**You can find [here]() our raw dataset (please notice the complete dataset weights +200GB). You can train with our plug-and-play [subsets]() by using the HuggingFace 🤗 pipeline. (Under development :hammer_and_wrench:)**
+**You can download the [MERIT Datset](http://merit-dataset.s3-website.eu-north-1.amazonaws.com) raw data (please notice the complete dataset weights +200GB). You can train with our plug-and-play [subsets]() by using the HuggingFace 🤗 pipeline. (Under development :hammer_and_wrench:)**
 
 ## Software :woman_technologist:
 
