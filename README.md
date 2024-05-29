@@ -37,6 +37,10 @@ To generate the digital samples, we start by defining 14 templates (7 in English
 
 To transform our samples, we use a Blender module that can run cloth simulations to fold the document, apply textures over the document, or render with different lighting conditions.
 
+<p align="center">
+  <img src="src/blender_mod/blender-mod.gif" alt="Visual Abstract" width="630" />
+</p>
+
 **You can learn more details of our generation pipeline in our [paper]().**
 
 
@@ -64,7 +68,7 @@ We run the pipeline on Ubuntu 20.04. It is designed to run on Windows too, altho
 Requirements file under development :hammer_and_wrench:
 
 ## Hardware :gear:
-We ran the pipeline on an MSI Meg Infinite X 10SF-666EU with an Intel Core i9-10900KF and an Nvidia RTX 2080 GPU, running on Ubuntu 20.04. Values in the table are per 1k samples.
+We ran the pipeline on an MSI Meg Infinite X 10SF-666EU with an Intel Core i9-10900KF and an Nvidia RTX 2080 GPU, running on Ubuntu 20.04. Energy values in the table refer to 1k samples, and time values refer to one sample.
 
 | Task                         | Energy (kWh) | Time (s) |
 |------------------------------|--------------|----------|
