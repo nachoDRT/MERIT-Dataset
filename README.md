@@ -11,6 +11,10 @@ The MERIT Dataset is a multimodal dataset (image + text + layout) designed for t
 + **You can find our data generation pipeline in this repo.**
 
 
+<p align="center" style="margin-top: 50px; margin-bottom: 50px;">
+  <img src="demo-samples.gif" alt="Visual Abstract" width="200" />
+</p>
+
 
 ## Introduction :information_source:
 AI faces some dynamic and technical issues that push end-users to create and gather their own data. In addition, multimodal LLMs are gaining more and more attention, but datasets to train them might be improved to be more complex, more flexible, and easier to gather/generate.
@@ -25,7 +29,7 @@ By introducing this dataset, we expect to contribute to:
 + Pretraining LLMs with more challenging data.
 + Solving the Token Classification task in a challenging context.
 
-<p align="center">
+<p align="center" style="margin-top: 50px; margin-bottom: 50px;">
   <img src="figs/dataset_figs/config/visualAbstract.png" alt="Visual Abstract" width="600" />
 </p>
 
@@ -33,20 +37,19 @@ By introducing this dataset, we expect to contribute to:
 ## Pipeline :arrows_counterclockwise:
 Our generation pipeline consists of two modules: in the first one, we generate labeled digital samples, while in the second one, we transform these samples in Blender to improve photorealism and generate realistic scenarios.
 
+<p align="center" style="margin-top: 50px; margin-bottom: 50px;">
+  <img src="figs/pipeline_figs/pipeline_overview.png" alt="Pipeline Overview" width="600" />
+</p>
+
 To generate the digital samples, we start by defining 14 templates (7 in English and 7 in Spanish) in a text editor. These templates are populated with keywords that our pipeline replaces with text from databases (names, subjects, and grades). We classify the textual content of our dataset into more than 400 labels.
 
 To transform our samples, we use a Blender module that can run cloth simulations to fold the document, apply textures over the document, or render with different lighting conditions.
 
-<p align="center">
-  <img src="src/blender_mod/blender-mod.gif" alt="Visual Abstract" width="630" />
+<p align="center" style="margin-top: 50px; margin-bottom: 50px;">
+  <img src="src/blender_mod/blender-mod.gif" alt="Blender Cloth Simulation" width="630" />
 </p>
 
 **You can learn more details of our generation pipeline in our [paper]().**
-
-
-<p align="center">
-  <img src="figs/pipeline_figs/pipeline_overview.png" alt="Pipeline Overview" width="600" />
-</p>
 
 ## Dataset :bookmark_tabs::camera:
 Our dataset contains 33k multimodal samples and is fully labeled. In addition, it features a blueprint that gathers relevant data for every sample, including student name, average grade, rendering conditions, and more.
@@ -54,7 +57,7 @@ Our dataset contains 33k multimodal samples and is fully labeled. In addition, i
 Each sample has two versions: one with Blender modifications and another without them. Additionally, each PNG is mapped to a JSON file where the labels are stored. The labels follow the FUNSD dataset format.
 
 
-<p align="center">
+<p align="center" style="margin-top: 50px; margin-bottom: 50px;">
   <img src="figs/dataset_figs/config/dataset_structure.png" alt="Dataset Structure" width="600" />
 </p>
 
