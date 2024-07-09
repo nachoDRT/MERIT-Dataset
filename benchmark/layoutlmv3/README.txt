@@ -12,6 +12,11 @@ docker build -f dockerfiles/rtx2080/Dockerfile -t layoutlmv3 .
 # Create the docker
 docker build -f dockerfiles/rtx3090/Dockerfile -t layoutlmv3 .
 
+# For Nvidia RTX4090:
+
+# Create the docker
+docker build -f dockerfiles/rtx4090/Dockerfile -t layoutlmv3 .
+
 
 # Run the docker in all available GPUs as:
 docker run -it --gpus all layoutlmv3
