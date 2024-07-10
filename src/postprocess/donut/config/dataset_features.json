@@ -1,0 +1,7 @@
+{
+    "dataset_partitions": {
+        "training": 0.7,
+        "validating": 0.2,
+        "testing": 0.1
+    }
+}

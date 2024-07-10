@@ -34,5 +34,7 @@ src/replication_pipeline/default
 src/replication_pipeline/scripts/__pycache__
 
 src/postprocess/donut/cord-target/
+src/postprocess/donut/output/
+src/postprocess/donut/data/
 
 benchmark/results/training_results.csv
