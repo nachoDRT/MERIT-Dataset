@@ -36,9 +36,12 @@ def format_data(data: Dict) -> DatasetDict:
     })
     train_dataset = Dataset.from_dict(data["train"], features=features)
     test_dataset = Dataset.from_dict(data["test"], features=features)
+    validation_dataset = Dataset.from_dict(data["validation"], features=features)
 
     # Create DatasetDict
-    dataset = DatasetDict({"train": train_dataset, "test": test_dataset})
+    dataset = DatasetDict({"train": train_dataset, 
+                           "test": test_dataset, 
+                           "validation": validation_dataset})
     
     return dataset
 
@@ -77,7 +80,7 @@ if __name__ ==  "__main__":
     validation_data = load_data(os.path.join(root, "validation"))
     test_data = load_data(os.path.join(root, "test"))
     
-    dataset = {"train": train_data, "test": test_data}
+    dataset = {"train": train_data, "test": test_data, "validation": validation_data}
 
     dataset = format_data(dataset)
 
