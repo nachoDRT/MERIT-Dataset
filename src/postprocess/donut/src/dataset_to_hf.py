@@ -61,8 +61,8 @@ def push_dataset_to_hf(data: DatasetDict, configuration: Dict):
         dataset.push_to_hub(dataset_name, split=split)
 
 
-def get_config() -> Dict:
-    with open("/app/config/config.json") as f:
+def get_hf_config() -> Dict:
+    with open("/app/config/hf_config.json") as f:
         configuration = json.load(f)
     
     return configuration
@@ -70,8 +70,8 @@ def get_config() -> Dict:
 
 if __name__ ==  "__main__":
 
-    # Get config
-    config = get_config()
+    # Get HuggingFace config
+    hf_config = get_hf_config()
     
     # Load data (imgs + annotations)
     root = os.path.join("/app", DATASET_NAME)
@@ -85,4 +85,4 @@ if __name__ ==  "__main__":
     dataset = format_data(dataset)
 
     # Load upload dataset to HF
-    push_dataset_to_hf(dataset, config)
+    push_dataset_to_hf(dataset, hf_config)
