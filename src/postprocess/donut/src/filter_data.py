@@ -55,9 +55,11 @@ def get_blueprint():
 def move_files(file_names, split):
     # Create the destination folder
     dst_path = os.path.join("/app/output", split)
-    os.makedirs(dst_path, exist_ok=True)
+    if os.path.exists(dst_path):
+        shutil.rmtree(dst_path)
+    os.makedirs(dst_path)
 
-    if split == "training_data" or split == "validating_data":
+    if split == "train" or split == "validation":
         imgs_dir = "".join([ROOT, "train-val", IMGS_DIR_SUFIX])
         annotations_dir = "".join([ROOT, "train-val", ANNOTATIONS_DIR_SUFIX])
     else:
@@ -101,7 +103,7 @@ def split_dataset(partitions: List, fractions: List, test_data: bool = None):
             os.path.splitext(os.path.basename(x))[0] for x in glob(test_files_path)
         ]
         random.shuffle(test_files)
-        partitions.append("testing")
+        partitions.append("test")
 
     else:
         test_files = file_names[split_index_eval:]
@@ -110,7 +112,7 @@ def split_dataset(partitions: List, fractions: List, test_data: bool = None):
 
     for files_partition, partition in zip(files, partitions):
         print(f"{partition.upper()} SAMPLES: {len(files_partition)}")
-        move_files(files_partition, "".join([partition, "_data"]))
+        move_files(files_partition, partition)
 
 
 def check_file_name(name: str) -> str:
@@ -216,7 +218,7 @@ if __name__ == "__main__":
     d_features = read_dataset_features_json()
 
     if eval(args.test_data_folder) != None:
-        d_features["dataset_partitions"].pop("testing")
+        d_features["dataset_partitions"].pop("test")
 
     partitions, partitions_fractions = get_partitions_and_fractions(d_features)
     # Files are firstly arragned by lang and school. We collect them in a common place
