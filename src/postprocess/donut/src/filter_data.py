@@ -3,6 +3,7 @@ import os
 import random
 import argparse
 import shutil
+import warnings
 import pandas as pd
 from typing import List, Dict
 from glob import glob
@@ -75,7 +76,6 @@ def move_files(file_names, split):
 
         image_dst = os.path.join(dst_path, name + ".png")
         annotation_dst = os.path.join(dst_path, name + ".json")
-
         shutil.move(image_src, image_dst)
         shutil.move(annotation_src, annotation_dst)
 
@@ -136,7 +136,7 @@ def gather_files(data_language: str, format: str, dataset_features: Dict):
     )
 
     # Loop over partitions (train/val and test)
-    for partition in tqdm(os.listdir(GATHER_FILES_PATH)):
+    for partition in os.listdir(GATHER_FILES_PATH):
 
         images_dir = "".join([ROOT, partition, IMGS_DIR_SUFIX])
         annotations_dir = "".join([ROOT, partition, ANNOTATIONS_DIR_SUFIX])
@@ -153,7 +153,7 @@ def gather_files(data_language: str, format: str, dataset_features: Dict):
                 language_path = os.path.join(partition_path, language)
 
                 # Loop over schools
-                for school in tqdm(os.listdir(language_path)):
+                for school in os.listdir(language_path):
                     print(
                         f"Gathering samples for {school.capitalize()} in {language.capitalize()}"
                     )
@@ -164,6 +164,9 @@ def gather_files(data_language: str, format: str, dataset_features: Dict):
                     images_path = os.path.join(school_path, "dataset_output", "images")
 
                     # Gather annotations
+                    print(
+                        f"{partition.upper()}: Gathering annotations for {school.capitalize()} in {language.capitalize()}"
+                    )
                     for file in tqdm(os.listdir(annotations_path)):
                         file_name = file.split(".")[0]
                         file_name = check_file_name(file_name)
@@ -193,6 +196,9 @@ def gather_files(data_language: str, format: str, dataset_features: Dict):
                             shutil.move(source_file, dest_file)
 
                     # Gather images
+                    print(
+                        f"{partition.upper()}: Gathering images for {school.capitalize()} in {language.capitalize()}"
+                    )
                     for file in tqdm(os.listdir(images_path)):
                         file_name = file.split(".")[0]
                         file_name = check_file_name(file_name)
@@ -218,13 +224,25 @@ def process_extractions(years: List, subjects: List, grades: Dict) -> Dict:
     for year in years:
         ground_truth_year = []
         for subject in subjects:
-            subject_dict = {}
-            subject_dict["subject"] = list(subject.values())[0]
-            subject_dict["grade"] = grades[list(subject.keys())[0]]
-            ground_truth_year.append(subject_dict)
+            if subject["year"] == year:
+                subject_dict = {}
+                subject_dict["subject"] = list(subject.values())[0]
+                subject_dict["grade"] = grades[list(subject.keys())[0]]
+                ground_truth_year.append(subject_dict)
         ground_truth[year] = ground_truth_year
 
     return ground_truth
+
+
+def get_year_from_subject(subject: str, years: List) -> str:
+
+    for year in years:
+        if year in subject:
+            return year
+
+    warnings.warn(f"Unable to extract the academic year from {subject}")
+
+    return None
 
 
 def extract_key_annotations(dataset_data: Dict, academic_years: List):
@@ -250,6 +268,9 @@ def extract_key_annotations(dataset_data: Dict, academic_years: List):
         else:
             subject_dict = {}
             subject_dict[segment["label"]] = segment["text"]
+            subject_dict["year"] = get_year_from_subject(
+                segment["label"], academic_years
+            )
             subjects.append(subject_dict)
 
     ground_truth = process_extractions(years, subjects, grades)
