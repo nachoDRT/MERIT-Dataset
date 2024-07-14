@@ -3,5 +3,11 @@
         "train": 0.7,
         "validation": 0.2,
         "test": 0.1
-    }
+    },
+    "years": [
+        "year_9",
+        "year_10",
+        "year_11",
+        "year_12"
+    ]
 }

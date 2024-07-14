@@ -4,7 +4,7 @@ import random
 import argparse
 import shutil
 import pandas as pd
-from typing import List
+from typing import List, Dict
 from glob import glob
 from tqdm import tqdm
 from pathlib import Path
@@ -23,13 +23,16 @@ ANNOTATIONS_DIR_SUFIX = "/annotations/"
 MAX_WAVINESS = 4.5
 
 
+def read_json(json_path: str) -> Dict:
+    with open(json_path, "r") as json_content:
+        data = json_content.read()
+        data = json.loads(data)
+    return data
+
+
 def read_dataset_features_json():
-
-    with open(DATASET_FEATURES_JSON, "r") as dataset_features:
-        data = dataset_features.read()
-        d_features = json.loads(data)
-
-    return d_features
+    dataset_features = read_json(DATASET_FEATURES_JSON)
+    return dataset_features
 
 
 def get_blueprint():
@@ -123,7 +126,7 @@ def check_file_name(name: str) -> str:
         return name[:-12]
 
 
-def gather_files(data_language: str):
+def gather_files(data_language: str, format: str, dataset_features: Dict):
     """Gather all the files (stored by language and school) in a common place"""
 
     # Read the blueprint and convert waviness values to float
@@ -174,6 +177,18 @@ def gather_files(data_language: str):
                         ].iloc[0]
                         source_file = os.path.join(annotations_path, file)
                         dest_file = os.path.join(annotations_dir, file)
+
+                        if format == "cord-v2":
+                            source_formatted_file = os.path.join(
+                                annotations_path, "".join([file_name, "_cord-v2_.json"])
+                            )
+                            format_annotations_cordv2_style(
+                                source_file,
+                                source_formatted_file,
+                                dataset_features["years"],
+                            )
+                            source_file = source_formatted_file
+
                         if waviness_value < MAX_WAVINESS and not words_out:
                             shutil.move(source_file, dest_file)
 
@@ -197,11 +212,72 @@ def gather_files(data_language: str):
                 pass
 
 
-def get_partitions_and_fractions(d_features: dict):
-    partitions = [part for part in d_features["dataset_partitions"].keys()]
-    partitions_fractions = [frac for frac in d_features["dataset_partitions"].values()]
+def process_extractions(years: List, subjects: List, grades: Dict) -> Dict:
+    ground_truth = {}
 
-    # In case there there is a specific test set, increase the training dataset fraction
+    for year in years:
+        ground_truth_year = []
+        for subject in subjects:
+            subject_dict = {}
+            subject_dict["subject"] = list(subject.values())[0]
+            subject_dict["grade"] = grades[list(subject.keys())[0]]
+            ground_truth_year.append(subject_dict)
+        ground_truth[year] = ground_truth_year
+
+    return ground_truth
+
+
+def extract_key_annotations(dataset_data: Dict, academic_years: List):
+    years = []
+    subjects = []
+    grades = {}
+
+    for segment in dataset_data["form"]:
+        if segment["label"] == "other":
+            pass
+
+        # Look for academic years
+        elif segment["label"] in academic_years:
+            years.append(segment["label"])
+
+        # Look for grades
+        elif segment["label"].split("_")[-1] == "answer":
+            grade = segment["text"]
+            subject = segment["label"][:-7]
+            grades[subject] = grade
+
+        # Otherwise it is a subject
+        else:
+            subject_dict = {}
+            subject_dict[segment["label"]] = segment["text"]
+            subjects.append(subject_dict)
+
+    ground_truth = process_extractions(years, subjects, grades)
+
+    return ground_truth
+
+
+def format_annotations_cordv2_style(
+    source: str, formatted: str, academic_years: List
+) -> None:
+
+    funsd_format_data = read_json(source)
+    cordv2_format_data = {}
+
+    cordv2_format_data = extract_key_annotations(funsd_format_data, academic_years)
+    cordv2_format_data = {"gt_parse": cordv2_format_data}
+
+    with open(formatted, "w") as output_file:
+        json.dump(cordv2_format_data, output_file, indent=4)
+
+
+def get_partitions_and_fractions(dataset_features: dict):
+    partitions = [part for part in dataset_features["dataset_partitions"].keys()]
+    partitions_fractions = [
+        frac for frac in dataset_features["dataset_partitions"].values()
+    ]
+
+    # In case there is a specific test set, increase the training dataset fraction
     if sum(partitions_fractions) + ASSERT_TOLERANCE < 1:
         partitions_fractions[0] += 1 - sum(partitions_fractions)
 
@@ -213,6 +289,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--test_data_folder", type=str)
     parser.add_argument("--language", type=str)
+    parser.add_argument("--annotations_format", type=str)
     args = parser.parse_args()
 
     d_features = read_dataset_features_json()
@@ -222,6 +299,6 @@ if __name__ == "__main__":
 
     partitions, partitions_fractions = get_partitions_and_fractions(d_features)
     # Files are firstly arragned by lang and school. We collect them in a common place
-    gather_files(args.language)
+    gather_files(args.language, args.annotations_format, d_features)
     # Split files in train, validation and test partitions
     split_dataset(partitions, partitions_fractions, eval(args.test_data_folder))
