@@ -8,7 +8,6 @@ WORKDIR /app
 
 # Copy the rest of the project
 COPY config/ /app/config
-COPY cord-target/ /app/cord-target
 COPY data/ /app/data
 COPY output/ /app/output
 COPY src/ /app/src
