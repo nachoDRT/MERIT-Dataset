@@ -5,4 +5,4 @@ python src/filter_data.py \
     --test_data_folder True \
     --language english \
     --annotations_format cord-v2
-# python src/dataset_to_hf.py
+python src/dataset_to_hf.py
