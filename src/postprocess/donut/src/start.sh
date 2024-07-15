@@ -3,6 +3,6 @@ chmod +x src/filter_data.py
 
 python src/filter_data.py \
     --test_data_folder True \
-    --language english \
+    --language spanish \
     --annotations_format cord-v2
 python src/dataset_to_hf.py

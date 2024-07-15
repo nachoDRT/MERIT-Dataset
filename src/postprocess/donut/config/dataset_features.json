@@ -5,9 +5,9 @@
         "test": 0.1
     },
     "years": [
-        "year_9",
-        "year_10",
-        "year_11",
-        "year_12"
+        "3_de_la_eso",
+        "4_de_la_eso",
+        "1_de_bachillerato",
+        "2_de_bachillerato"
     ]
 }

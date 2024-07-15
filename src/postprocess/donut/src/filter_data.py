@@ -58,7 +58,7 @@ def get_blueprint():
 
 def move_files(file_names, split):
     # Create the destination folder
-    dst_path = os.path.join("/app/output", split)
+    dst_path = os.path.join("/app/merit-dataset-sequence-format", split)
     if os.path.exists(dst_path):
         shutil.rmtree(dst_path)
     os.makedirs(dst_path)
