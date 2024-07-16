@@ -1,0 +1,13 @@
+{
+    "dataset_partitions": {
+        "train": 0.7,
+        "validation": 0.2,
+        "test": 0.1
+    },
+    "years": [
+        "3_de_la_eso",
+        "4_de_la_eso",
+        "1_de_bachillerato",
+        "2_de_bachillerato"
+    ]
+}

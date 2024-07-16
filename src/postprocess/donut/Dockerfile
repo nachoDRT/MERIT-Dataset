@@ -5,10 +5,13 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 WORKDIR /app
+
 # Copy the rest of the project
-COPY src/ /app/src
-COPY cord-target/ /app/cord-target
 COPY config/ /app/config
+COPY data/ /app/data
+COPY output/ /app/output
+COPY src/ /app/src
 
 # Run the server
-CMD ["python", "/app/src/dataset_to_hf.py"]
+RUN chmod +x /app/src/start.sh
+CMD ["bash", "/app/src/start.sh"]
