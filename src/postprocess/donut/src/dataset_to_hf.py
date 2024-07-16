@@ -4,7 +4,8 @@ from typing import Dict
 from datasets import Dataset, Features, Image, Value, DatasetDict
 from huggingface_hub import HfApi, Repository, HfFolder
 
-DATASET_NAME = "merit-es-digital-seq"
+DATASET_NAME = "merit"
+SUBSET = "es-digital-seq"
 
 
 def load_data(data_dir: str) -> Dict:
@@ -55,7 +56,7 @@ def push_dataset_to_hf(data: DatasetDict, configuration: Dict):
 
     for split, dataset in data.items():
         dataset_name = f"{username}/{repo_name}"
-        dataset.push_to_hub(dataset_name, split=split)
+        dataset.push_to_hub(dataset_name, config_name=SUBSET, split=split)
 
 
 def get_hf_config() -> Dict:
