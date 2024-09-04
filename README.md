@@ -4,10 +4,10 @@
 The MERIT Dataset is a multimodal dataset (image + text + layout) designed for training and benchmarking Large Language Models (LLMs) on Visually Rich Document Understanding (VrDU) tasks.
 
 **You can find more about our work here:**
-+ **[Paper]()**: Read all the details of our pipeline and dataset. Under revision :hammer_and_wrench:
-+ **The [MERIT Dataset](http://merit-dataset.s3-website.eu-north-1.amazonaws.com )**: Explore the raw data.
-+ **Plug-and-play [subsets]()**. The subsets that we have used in our benchmark by using the HuggingFace pipeline 🤗. Under development :hammer_and_wrench:
-+ **Our [benchmark](https://wandb.ai/iderodrigo/MERIT-Dataset)**. We include all the details of our benchmark with result metrics.
++ **[Paper](https://arxiv.org/abs/2409.00447)**: Read all the details of our pipeline and dataset.
++ **The [MERIT Dataset](https://de-Rodrigo@huggingface.co/datasets/de-Rodrigo/merit)**. Explore the different plug&play Hugging Face 🤗 subsets.
++ **[Raw data](http://merit-dataset.s3-website.eu-north-1.amazonaws.com )**: Explore the Merit dataset raw data.
++ **Our [benchmark](https://wandb.ai/iderodrigo/MERIT-Dataset)**. We include all the details of our benchmark metrics.
 + **You can find our data generation pipeline in this repo.**
 
 
@@ -19,7 +19,7 @@ The MERIT Dataset is a multimodal dataset (image + text + layout) designed for t
 ## Introduction :information_source:
 AI faces some dynamic and technical issues that push end-users to create and gather their own data. In addition, multimodal LLMs are gaining more and more attention, but datasets to train them might be improved to be more complex, more flexible, and easier to gather/generate.
 
-In this research project, we identify school transcripts of records as a suitable niche to generate a challenging multimodal dataset (image + text + layout) for Token Classification. **Thus, we introduce the multimodal [MERIT Dataset]() (image + text + layout) and its generation pipeline.**
+In this research project, we identify school transcripts of records as a suitable niche to generate a challenging multimodal dataset (image + text + layout) for Token Classification and Sequence Generation. **Thus, we introduce the multimodal [MERIT Dataset](https://de-Rodrigo@huggingface.co/datasets/de-Rodrigo/merit) (image + text + layout) and its generation pipeline.**
 
 By introducing this dataset, we expect to contribute to:
 
@@ -49,7 +49,7 @@ To transform our samples, we use a Blender module that can run cloth simulations
   <img src="src/blender_mod/blender-mod.gif" alt="Blender Cloth Simulation" width="630" />
 </p>
 
-**You can learn more details of our generation pipeline in our [paper]().**
+**You can learn more details of our generation pipeline in our [paper](https://arxiv.org/abs/2409.00447).**
 
 ## Dataset :bookmark_tabs::camera:
 Our dataset contains 33k multimodal samples and is fully labeled. In addition, it features a blueprint that gathers relevant data for every sample, including student name, average grade, rendering conditions, and more.
@@ -62,7 +62,7 @@ Each sample has two versions: one with Blender modifications and another without
 </p>
 
 
-**You can download the [MERIT Datset](http://merit-dataset.s3-website.eu-north-1.amazonaws.com) raw data (please notice the complete dataset weights +200GB). You can train with our plug-and-play [subsets]() by using the HuggingFace 🤗 pipeline. (Under development :hammer_and_wrench:)**
+**You can download the [MERIT Datset](http://merit-dataset.s3-website.eu-north-1.amazonaws.com) raw data (please notice the complete dataset weights +200GB). You can train with our plug-and-play [subsets](https://de-Rodrigo@huggingface.co/datasets/de-Rodrigo/merit) by using the HuggingFace 🤗 pipeline.**
 
 ## Software :woman_technologist:
 
@@ -99,11 +99,11 @@ We benchmark on three scenarios with an increasing presence of Blender-modified 
 | **LayoutLMv3**       | 0.3452         | 0.2681         | 0.6370         | 0.9029     | Eng.      | 7324 / 1831 / 4349       |
 | **LayoutXLM**        | 0.5977         | 0.3295         | 0.4489         | 0.7550     | Spa.      | 8115 / 2028 / 4426       |
 
-**Access our [paper]() to read our conclusions**. 
+**Access our [paper](https://arxiv.org/abs/2409.00447) to read our conclusions**. 
 
 
 ## Biases :detective:
-Although synthetic, we acknowledge that our data generation involves sensitive topics. A solution to avoid biases might be to randomize students' grades. However, this approach would be useless if we want to detect biases in LLMs. Therefore, we have decided to associate students' grades based on [PISA](https://www.oecd-ilibrary.org/content/publication/53f23881-en) reports. **You can discover more information in the [paper]()**.
+Although synthetic, we acknowledge that our data generation involves sensitive topics. A solution to avoid biases might be to randomize students' grades. However, this approach would be useless if we want to detect biases in LLMs. Therefore, we have decided to associate students' grades based on [PISA](https://www.oecd-ilibrary.org/content/publication/53f23881-en) reports. **You can discover more information in the [paper](https://arxiv.org/abs/2409.00447)**.
 
 | Educative System | Origin   | Country       | PISA Score                                                                                   | System Score |
 |------------------|----------|---------------|----------------------------------------------------------------------------------------------|--------------|
