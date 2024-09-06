@@ -127,3 +127,11 @@ We are researchers from **[Comillas Pontifical University](https://www.iit.comil
 
 ## Citation
 If you find our research interesting, please cite our work. :page_with_curl::black_nib:
+
+```bibtex
+@article{de2024merit,
+  title={The MERIT Dataset: Modelling and Efficiently Rendering Interpretable Transcripts},
+  author={de Rodrigo, I and Sanchez-Cuadrado, A and Boal, J and Lopez-Lopez, AJ},
+  journal={arXiv preprint arXiv:2409.00447},
+  year={2024}
+}
