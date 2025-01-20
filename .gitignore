@@ -37,4 +37,6 @@ src/postprocess/donut/cord-target/
 src/postprocess/donut/output/
 src/postprocess/donut/data/
 
+*pyc
+
 benchmark/results/training_results.csv
