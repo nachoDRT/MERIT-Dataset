@@ -15,7 +15,7 @@ if __name__ == "__main__":
     language = args.language
     school = args.school
 
-    merit_subset = get_merit_subset(language, school)
+    merit_subset = get_merit_subset_paths(language, school)
 
     if args.degradation.lower() in ("paragraph"):
         generate_paragraph_samples(merit_subset)
