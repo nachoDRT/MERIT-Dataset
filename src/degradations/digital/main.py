@@ -18,6 +18,8 @@ if __name__ == "__main__":
     merit_subset = get_merit_subset_paths(language, school)
 
     if args.degradation.lower() in ("paragraph"):
+        print("Generating paragraph samples")
         generate_paragraph_samples(merit_subset)
+        print("Done")
     else:
         print(f"Degradation called {degradation} has not been implemented yet.")
