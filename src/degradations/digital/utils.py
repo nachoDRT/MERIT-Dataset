@@ -1,4 +1,3 @@
-from os.path import join, abspath, dirname
 from typing import List
 import os
 import json
@@ -100,3 +99,11 @@ def generate_img(text: str):
 def save_sample(path: str, img: List):
     os.makedirs(os.path.dirname(path), exist_ok=True)
     img[0].save(path, "PNG")
+
+
+def get_sample_data(sample):
+
+    img = sample["image"]
+    annotation = json.loads(sample["ground_truth"])
+
+    return img, annotation
