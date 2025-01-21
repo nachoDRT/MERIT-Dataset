@@ -8,17 +8,22 @@ from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
 from io import BytesIO
 import textwrap
+from datasets import load_dataset
+from PIL import Image
 
 
-def get_merit_subset_paths(language: str, school: str) -> List:
-    root_path = join(dirname(dirname(dirname(dirname(dirname(abspath(__file__)))))), "data")
-    subset_path = join(root_path, "original", language, school, "dataset_output", "annotations")
+def get_merit_dataset_iterator(subset_name: str, decode=None):
 
-    file_list = []
-    if os.path.exists(subset_path):
-        file_list = [join(subset_path, f) for f in os.listdir(subset_path) if os.path.isfile(join(subset_path, f))]
+    print("Loading Dataset")
 
-    return file_list
+    dataset = load_dataset("de-Rodrigo/merit", subset_name, split="test", streaming=True)
+
+    if decode:
+        dataset = dataset.cast_column("image", Image(decode=False))
+
+    dataset_iterator = iter(dataset)
+
+    return dataset_iterator
 
 
 def get_annotation(path: str):
