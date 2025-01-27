@@ -37,6 +37,8 @@ src/postprocess/donut/cord-target/
 src/postprocess/donut/output/
 src/postprocess/donut/data/
 
+src/degradations/config/hf_config.json
+
 *pyc
 
 benchmark/results/training_results.csv

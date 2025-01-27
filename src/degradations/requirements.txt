@@ -1,2 +1,4 @@
 pdf2image
 pypdf
+datasets
+reportlab

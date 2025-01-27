@@ -1,17 +1,28 @@
-from typing import List
-import os
 from utils import *
+from io import BytesIO
+from tqdm import tqdm
 
 
-def generate_paragraph_samples(merit_subset_paths: List):
+def generate_paragraph_samples(merit_subset_iterator, lang: str, data_format: str = "seq"):
 
-    for path in merit_subset_paths:
-        print(path)
-        sample_name = os.path.splitext(os.path.basename(path))[0]
-        annotation = get_annotation(path)
-        text = clean_annotation(annotation)
+    images_bytes = []
+    ground_truths = []
+
+    if data_format == "seq":
+        d_features = read_dataset_features_json()
+
+    for i, sample in enumerate(merit_subset_iterator):
+
+        _, annotations = get_sample_data(sample)
+        text = clean_annotation(annotations)
         img = generate_img(text)
-        saving_path = join(dirname(dirname(path)), "degradations", "paragraph", f"{sample_name}.png")
-        print(saving_path)
-        save_sample(saving_path, img)
-        break
+
+        buffer = BytesIO()
+        img[0].save(buffer, format="PNG")
+        images_bytes.append(buffer.getvalue())
+
+        if data_format == "seq":
+            annotations = format_annotations_cordv2_style(annotations, d_features[f"years-{lang}"])
+        ground_truths.append(json.dumps(annotations))
+
+    return {"image": images_bytes, "ground_truth": ground_truths}
