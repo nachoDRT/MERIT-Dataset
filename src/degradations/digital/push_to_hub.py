@@ -13,7 +13,6 @@ SUBSET = "dummy-subset"
 def format_data(data: Dict) -> DatasetDict:
     # Convert to HF dataset
     features = Features({"image": Image(), "ground_truth": Value("string")})
-    print(data.keys())
     train_dataset = Dataset.from_dict(data["train"], features=features)
     test_dataset = Dataset.from_dict(data["test"], features=features)
     validation_dataset = Dataset.from_dict(data["validation"], features=features)

@@ -23,7 +23,7 @@ if __name__ == "__main__":
         for split in splits:
             print(f"Generating {split} paragraph samples")
             merit_subset_iterator, _ = get_merit_dataset_iterator(merit_subset_name, split)
-            split_subset = generate_paragraph_samples(merit_subset_iterator)
+            split_subset = generate_paragraph_samples(merit_subset_iterator, language)
             dataset.append((split, split_subset))
         dataset = format_data(dict(dataset))
         push_dataset_to_hf(dataset)
