@@ -8,21 +8,29 @@ from reportlab.lib.pagesizes import letter
 from io import BytesIO
 import textwrap
 from datasets import load_dataset
-from PIL import Image
+from PIL import Image as PÌLIMage
 
 
-def get_merit_dataset_iterator(subset_name: str, decode=None):
+def get_merit_dataset_iterator(subset_name: str, split: str, decode=None):
 
     print("Loading Dataset")
 
-    dataset = load_dataset("de-Rodrigo/merit", subset_name, split="test", streaming=True)
+    dataset = load_dataset("de-Rodrigo/merit", subset_name, split=split, streaming=True)
 
     if decode:
-        dataset = dataset.cast_column("image", Image(decode=False))
+        dataset = dataset.cast_column("image", PÌLIMage(decode=False))
 
     dataset_iterator = iter(dataset)
 
-    return dataset_iterator
+    return dataset_iterator, dataset
+
+
+def get_merit_dataset_splits(merit_subset_name):
+
+    _, dataset = get_merit_dataset_iterator(subset_name=merit_subset_name, split=None)
+    splits = list(dataset.keys())
+
+    return splits
 
 
 def get_annotation(path: str):

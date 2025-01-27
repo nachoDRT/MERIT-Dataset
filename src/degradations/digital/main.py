@@ -1,6 +1,7 @@
 import argparse
 from degradations import *
 from utils import *
+from push_to_hub import *
 
 if __name__ == "__main__":
 
@@ -14,10 +15,17 @@ if __name__ == "__main__":
     language = args.language
 
     merit_subset_name = f"{language}-digital-token-class"
-    merit_subset_iterator = get_merit_dataset_iterator(merit_subset_name)
+    splits = get_merit_dataset_splits(merit_subset_name)
+
+    dataset = []
 
     if args.degradation.lower() in ("paragraph"):
-        print("Generating paragraph samples")
-        generate_paragraph_samples(merit_subset_iterator)
+        for split in splits:
+            print(f"Generating {split} paragraph samples")
+            merit_subset_iterator, _ = get_merit_dataset_iterator(merit_subset_name, split)
+            split_subset = generate_paragraph_samples(merit_subset_iterator)
+            dataset.append((split, split_subset))
+        dataset = format_data(dict(dataset))
+        push_dataset_to_hf(dataset)
     else:
         print(f"Degradation called {degradation} has not been implemented yet.")
