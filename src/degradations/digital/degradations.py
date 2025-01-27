@@ -1,16 +1,14 @@
 from utils import *
 from io import BytesIO
+from tqdm import tqdm
 
 
-MAX_SAMPLES = 2
-
-
-def generate_paragraph_samples(merit_subset_iterator, lang: str, data_format: str = "cord-v2"):
+def generate_paragraph_samples(merit_subset_iterator, lang: str, data_format: str = "seq"):
 
     images_bytes = []
     ground_truths = []
 
-    if data_format == "cord-v2":
+    if data_format == "seq":
         d_features = read_dataset_features_json()
 
     for i, sample in enumerate(merit_subset_iterator):
@@ -23,11 +21,8 @@ def generate_paragraph_samples(merit_subset_iterator, lang: str, data_format: st
         img[0].save(buffer, format="PNG")
         images_bytes.append(buffer.getvalue())
 
-        if data_format == "cord-v2":
+        if data_format == "seq":
             annotations = format_annotations_cordv2_style(annotations, d_features[f"years-{lang}"])
         ground_truths.append(json.dumps(annotations))
-
-        if i >= MAX_SAMPLES:
-            break
 
     return {"image": images_bytes, "ground_truth": ground_truths}

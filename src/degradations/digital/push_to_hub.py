@@ -6,10 +6,6 @@ from utils import *
 from io import BytesIO
 
 
-DATASET_NAME = "dummy"
-SUBSET = "dummy-subset"
-
-
 def format_data(data: Dict) -> DatasetDict:
     # Convert to HF dataset
     features = Features({"image": Image(), "ground_truth": Value("string")})
@@ -23,7 +19,7 @@ def format_data(data: Dict) -> DatasetDict:
     return dataset
 
 
-def push_splits_to_hf(data: DatasetDict, configuration: Dict):
+def push_splits_to_hf(data: DatasetDict, configuration: Dict, subset: str, repo_name: str = "merit"):
     # Authentication
     HfFolder.save_token(configuration["hf_token"])
 
@@ -31,11 +27,9 @@ def push_splits_to_hf(data: DatasetDict, configuration: Dict):
     user = api.whoami()
     username = user["name"]
 
-    repo_name = DATASET_NAME
-
     for split, dataset in data.items():
         dataset_name = f"{username}/{repo_name}"
-        dataset.push_to_hub(dataset_name, config_name=SUBSET, split=split)
+        dataset.push_to_hub(dataset_name, config_name=subset, split=split)
 
 
 def get_hf_config() -> Dict:
@@ -46,10 +40,10 @@ def get_hf_config() -> Dict:
     return configuration
 
 
-def push_dataset_to_hf(dataset):
+def push_dataset_to_hf(dataset, subset: str):
 
     hf_config = get_hf_config()
-    push_splits_to_hf(dataset, hf_config)
+    push_splits_to_hf(dataset, hf_config, subset)
 
 
 if __name__ == "__main__":
