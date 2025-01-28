@@ -44,17 +44,87 @@ def read_json(path: str):
         return json.load(f)
 
 
-def clean_annotation(annotation: Dict):
+def clean_annotation(annotation: Dict, years: List = ["year_9", "year_10", "year_11", "year_12"]):
+
+    # TODO Parse "years" to the method
 
     text = ""
+    record = {}
+
     for element in annotation["form"]:
         text += f" {element['text']}"
 
-    return text
+        if element["label"] != "other":
+            clean = element["label"].split("_answer")
+
+            len_clean = len(clean)
+            clean = clean[0]
+
+            if clean not in years:
+
+                if clean not in record:
+                    if len_clean == 1:
+                        subject_content = {"subject": element["text"], "grade": ""}
+                    else:
+                        subject_content = {"subject": "", "grade": element["text"]}
+
+                    record[clean] = subject_content
+
+                else:
+                    subject_content = record[clean]
+                    if len_clean == 1:
+                        subject_content["subject"] = element["text"]
+                    else:
+                        subject_content["grade"] = element["text"]
+
+    return text, record
 
 
 def generate_pdf(text: str) -> BytesIO:
 
+    # Create a temporary buffer for the PDF
+    buffer = BytesIO()
+
+    # Create the PDF with reportlab
+    c = canvas.Canvas(buffer, pagesize=letter)
+
+    # Set the maximum width for the text
+    max_width = 500  # Adjust this value as needed
+    text_object = c.beginText(100, 750)
+    text_object.setFont("Helvetica", 12)
+
+    # Add the text, automatically adjusting
+    for line in text.splitlines():
+        # Wrap the text using textwrap
+        wrapped_lines = textwrap.wrap(line, width=70)  # Adjust width as needed
+
+        for wrapped_line in wrapped_lines:
+            text_object.textLine(wrapped_line)
+
+    c.drawText(text_object)
+    c.save()
+
+    # Move buffer position to beginning
+    buffer.seek(0)
+
+    # Create PDF writer object
+    output = PdfWriter()
+
+    # Add the page
+    page = PdfReader(buffer).pages[0]
+    output.add_page(page)
+
+    # Write to a temporary buffer
+    output_buffer = BytesIO()
+    output.write(output_buffer)
+    output_buffer.seek(0)
+
+    return output_buffer
+
+
+def generate_line_pdf(text: str, record: dict) -> BytesIO:
+
+    print(text)
     # Create a temporary buffer for the PDF
     buffer = BytesIO()
 
@@ -101,6 +171,13 @@ def convert_pdf_to_img(pdf_buffer: BytesIO):
 
 def generate_img(text: str):
     pdf_bytes = generate_pdf(text)
+    img = convert_pdf_to_img(pdf_bytes)
+
+    return img
+
+
+def generate_line_img(text: str, record: dict):
+    pdf_bytes = generate_line_pdf(text, record)
     img = convert_pdf_to_img(pdf_bytes)
 
     return img
