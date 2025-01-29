@@ -44,7 +44,7 @@ def read_json(path: str):
         return json.load(f)
 
 
-def clean_annotation(annotation: Dict, years: List = ["year_9", "year_10", "year_11", "year_12"]):
+def clean_line_annotation(annotation: Dict, years: List = ["year_9", "year_10", "year_11", "year_12"]):
 
     # TODO Parse "years" to the method
 
@@ -78,6 +78,15 @@ def clean_annotation(annotation: Dict, years: List = ["year_9", "year_10", "year
                         subject_content["grade"] = element["text"]
 
     return text, record
+
+
+def clean_paragraph_annotation(annotation: Dict):
+
+    text = ""
+    for element in annotation["form"]:
+        text += f" {element['text']}"
+
+    return text
 
 
 def generate_pdf(text: str) -> BytesIO:
