@@ -19,7 +19,7 @@ def format_data(data: Dict) -> DatasetDict:
     return dataset
 
 
-def push_splits_to_hf(data: DatasetDict, configuration: Dict, subset: str, repo_name: str = "merit"):
+def push_splits_to_hf(data: DatasetDict, configuration: Dict, subset: str, repo_name: str):
     # Authentication
     HfFolder.save_token(configuration["hf_token"])
 
@@ -40,10 +40,10 @@ def get_hf_config() -> Dict:
     return configuration
 
 
-def push_dataset_to_hf(dataset, subset: str):
+def push_dataset_to_hf(dataset, subset: str, repo_name: str = "merit"):
 
     hf_config = get_hf_config()
-    push_splits_to_hf(dataset, hf_config, subset)
+    push_splits_to_hf(dataset, hf_config, subset, repo_name)
 
 
 if __name__ == "__main__":

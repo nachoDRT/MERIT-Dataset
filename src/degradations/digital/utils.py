@@ -13,6 +13,9 @@ import warnings
 from os.path import abspath, dirname, join
 
 
+PARAGRAPH_DETECTION_THRES = 50
+
+
 def get_merit_dataset_iterator(subset_name: str, split: str, decode=None):
 
     print("Loading Dataset")
@@ -44,13 +47,111 @@ def read_json(path: str):
         return json.load(f)
 
 
-def clean_annotation(annotation: Dict):
+def clean_line_annotation(annotation: Dict, years: List = ["year_9", "year_10", "year_11", "year_12"]):
+
+    # TODO Parse "years" to the method
+
+    record = {}
+    paragraphs = []
+    last_element = None
+
+    for element in annotation["form"]:
+
+        if element["label"] != "other":
+            clean = element["label"].split("_answer")
+
+            len_clean = len(clean)
+            clean = clean[0]
+
+            if clean not in years:
+
+                if clean not in record:
+                    if len_clean == 1:
+                        subject_content = {"subject": element["text"], "grade": ""}
+                    else:
+                        subject_content = {"subject": "", "grade": element["text"]}
+
+                    record[clean] = subject_content
+
+                else:
+                    subject_content = record[clean]
+                    if len_clean == 1:
+                        subject_content["subject"] = element["text"]
+                    else:
+                        subject_content["grade"] = element["text"]
+
+            else:
+                # Flag to insert the grades
+                paragraphs.append(f" {element['text']}")
+                paragraphs.append(True)
+
+        else:
+            new_paragraph = detect_new_paragraph(element, last_element)
+
+            if new_paragraph:
+                try:
+                    text += ""
+                    paragraphs.append(text)
+                    text = f" {element['text']}"
+                except NameError:
+                    text = ""
+            else:
+                text += f" {element['text']}"
+
+        last_element = element
+
+    text = get_string_from_paragraphs(paragraphs, record)
+
+    return text
+
+
+def detect_new_paragraph(element: Dict, last_element: Dict) -> bool:
+
+    try:
+        # Get 'y' coordinate
+        y_last = last_element["box"][1]
+        y = element["box"][1]
+        if y - y_last > PARAGRAPH_DETECTION_THRES:
+            new_paragraph = True
+        else:
+            new_paragraph = False
+        return new_paragraph
+
+    except TypeError:
+        return True
+
+
+def get_string_from_paragraphs(paragraphs: List, record: Dict) -> str:
+
+    string = ""
+
+    for element in paragraphs:
+
+        if type(element) is bool:
+            string += compose_table_as_string(record)
+        else:
+            string += element
+
+    return string
+
+
+def clean_paragraph_annotation(annotation: Dict):
 
     text = ""
     for element in annotation["form"]:
         text += f" {element['text']}"
 
     return text
+
+
+def compose_table_as_string(record: Dict):
+
+    string_table = "\n"
+
+    for instance in record.values():
+        string_table += f"{instance['subject']} {instance['grade']}\n"
+
+    return string_table
 
 
 def generate_pdf(text: str) -> BytesIO:
@@ -66,10 +167,8 @@ def generate_pdf(text: str) -> BytesIO:
     text_object = c.beginText(100, 750)
     text_object.setFont("Helvetica", 12)
 
-    # Add the text, automatically adjusting
     for line in text.splitlines():
-        # Wrap the text using textwrap
-        wrapped_lines = textwrap.wrap(line, width=70)  # Adjust width as needed
+        wrapped_lines = textwrap.wrap(line, width=70)
 
         for wrapped_line in wrapped_lines:
             text_object.textLine(wrapped_line)
@@ -95,12 +194,47 @@ def generate_pdf(text: str) -> BytesIO:
     return output_buffer
 
 
+def generate_line_pdf(text: str) -> BytesIO:
+
+    # Create a temporary buffer for the PDF
+    buffer = BytesIO()
+
+    # Create the PDF with reportlab
+    c = canvas.Canvas(buffer, pagesize=letter)
+
+    text_object = c.beginText(35, 750)
+    text_object.setFont("Helvetica", 8)
+
+    for line in text.splitlines():
+        wrapped_lines = textwrap.wrap(line, width=150)
+        for i, wrapped_line in enumerate(wrapped_lines):
+            text_object.textLine(wrapped_line)
+
+        # TODO useful for next degradation
+        # text_object.textLine(" ")
+
+    c.drawText(text_object)
+    c.save()
+
+    # Move buffer position to beginning
+    buffer.seek(0)
+
+    return buffer
+
+
 def convert_pdf_to_img(pdf_buffer: BytesIO):
     return convert_from_bytes(pdf_buffer.getvalue())
 
 
 def generate_img(text: str):
     pdf_bytes = generate_pdf(text)
+    img = convert_pdf_to_img(pdf_bytes)
+
+    return img
+
+
+def generate_line_img(text: str):
+    pdf_bytes = generate_line_pdf(text)
     img = convert_pdf_to_img(pdf_bytes)
 
     return img
