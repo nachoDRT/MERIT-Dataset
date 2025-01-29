@@ -13,6 +13,9 @@ import warnings
 from os.path import abspath, dirname, join
 
 
+PARAGRAPH_DETECTION_THRES = 50
+
+
 def get_merit_dataset_iterator(subset_name: str, split: str, decode=None):
 
     print("Loading Dataset")
@@ -48,11 +51,11 @@ def clean_line_annotation(annotation: Dict, years: List = ["year_9", "year_10", 
 
     # TODO Parse "years" to the method
 
-    text = ""
     record = {}
+    paragraphs = []
+    last_element = None
 
     for element in annotation["form"]:
-        text += f" {element['text']}"
 
         if element["label"] != "other":
             clean = element["label"].split("_answer")
@@ -77,7 +80,59 @@ def clean_line_annotation(annotation: Dict, years: List = ["year_9", "year_10", 
                     else:
                         subject_content["grade"] = element["text"]
 
-    return text, record
+            else:
+                # Flag to insert the grades
+                paragraphs.append(f" {element['text']}")
+                paragraphs.append(True)
+
+        else:
+            new_paragraph = detect_new_paragraph(element, last_element)
+
+            if new_paragraph:
+                try:
+                    text += ""
+                    paragraphs.append(text)
+                    text = f" {element['text']}"
+                except NameError:
+                    text = ""
+            else:
+                text += f" {element['text']}"
+
+        last_element = element
+
+    text = get_string_from_paragraphs(paragraphs, record)
+
+    return text
+
+
+def detect_new_paragraph(element: Dict, last_element: Dict) -> bool:
+
+    try:
+        # Get 'y' coordinate
+        y_last = last_element["box"][1]
+        y = element["box"][1]
+        if y - y_last > PARAGRAPH_DETECTION_THRES:
+            new_paragraph = True
+        else:
+            new_paragraph = False
+        return new_paragraph
+
+    except TypeError:
+        return True
+
+
+def get_string_from_paragraphs(paragraphs: List, record: Dict) -> str:
+
+    string = ""
+
+    for element in paragraphs:
+
+        if type(element) is bool:
+            string += compose_table_as_string(record)
+        else:
+            string += element
+
+    return string
 
 
 def clean_paragraph_annotation(annotation: Dict):
@@ -87,6 +142,16 @@ def clean_paragraph_annotation(annotation: Dict):
         text += f" {element['text']}"
 
     return text
+
+
+def compose_table_as_string(record: Dict):
+
+    string_table = "\n"
+
+    for instance in record.values():
+        string_table += f"{instance['subject']} {instance['grade']}\n"
+
+    return string_table
 
 
 def generate_pdf(text: str) -> BytesIO:
@@ -102,10 +167,8 @@ def generate_pdf(text: str) -> BytesIO:
     text_object = c.beginText(100, 750)
     text_object.setFont("Helvetica", 12)
 
-    # Add the text, automatically adjusting
     for line in text.splitlines():
-        # Wrap the text using textwrap
-        wrapped_lines = textwrap.wrap(line, width=70)  # Adjust width as needed
+        wrapped_lines = textwrap.wrap(line, width=70)
 
         for wrapped_line in wrapped_lines:
             text_object.textLine(wrapped_line)
@@ -131,27 +194,24 @@ def generate_pdf(text: str) -> BytesIO:
     return output_buffer
 
 
-def generate_line_pdf(text: str, record: dict) -> BytesIO:
+def generate_line_pdf(text: str) -> BytesIO:
 
-    print(text)
     # Create a temporary buffer for the PDF
     buffer = BytesIO()
 
     # Create the PDF with reportlab
     c = canvas.Canvas(buffer, pagesize=letter)
 
-    # Set the maximum width for the text
-    max_width = 500  # Adjust this value as needed
-    text_object = c.beginText(100, 750)
-    text_object.setFont("Helvetica", 12)
+    text_object = c.beginText(35, 750)
+    text_object.setFont("Helvetica", 8)
 
-    # Add the text, automatically adjusting
     for line in text.splitlines():
-        # Wrap the text using textwrap
-        wrapped_lines = textwrap.wrap(line, width=70)  # Adjust width as needed
-
-        for wrapped_line in wrapped_lines:
+        wrapped_lines = textwrap.wrap(line, width=150)
+        for i, wrapped_line in enumerate(wrapped_lines):
             text_object.textLine(wrapped_line)
+
+        # TODO useful for next degradation
+        # text_object.textLine(" ")
 
     c.drawText(text_object)
     c.save()
@@ -159,19 +219,7 @@ def generate_line_pdf(text: str, record: dict) -> BytesIO:
     # Move buffer position to beginning
     buffer.seek(0)
 
-    # Create PDF writer object
-    output = PdfWriter()
-
-    # Add the page
-    page = PdfReader(buffer).pages[0]
-    output.add_page(page)
-
-    # Write to a temporary buffer
-    output_buffer = BytesIO()
-    output.write(output_buffer)
-    output_buffer.seek(0)
-
-    return output_buffer
+    return buffer
 
 
 def convert_pdf_to_img(pdf_buffer: BytesIO):
@@ -185,8 +233,8 @@ def generate_img(text: str):
     return img
 
 
-def generate_line_img(text: str, record: dict):
-    pdf_bytes = generate_line_pdf(text, record)
+def generate_line_img(text: str):
+    pdf_bytes = generate_line_pdf(text)
     img = convert_pdf_to_img(pdf_bytes)
 
     return img

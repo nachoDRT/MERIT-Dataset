@@ -36,11 +36,14 @@ if __name__ == "__main__":
     if args.degradation.lower() in ("line"):
 
         degradation_subset_name = f"{language}-digital-{degradation}-degradation-{data_format}"
-        print(degradation_subset_name)
+
         for split in splits:
             print(f"Generating {split} {degradation} samples")
             merit_subset_iterator, _ = get_merit_dataset_iterator(merit_subset_name, split)
-            generate_line_samples(merit_subset_iterator, language)
+            split_subset = generate_line_samples(merit_subset_iterator, language)
+            dataset.append((split, split_subset))
+        dataset = format_data(dict(dataset))
+        push_dataset_to_hf(dataset, degradation_subset_name, repo_name="dummy")
 
     else:
         print(f"Degradation called {degradation} has not been implemented yet.")

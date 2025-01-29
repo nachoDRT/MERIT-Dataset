@@ -14,7 +14,7 @@ def generate_paragraph_samples(merit_subset_iterator, lang: str, data_format: st
     for i, sample in enumerate(merit_subset_iterator):
 
         _, annotations = get_sample_data(sample)
-        text, _ = clean_paragraph_annotation(annotations)
+        text = clean_paragraph_annotation(annotations)
         img = generate_img(text)
 
         buffer = BytesIO()
@@ -40,8 +40,9 @@ def generate_line_samples(merit_subset_iterator, lang: str, data_format: str = "
     for i, sample in tqdm(enumerate(merit_subset_iterator)):
 
         _, annotations = get_sample_data(sample)
-        text, record = clean_line_annotation(annotations)
-        img = generate_line_img(text, record)
+        text = clean_line_annotation(annotations)
+        img = generate_line_img(text)
+        # img[0].show()
 
         buffer = BytesIO()
         img[0].save(buffer, format="PNG")
