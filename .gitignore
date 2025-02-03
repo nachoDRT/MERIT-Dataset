@@ -41,6 +41,9 @@ src/degradations/config/hf_config.json
 
 src/secret/config/hf_config.json
 src/secret/data
+src/secret/curated
+src/secret/config/config.json
+src/secret/config/secrets.json
 
 *pyc
 
