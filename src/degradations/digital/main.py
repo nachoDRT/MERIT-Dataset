@@ -43,7 +43,7 @@ if __name__ == "__main__":
             split_subset = generate_line_samples(merit_subset_iterator, language)
             dataset.append((split, split_subset))
         dataset = format_data(dict(dataset))
-        push_dataset_to_hf(dataset, degradation_subset_name, repo_name="dummy")
+        push_dataset_to_hf(dataset, degradation_subset_name, repo_name="merit")
 
     else:
         print(f"Degradation called {degradation} has not been implemented yet.")
