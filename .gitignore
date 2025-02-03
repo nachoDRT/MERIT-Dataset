@@ -39,6 +39,9 @@ src/postprocess/donut/data/
 
 src/degradations/config/hf_config.json
 
+src/secret/config/hf_config.json
+src/secret/data
+
 *pyc
 
 benchmark/results/training_results.csv
