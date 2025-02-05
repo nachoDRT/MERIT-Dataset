@@ -47,6 +47,7 @@ def get_output_seq(base64_image, gt, client, list_ft_models: bool = False):
                             "  ]\n"
                             "}\n\n"
                             "DO NOT include any additional text, explanations, or comments. "
+                            "Use the necessary encoding to correctly visualize graphic signs such as ´ "
                             "Use the key '3_de_la_eso', '4_de_la_eso', '1_de_bachillerato', or '2_de_bachillerato' based on what can be inferred from the image."
                             "To help you, you can infer the grades from the Dictionary I give you. Also, you should match every subject area given in this "
                             f"dictionary with a subject extracted from the page: {gt}"
@@ -120,7 +121,7 @@ def process_local_dataset(directory: str, show_imgs: bool = False):
             curated_image_path = curated_dir / f"{json_file.stem}.png"
 
             with open(curated_json_path, "w", encoding="utf-8") as f:
-                json.dump(seq, f, indent=4)
+                json.dump(seq, f, indent=4, ensure_ascii=False)
 
             cv2.imwrite(str(curated_image_path), img)
             print(f"Saved curated files: {curated_json_path}, {curated_image_path}")
