@@ -36,11 +36,15 @@ def generate_line_samples(merit_subset_iterator, lang: str, data_format: str = "
 
     if data_format == "seq":
         d_features = read_dataset_features_json()
+    if lang == "es":
+        years = ["3_de_la_eso", "4_de_la_eso", "1_de_bachillerato", "2_de_bachillerato"]
+    elif lang == "en":
+        years = ["year_9", "year_10", "year_11", "year_12"]
 
     for i, sample in tqdm(enumerate(merit_subset_iterator)):
 
         _, annotations = get_sample_data(sample)
-        text = clean_line_annotation(annotations)
+        text = clean_line_annotation(annotations, years)
         img = generate_line_img(text)
         # img[0].show()
 

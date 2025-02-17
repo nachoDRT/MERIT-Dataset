@@ -14,6 +14,7 @@ from os.path import abspath, dirname, join
 
 
 PARAGRAPH_DETECTION_THRES = 50
+MAX_CHARACTERS = 65
 
 
 def get_merit_dataset_iterator(subset_name: str, split: str, decode=None):
@@ -47,9 +48,7 @@ def read_json(path: str):
         return json.load(f)
 
 
-def clean_line_annotation(annotation: Dict, years: List = ["year_9", "year_10", "year_11", "year_12"]):
-
-    # TODO Parse "years" to the method
+def clean_line_annotation(annotation: Dict, years: List):
 
     record = {}
     paragraphs = []
@@ -162,13 +161,11 @@ def generate_pdf(text: str) -> BytesIO:
     # Create the PDF with reportlab
     c = canvas.Canvas(buffer, pagesize=letter)
 
-    # Set the maximum width for the text
-    max_width = 500  # Adjust this value as needed
     text_object = c.beginText(100, 750)
     text_object.setFont("Helvetica", 12)
 
     for line in text.splitlines():
-        wrapped_lines = textwrap.wrap(line, width=70)
+        wrapped_lines = textwrap.wrap(line, width=MAX_CHARACTERS)
 
         for wrapped_line in wrapped_lines:
             text_object.textLine(wrapped_line)

@@ -33,7 +33,7 @@ if __name__ == "__main__":
         dataset = format_data(dict(dataset))
         push_dataset_to_hf(dataset, degradation_subset_name)
 
-    if args.degradation.lower() in ("line"):
+    elif args.degradation.lower() in ("line"):
 
         degradation_subset_name = f"{language}-digital-{degradation}-degradation-{data_format}"
 
