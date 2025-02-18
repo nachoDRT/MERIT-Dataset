@@ -2,6 +2,7 @@ from utils import *
 from io import BytesIO
 from tqdm import tqdm
 import random
+from PIL import Image
 
 
 def generate_paragraph_samples(merit_subset_iterator, lang: str, data_format: str = "seq"):
@@ -60,7 +61,7 @@ def generate_line_samples(merit_subset_iterator, lang: str, data_format: str = "
     return {"image": images_bytes, "ground_truth": ground_truths}
 
 
-def generate_rotation_samples(merit_subset_iterator, lang: str, data_format: str = "seq"):
+def generate_rotation_samples(merit_subset_iterator, data_format: str = "seq"):
 
     images_bytes = []
     ground_truths = []
@@ -78,6 +79,40 @@ def generate_rotation_samples(merit_subset_iterator, lang: str, data_format: str
 
         buffer = BytesIO()
         rotated_img.save(buffer, format="PNG")
+        images_bytes.append(buffer.getvalue())
+
+        ground_truths.append(json.dumps(annotations))
+
+    return {"image": images_bytes, "ground_truth": ground_truths}
+
+
+def generate_zoom_samples(merit_subset_iterator):
+    images_bytes = []
+    ground_truths = []
+
+    for i, sample in tqdm(enumerate(merit_subset_iterator)):
+
+        img, annotations = get_sample_data(sample)
+
+        scale = random.uniform([1, 0.3])
+
+        width, height = img.size
+        center_x, center_y = width / 2, height / 2
+
+        inv_scale = 1 / scale
+        a = inv_scale  # x scale
+        b = 0  # No rotation
+        c = center_x - center_x * inv_scale  # Translation to center x
+        d = 0  # No rotation
+        e = inv_scale  # y scale
+        f = center_y - center_y * inv_scale  # Translation to center y
+
+        matrix = (a, b, c, d, e, f)
+
+        scaled_img = img.transform(img.size, Image.AFFINE, matrix, resample=Image.BICUBIC, fillcolor=(0, 0, 0))
+
+        buffer = BytesIO()
+        scaled_img.save(buffer, format="PNG")
         images_bytes.append(buffer.getvalue())
 
         ground_truths.append(json.dumps(annotations))
