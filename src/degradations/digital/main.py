@@ -45,5 +45,29 @@ if __name__ == "__main__":
         dataset = format_data(dict(dataset))
         push_dataset_to_hf(dataset, degradation_subset_name, repo_name="merit")
 
+    elif args.degradation.lower() in ("rotation"):
+        degradation_subset_name = f"{language}-digital-{degradation}-degradation-{data_format}"
+        merit_subset_name = f"{language}-digital-seq"
+
+        for split in splits:
+            print(f"Generating {split} {degradation} samples")
+            merit_subset_iterator, _ = get_merit_dataset_iterator(merit_subset_name, split)
+            split_subset = generate_rotation_samples(merit_subset_iterator)
+            dataset.append((split, split_subset))
+        dataset = format_data(dict(dataset))
+        push_dataset_to_hf(dataset, degradation_subset_name)
+
+    elif args.degradation.lower() in ("zoom"):
+        degradation_subset_name = f"{language}-digital-{degradation}-degradation-{data_format}"
+        merit_subset_name = f"{language}-digital-seq"
+
+        for split in splits:
+            print(f"Generating {split} {degradation} samples")
+            merit_subset_iterator, _ = get_merit_dataset_iterator(merit_subset_name, split)
+            split_subset = generate_zoom_samples(merit_subset_iterator)
+            dataset.append((split, split_subset))
+        dataset = format_data(dict(dataset))
+        push_dataset_to_hf(dataset, degradation_subset_name)
+
     else:
         print(f"Degradation called {degradation} has not been implemented yet.")
