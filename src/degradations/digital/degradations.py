@@ -94,7 +94,7 @@ def generate_zoom_samples(merit_subset_iterator):
 
         img, annotations = get_sample_data(sample)
 
-        scale = random.uniform([1, 0.3])
+        scale = random.uniform(1, 0.3)
 
         width, height = img.size
         center_x, center_y = width / 2, height / 2
