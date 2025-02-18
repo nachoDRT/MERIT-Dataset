@@ -1,6 +1,7 @@
 from utils import *
 from io import BytesIO
 from tqdm import tqdm
+import random
 
 
 def generate_paragraph_samples(merit_subset_iterator, lang: str, data_format: str = "seq"):
@@ -54,6 +55,31 @@ def generate_line_samples(merit_subset_iterator, lang: str, data_format: str = "
 
         if data_format == "seq":
             annotations = format_annotations_cordv2_style(annotations, d_features[f"years-{lang}"])
+        ground_truths.append(json.dumps(annotations))
+
+    return {"image": images_bytes, "ground_truth": ground_truths}
+
+
+def generate_rotation_samples(merit_subset_iterator, lang: str, data_format: str = "seq"):
+
+    images_bytes = []
+    ground_truths = []
+
+    for i, sample in tqdm(enumerate(merit_subset_iterator)):
+
+        img, annotations = get_sample_data(sample)
+
+        angle = random.random() * 30
+        if random.choice([True, False]):
+            rot_angle = angle
+        else:
+            rot_angle = -angle
+        rotated_img = img.rotate(rot_angle, expand=True, fillcolor=(0, 0, 0))
+
+        buffer = BytesIO()
+        rotated_img.save(buffer, format="PNG")
+        images_bytes.append(buffer.getvalue())
+
         ground_truths.append(json.dumps(annotations))
 
     return {"image": images_bytes, "ground_truth": ground_truths}
