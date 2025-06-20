@@ -86,7 +86,7 @@ def generate_rotation_samples(merit_subset_iterator, data_format: str = "seq"):
     return {"image": images_bytes, "ground_truth": ground_truths}
 
 
-def generate_zoom_samples(merit_subset_iterator):
+def generate_zoom_samples(merit_subset_iterator, scale: float = None):
     images_bytes = []
     ground_truths = []
 
@@ -94,7 +94,7 @@ def generate_zoom_samples(merit_subset_iterator):
 
         img, annotations = get_sample_data(sample)
 
-        scaled_img = scale_img(img)
+        scaled_img = scale_img(img, scale=scale)
 
         buffer = BytesIO()
         scaled_img.save(buffer, format="PNG")
@@ -131,9 +131,10 @@ def generate_rotation_zoom_samples(merit_subset_iterator):
     return {"image": images_bytes, "ground_truth": ground_truths}
 
 
-def scale_img(img):
+def scale_img(img, scale: float = None):
 
-    scale = random.uniform(1, 0.3)
+    if not scale:
+        scale = random.uniform(1, 0.3)
 
     width, height = img.size
     center_x, center_y = width / 2, height / 2
