@@ -226,154 +226,187 @@ def compute_metrics(p):
         }
 
 
-parser = argparse.ArgumentParser()
-parser.add_argument("--load_from_hub", action="store_true", default=False)
-parser.add_argument("--dataset_subset", type=str, default=None)
-args = parser.parse_args()
+def init_apis():
 
-load_from_hub = args.load_from_hub
-dataset_subset = args.dataset_subset
+    # Wandb
+    with open(WANDB_LOGGING_PATH) as f:
+        wandb_config = json.load(f)
 
-# Logging in wandb
-with open(WANDB_LOGGING_PATH) as f:
-    wandb_config = json.load(f)
+    wandb.login(key=os.getenv("WANDB_API_KEY"))
 
-wandb.login(key=os.getenv("WANDB_API_KEY"))
+    training_session_name = get_training_session_name(wandb_config)
 
-training_session_name = get_training_session_name(wandb_config)
-
-wandb.init(
-    project=wandb_config["project"],
-    entity=wandb_config["entity"],
-    name=training_session_name,
-    settings=wandb.Settings(console="off"),
-)
-
-if load_from_hub:
-    login(token=os.getenv("HUGGINGFACE_HUB_TOKEN"))
-    datasets = load_dataset(
-        "de-Rodrigo/merit",
-        name=dataset_subset,
-        num_proc=16,
+    wandb.init(
+        project=wandb_config["project"],
+        entity=wandb_config["entity"],
+        name=training_session_name,
+        settings=wandb.Settings(console="off"),
     )
 
-else:
-    # Load dataset using a '.py' file
-    datasets = load_dataset(LOAD_DATASET_FROM_PY, trust_remote_code=True)
+    # HuggingFace
+    login(token=os.getenv("HUGGINGFACE_HUB_TOKEN"))
+
+    return wandb_config
 
 
-datasets = datasets.map(
-    add_layoutlm_fields,
-    batched=False,
-    remove_columns=["ground_truth"],
-)
+def load_session_dataset():
+
+    if load_from_hub:
+
+        datasets = load_dataset(
+            "de-Rodrigo/merit",
+            name=dataset_subset,
+            num_proc=16,
+            split={
+                "train": "train[:1%]",
+                "validation": "validation[:1%]",
+                "test": "test[:1%]",
+            },
+        )
+
+        datasets = datasets.map(
+            add_layoutlm_fields,
+            batched=False,
+            remove_columns=["ground_truth"],
+        )
+
+        class_label = ClassLabel(names=LABEL_LIST)
+        datasets = datasets.cast_column("ner_tags", Sequence(class_label))
+
+    else:
+        # Load dataset using a '.py' file
+        datasets = load_dataset(LOAD_DATASET_FROM_PY, trust_remote_code=True)
+
+    return datasets
 
 
-class_label = ClassLabel(names=LABEL_LIST)
-datasets = datasets.cast_column("ner_tags", Sequence(class_label))
+def get_dataset_partitions():
+    """Preprocess datasets partitions"""
+    # Train
+    train_dataset = datasets["train"].map(
+        preprocess_data,
+        batched=True,
+        remove_columns=datasets["train"].column_names,
+        features=features,
+    )
+    train_dataset.set_format(type="torch")
+
+    # Validation
+    validation_dataset = datasets["validation"].map(
+        preprocess_data,
+        batched=True,
+        remove_columns=datasets["validation"].column_names,
+        features=features,
+    )
+    validation_dataset.set_format(type="torch")
+
+    # Test
+    test_dataset = datasets["test"].map(
+        preprocess_data,
+        batched=True,
+        remove_columns=datasets["test"].column_names,
+        features=features,
+    )
+    test_dataset.set_format(type="torch")
+
+    return train_dataset, validation_dataset, test_dataset
 
 
-labels = datasets["train"].features["ner_tags"].feature.names
-id2label = {v: k for v, k in enumerate(labels)}
-label2id = {k: v for v, k in enumerate(labels)}
+def get_args():
+
+    args = TrainingArguments(
+        output_dir="".join(["app/", wandb_config["project"]]),
+        max_steps=MAX_TRAIN_STEPS,
+        # warmup_ratio=0.1,
+        learning_rate=5e-5,
+        fp16=True,
+        push_to_hub=False,
+        # push_to_hub_model_id="CICLAB-Comillas/layoutlmv2-LSD",
+        logging_strategy="steps",
+        logging_steps=LOGGING_STEPS,
+        evaluation_strategy="steps",
+        eval_steps=EVAL_FRECUENCY,
+        report_to="wandb",
+        load_best_model_at_end=True,
+        save_total_limit=1,
+    )
+    return args
 
 
-# Load (pre) processor
-processor = LayoutLMv2Processor.from_pretrained("microsoft/layoutlmv2-base-uncased", revision="no_ocr")
+if __name__ == "__main__":
 
-features = Features(
-    {
-        "image": Array3D(dtype="int64", shape=(3, 224, 224)),
-        "input_ids": Sequence(feature=Value(dtype="int64")),
-        "attention_mask": Sequence(Value(dtype="int64")),
-        "token_type_ids": Sequence(Value(dtype="int64")),
-        "bbox": Array2D(dtype="int64", shape=(512, 4)),
-        "labels": Sequence(ClassLabel(names=labels)),
-    }
-)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--load_from_hub", action="store_true", default=False)
+    parser.add_argument("--dataset_subset", type=str, default=None)
+    args = parser.parse_args()
 
-"""Preprocess datasets partitions"""
-# Train
-train_dataset = datasets["train"].map(
-    preprocess_data,
-    batched=True,
-    remove_columns=datasets["train"].column_names,
-    features=features,
-)
-train_dataset.set_format(type="torch")
+    load_from_hub = args.load_from_hub
+    dataset_subset = args.dataset_subset
 
-# Validation
-validation_dataset = datasets["validation"].map(
-    preprocess_data,
-    batched=True,
-    remove_columns=datasets["validation"].column_names,
-    features=features,
-)
-validation_dataset.set_format(type="torch")
+    wandb_config = init_apis()
+    datasets = load_session_dataset()
 
-# Test
-test_dataset = datasets["test"].map(
-    preprocess_data,
-    batched=True,
-    remove_columns=datasets["test"].column_names,
-    features=features,
-)
-test_dataset.set_format(type="torch")
+    labels = datasets["train"].features["ner_tags"].feature.names
+    id2label = {v: k for v, k in enumerate(labels)}
+    label2id = {k: v for v, k in enumerate(labels)}
 
-# Dataloaders
-train_dataloader = DataLoader(train_dataset, batch_size=4, shuffle=True, pin_memory=False)
-validation_dataloader = DataLoader(validation_dataset, batch_size=2, shuffle=True, pin_memory=False)
-test_dataloader = DataLoader(test_dataset, batch_size=2, pin_memory=False)
+    # Load (pre) processor
+    processor = LayoutLMv2Processor.from_pretrained("microsoft/layoutlmv2-base-uncased", revision="no_ocr")
 
-model = LayoutLMv2ForTokenClassification.from_pretrained("microsoft/layoutlmv2-base-uncased", num_labels=len(label2id))
+    features = Features(
+        {
+            "image": Array3D(dtype="int64", shape=(3, 224, 224)),
+            "input_ids": Sequence(feature=Value(dtype="int64")),
+            "attention_mask": Sequence(Value(dtype="int64")),
+            "token_type_ids": Sequence(Value(dtype="int64")),
+            "bbox": Array2D(dtype="int64", shape=(512, 4)),
+            "labels": Sequence(ClassLabel(names=labels)),
+        }
+    )
 
-# Set id2label and label2id
-model.config.id2label = id2label
-model.config.label2id = label2id
+    train_dataset, validation_dataset, test_dataset = get_dataset_partitions()
 
-# Metrics
-metric = load_metric("seqeval")
-return_entity_level_metrics = False
+    # Dataloaders
+    train_dataloader = DataLoader(train_dataset, batch_size=4, shuffle=True, pin_memory=False)
+    validation_dataloader = DataLoader(validation_dataset, batch_size=2, shuffle=True, pin_memory=False)
+    test_dataloader = DataLoader(test_dataset, batch_size=2, pin_memory=False)
 
-args = TrainingArguments(
-    output_dir="".join(["app/", wandb_config["project"]]),
-    max_steps=MAX_TRAIN_STEPS,
-    # warmup_ratio=0.1,
-    learning_rate=5e-5,
-    fp16=True,
-    push_to_hub=False,
-    # push_to_hub_model_id="CICLAB-Comillas/layoutlmv2-LSD",
-    logging_strategy="steps",
-    logging_steps=LOGGING_STEPS,
-    evaluation_strategy="steps",
-    eval_steps=EVAL_FRECUENCY,
-    report_to="wandb",
-    load_best_model_at_end=True,
-    save_total_limit=1,
-)
+    model = LayoutLMv2ForTokenClassification.from_pretrained(
+        "microsoft/layoutlmv2-base-uncased", num_labels=len(label2id)
+    )
 
-# Initialize our Trainer
-trainer = FunsdTrainer(
-    model=model,
-    args=args,
-    train_dataset=train_dataset,
-    validation_dataset=validation_dataset,
-    compute_metrics=compute_metrics,
-)
+    # Set id2label and label2id
+    model.config.id2label = id2label
+    model.config.label2id = label2id
 
-# Train
-trainer.train()
+    # Metrics
+    metric = load_metric("seqeval")
+    return_entity_level_metrics = False
 
-# Test
-test_results = trainer.predict(test_dataset)
+    args = get_args()
 
-wandb.log(
-    {
-        "test_loss": test_results.metrics["test_loss"],
-        "test_accuracy": test_results.metrics["test_accuracy"],
-        "test_precision": test_results.metrics["test_precision"],
-        "test_recall": test_results.metrics["test_recall"],
-        "test_f1": test_results.metrics["test_f1"],
-    }
-)
-wandb.finish()
+    # Initialize our Trainer
+    trainer = FunsdTrainer(
+        model=model,
+        args=args,
+        train_dataset=train_dataset,
+        validation_dataset=validation_dataset,
+        compute_metrics=compute_metrics,
+    )
+
+    # Train
+    trainer.train()
+
+    # Test
+    test_results = trainer.predict(test_dataset)
+
+    wandb.log(
+        {
+            "test_loss": test_results.metrics["test_loss"],
+            "test_accuracy": test_results.metrics["test_accuracy"],
+            "test_precision": test_results.metrics["test_precision"],
+            "test_recall": test_results.metrics["test_recall"],
+            "test_f1": test_results.metrics["test_f1"],
+        }
+    )
+    wandb.finish()
