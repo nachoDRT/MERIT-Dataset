@@ -14,7 +14,7 @@ import wandb
 from lightning.pytorch.loggers import WandbLogger
 
 
-WANDB_PROJECT = "MERIT-Dataset"
+WANDB_PROJECT = "MERIT-Dataset-Img2Sequence"
 FINETUNED_MODEL_ID = "nielsr/paligemma-cord-demo"
 REPO_ID = "google/paligemma-3b-pt-224"
 MAX_LENGTH = 512

@@ -29,7 +29,7 @@ HF_CARD_FILES = [
 
 REPO_ID = "google/paligemma-3b-pt-224"
 MAX_LENGTH = 512
-WANDB_PROJECT = "MERIT-Dataset"
+WANDB_PROJECT = "MERIT-Dataset-Img2Sequence"
 
 
 PROMPT = "extract JSON."
