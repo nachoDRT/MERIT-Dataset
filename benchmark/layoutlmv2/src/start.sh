@@ -8,4 +8,5 @@ chmod +x src/train.py
 # find . | sed -e 's;[^/]*/;|____;g;s;____|; |;g'
 
 python src/train.py \
-    --load_from_hub
+    --load_from_hub \
+    --dataset_subset en-digital-token-class

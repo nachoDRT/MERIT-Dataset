@@ -137,7 +137,10 @@ def get_dataset_name() -> str:
 
 def get_training_session_name(wandb_config: dict) -> str:
 
-    dataset_name = get_dataset_name()
+    if load_from_hub:
+        dataset_name = dataset_subset
+    else:
+        dataset_name = get_dataset_name()
     name = "".join([wandb_config["name"], "_", dataset_name])
 
     return name
@@ -225,9 +228,11 @@ def compute_metrics(p):
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--load_from_hub", action="store_true", default=False)
+parser.add_argument("--dataset_subset", type=str, default=None)
 args = parser.parse_args()
 
 load_from_hub = args.load_from_hub
+dataset_subset = args.dataset_subset
 
 # Logging in wandb
 with open(WANDB_LOGGING_PATH) as f:
@@ -248,7 +253,7 @@ if load_from_hub:
     login(token=os.getenv("HUGGINGFACE_HUB_TOKEN"))
     datasets = load_dataset(
         "de-Rodrigo/merit",
-        name="en-digital-token-class",
+        name=dataset_subset,
         num_proc=16,
     )
 

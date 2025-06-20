@@ -20,6 +20,9 @@ RUN pip install -q detectron2 -f https://dl.fbaipublicfiles.com/detectron2/wheel
 COPY dockerfiles/rtx3090/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+ENV HUGGINGFACE_HUB_TOKEN=<your_token>
+ENV WANDB_API_KEY=<your_token>
+
 # Copy the rest of the project
 COPY . .
 
