@@ -1,6 +1,8 @@
 transformers==4.10.0
 pyyaml==5.1
-pillow==8.2.0
+# pillow==8.2.0
+pillow==9.4.0
 wandb
 seqeval
-datasets
+datasets==2.19.0
+wandb

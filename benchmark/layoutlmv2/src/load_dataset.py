@@ -99,9 +99,7 @@ class Funsd(datasets.GeneratorBasedBuilder):
 
         return lsd_labels
 
-    def _expand_labels_with_academic_years(
-        self, lsd_labels: list, academic_years: list, names_labels: list
-    ):
+    def _expand_labels_with_academic_years(self, lsd_labels: list, academic_years: list, names_labels: list):
 
         for academic_year in academic_years:
 
@@ -125,9 +123,7 @@ class Funsd(datasets.GeneratorBasedBuilder):
         # Loop over the dictionary to extract its keys
         expanded_labels = []
         expanded_tags = subjects_semantic["academic_years_tags"]
-        lsd_labels, names_labels = self._expand_labels_with_academic_years(
-            lsd_labels, expanded_tags, names_labels
-        )
+        lsd_labels, names_labels = self._expand_labels_with_academic_years(lsd_labels, expanded_tags, names_labels)
 
         for key in subjects_semantic["subjects"]:
             for tag in expanded_tags:
@@ -159,12 +155,8 @@ class Funsd(datasets.GeneratorBasedBuilder):
                 {
                     "id": datasets.Value("string"),
                     "words": datasets.Sequence(datasets.Value("string")),
-                    "bboxes": datasets.Sequence(
-                        datasets.Sequence(datasets.Value("int64"))
-                    ),
-                    "ner_tags": datasets.Sequence(
-                        datasets.features.ClassLabel(names=lsd_labels)
-                    ),
+                    "bboxes": datasets.Sequence(datasets.Sequence(datasets.Value("int64"))),
+                    "ner_tags": datasets.Sequence(datasets.features.ClassLabel(names=lsd_labels)),
                     "image_path": datasets.Value("string"),
                 }
             ),
