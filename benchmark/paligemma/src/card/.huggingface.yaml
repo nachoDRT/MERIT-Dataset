@@ -1,0 +1,8 @@
+---
+tags:
+- vision
+- document-understanding
+- paligemma
+metrics:
+- accuracy
+- f1
