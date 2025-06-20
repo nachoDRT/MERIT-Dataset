@@ -9,4 +9,6 @@ chmod +x src/train.py
 
 python src/train.py \
     --load_from_hub \
-    --dataset_subset en-digital-token-class
+    --dataset_path de-Rodrigo/merit \
+    --training_dataset_subset en-digital-token-class \
+    --testing_dataset_subset en-render-token-class

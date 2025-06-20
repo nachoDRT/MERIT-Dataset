@@ -9,7 +9,7 @@ from transformers import (
     Trainer,
 )
 from datasets import Features, Sequence, ClassLabel, Value, Array2D, Array3D
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, ConcatDataset
 from huggingface_hub import HfFolder
 import numpy as np
 import argparse
@@ -138,7 +138,7 @@ def get_dataset_name() -> str:
 def get_training_session_name(wandb_config: dict) -> str:
 
     if load_from_hub:
-        dataset_name = dataset_subset
+        dataset_name = training_dataset_subset
     else:
         dataset_name = get_dataset_name()
     name = "".join([wandb_config["name"], "_", dataset_name])
@@ -253,9 +253,46 @@ def load_session_dataset():
 
     if load_from_hub:
 
+        if dataset_path == "de-Rodrigo/merit":
+            datasets = load_merit_dataset()
+
+    else:
+        # Load dataset using a '.py' file
+        datasets = load_dataset(LOAD_DATASET_FROM_PY, trust_remote_code=True)
+
+    return datasets
+
+
+def load_merit_dataset():
+    if testing_dataset_subset:
+
+        print(f"Loading test dataset: {dataset_path}/{testing_dataset_subset}")
+        test_dataset = load_dataset(
+            path=dataset_path,
+            name=testing_dataset_subset,
+            num_proc=16,
+            split={
+                "test": "test[:1%]",
+            },
+        )
+
+        print(f"Loading training/validation dataset: {dataset_path}/{training_dataset_subset}")
         datasets = load_dataset(
-            "de-Rodrigo/merit",
-            name=dataset_subset,
+            path=dataset_path,
+            name=training_dataset_subset,
+            num_proc=16,
+            split={
+                "train": "train[:1%]",
+                "validation": "validation[:1%]",
+            },
+        )
+
+        datasets = ConcatDataset(datasets, test_dataset)
+
+    else:
+        datasets = load_dataset(
+            path=dataset_path,
+            name=training_dataset_subset,
             num_proc=16,
             split={
                 "train": "train[:1%]",
@@ -264,18 +301,14 @@ def load_session_dataset():
             },
         )
 
-        datasets = datasets.map(
-            add_layoutlm_fields,
-            batched=False,
-            remove_columns=["ground_truth"],
-        )
+    datasets = datasets.map(
+        add_layoutlm_fields,
+        batched=False,
+        remove_columns=["ground_truth"],
+    )
 
-        class_label = ClassLabel(names=LABEL_LIST)
-        datasets = datasets.cast_column("ner_tags", Sequence(class_label))
-
-    else:
-        # Load dataset using a '.py' file
-        datasets = load_dataset(LOAD_DATASET_FROM_PY, trust_remote_code=True)
+    class_label = ClassLabel(names=LABEL_LIST)
+    datasets = datasets.cast_column("ner_tags", Sequence(class_label))
 
     return datasets
 
@@ -337,11 +370,15 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--load_from_hub", action="store_true", default=False)
-    parser.add_argument("--dataset_subset", type=str, default=None)
+    parser.add_argument("--dataset_path", type=str, default=None)
+    parser.add_argument("--training_dataset_subset", type=str, default=None)
+    parser.add_argument("--testing_dataset_subset", type=str, default=None)
     args = parser.parse_args()
 
     load_from_hub = args.load_from_hub
-    dataset_subset = args.dataset_subset
+    dataset_path = args.dataset_path
+    training_dataset_subset = args.training_dataset_subset
+    testing_dataset_subset = args.testing_dataset_subset
 
     wandb_config = init_apis()
     datasets = load_session_dataset()
