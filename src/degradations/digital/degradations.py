@@ -3,6 +3,7 @@ from io import BytesIO
 from tqdm import tqdm
 import random
 from PIL import Image
+import numpy as np
 
 
 def generate_paragraph_samples(merit_subset_iterator, lang: str, data_format: str = "seq"):
@@ -152,3 +153,88 @@ def scale_img(img, scale: float = None):
     scaled_img = img.transform(img.size, Image.AFFINE, matrix, resample=Image.BICUBIC, fillcolor=(0, 0, 0))
 
     return scaled_img
+
+
+def generate_noisy_samples(merit_subset_iterator, seed: int | None = 42):
+
+    images_bytes = []
+    ground_truths = []
+    snr_metric = []
+
+    if seed is not None:
+        random.seed(seed)
+        np.random.seed(seed)
+
+    for i, sample in tqdm(enumerate(merit_subset_iterator)):
+
+        img, annotations = get_sample_data(sample)
+        amount = np.random.uniform(0.1, 0.45)
+        noisy_img = add_noise(img, amount=amount)
+        # noisy_img.show()
+
+        buffer = BytesIO()
+        noisy_img.save(buffer, format="PNG")
+        images_bytes.append(buffer.getvalue())
+
+        snr_metric.append(snr(img, noisy_img))
+
+        ground_truths.append(json.dumps(annotations))
+
+    return {"image": images_bytes, "ground_truth": ground_truths}, snr_metric
+
+
+def add_noise(
+    img: Image.Image,
+    mode: str = "salt_pepper",
+    amount: float = 0.02,
+    mean: float = 0.0,
+    std: float = 0.02,
+) -> Image.Image:
+    """
+    Get a noisy sample.
+
+    mode      : 'salt_pepper', 'gaussian' o 'speckle'
+    amount    : fraction of altered pixels (salt & pepper)
+    mean, std : noise parameters gaussian / speckle
+    """
+
+    arr = np.array(img).astype(np.float32)
+
+    if mode == "salt_pepper":
+
+        mask = np.random.choice([0, 1, 2], size=arr.shape[:2], p=[1 - amount, amount / 2, amount / 2])
+        salt = mask == 1
+        pepper = mask == 2
+
+        arr[salt] = 255
+        arr[pepper] = 0
+
+    elif mode == "gaussian":
+        noise = np.random.normal(mean, std * 255, arr.shape)
+        arr += noise
+
+    elif mode == "speckle":
+        noise = np.random.normal(mean, std, arr.shape)
+        arr += arr * noise
+
+    else:
+        raise ValueError(f"Non supported noise mode: {mode}")
+
+    arr = np.clip(arr, 0, 255).astype(np.uint8)
+
+    return Image.fromarray(arr)
+
+
+def snr(original: Image.Image, noisy: Image.Image) -> float:
+    """
+    Compute SNR between original and noisy image.
+    """
+
+    orig = np.asarray(original).astype(np.float32)
+    noisy_arr = np.asarray(noisy).astype(np.float32)
+    noise = orig - noisy_arr
+
+    signal_power = np.sum(orig**2)
+    noise_power = np.sum(noise**2) + 1e-8
+
+    return signal_power / noise_power

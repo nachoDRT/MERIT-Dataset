@@ -2,6 +2,7 @@ import argparse
 from degradations import *
 from utils import *
 from push_to_hub import *
+import numpy as np
 
 if __name__ == "__main__":
 
@@ -83,6 +84,25 @@ if __name__ == "__main__":
             split_subset = generate_rotation_zoom_samples(merit_subset_iterator)
             dataset.append((split, split_subset))
         dataset = format_data(dict(dataset))
+        push_dataset_to_hf(dataset, degradation_subset_name)
+
+    elif args.degradation.lower() in ("noisy"):
+        merit_subset_name = f"{language}-digital-seq"
+        snr = []
+        for split in splits:
+            print(f"Generating {split} {degradation} samples")
+            merit_subset_iterator, _ = get_merit_dataset_iterator(merit_subset_name, split)
+            split_subset, split_snr = generate_noisy_samples(merit_subset_iterator)
+            dataset.append((split, split_subset))
+            snr.extend(split_snr)
+        dataset = format_data(dict(dataset))
+
+        snr_mean_ratio = np.mean(snr)
+        snr_mean_db = 10 * np.log10(snr_mean_ratio)
+        snr_std_db = np.std(10 * np.log10(snr))
+
+        degradation = f"{degradation}-snr-{np.average(snr)}"
+        degradation_subset_name = f"{language}-digital-{degradation}-degradation-{data_format}"
         push_dataset_to_hf(dataset, degradation_subset_name)
 
     else:
