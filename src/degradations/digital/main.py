@@ -3,6 +3,7 @@ from degradations import *
 from utils import *
 from push_to_hub import *
 import numpy as np
+import gc
 
 if __name__ == "__main__":
 
@@ -87,24 +88,39 @@ if __name__ == "__main__":
         push_dataset_to_hf(dataset, degradation_subset_name)
 
     elif args.degradation.lower() in ("noisy"):
+
         merit_subset_name = f"{language}-digital-seq"
-        snr = []
+        noisy_subset = f"{language}-digital-{degradation}-degradation-{data_format}"
+
+        snr_ratios = []
+
         for split in splits:
             print(f"Generating {split} {degradation} samples")
-            merit_subset_iterator, _ = get_merit_dataset_iterator(merit_subset_name, split)
-            split_subset, split_snr = generate_noisy_samples(merit_subset_iterator)
-            dataset.append((split, split_subset))
-            snr.extend(split_snr)
-        dataset = format_data(dict(dataset))
 
-        snr_mean_ratio = np.mean(snr)
-        snr_mean_db = 10 * np.log10(snr_mean_ratio)
-        snr_std_db = np.std(10 * np.log10(snr))
+            iterator, _ = get_merit_dataset_iterator(merit_subset_name, split)
 
-        degradation = f"{degradation}-snr-{snr_mean_db}"
-        print(f"Noise level: \n mean: {snr_mean_db} \n std {snr_std_db}")
-        degradation_subset_name = f"{language}-digital-{degradation}-degradation-{data_format}"
-        push_dataset_to_hf(dataset, degradation_subset_name)
+            # Process batches
+            ds_split, split_snr = generate_noisy_samples_stream(
+                iterator,
+                batch_size=124,
+                seed=42,
+            )
+
+            # Push the split -> Free RAM
+            push_dataset_to_hf({split: ds_split}, noisy_subset)
+            # push_dataset_to_hf(ds_split, repo_split)
+
+            snr_ratios.extend(split_snr)
+
+            # delete memory associated to the split
+            del ds_split, split_snr
+            gc.collect()
+
+        mean_ratio = float(np.mean(snr_ratios))
+        mean_db = float(10 * np.log10(mean_ratio))
+        std_db = float(np.std(10 * np.log10(snr_ratios)))
+
+        print(f"SNR(dataset) = {mean_db:.2f} dB ± {std_db:.2f} dB")
 
     else:
         print(f"Degradation called {degradation} has not been implemented yet.")

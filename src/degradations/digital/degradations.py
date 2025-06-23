@@ -4,6 +4,9 @@ from tqdm import tqdm
 import random
 from PIL import Image
 import numpy as np
+import gc
+from datasets import Dataset, Value, Features, concatenate_datasets, Image as HFImage
+from os.path import dirname, join, abspath
 
 
 def generate_paragraph_samples(merit_subset_iterator, lang: str, data_format: str = "seq"):
@@ -155,32 +158,54 @@ def scale_img(img, scale: float = None):
     return scaled_img
 
 
-def generate_noisy_samples(merit_subset_iterator, seed: int | None = 42):
+def generate_noisy_samples_stream(iterator, *, batch_size=512, seed=42):
+    """
+    (split Dataset, list_snr_ratio).
+    Batch processing -> Efficient RAM usage.
+    """
+    random.seed(seed)
+    np.random.seed(seed)
 
-    images_bytes = []
-    ground_truths = []
-    snr_metric = []
+    feats = Features(
+        {
+            "image": HFImage(),
+            "ground_truth": Value("string"),
+            # "snr_ratio": Value("float32"),
+        }
+    )
+    batch = {k: [] for k in feats}
+    writer = None
+    snr_all = []
 
-    if seed is not None:
-        random.seed(seed)
-        np.random.seed(seed)
+    for idx, sample in tqdm(enumerate(iterator), desc="adding noise"):
+        img, ann = get_sample_data(sample)
+        noisy = add_noise(img, amount=np.random.uniform(0.1, 0.45))
 
-    for i, sample in tqdm(enumerate(merit_subset_iterator)):
+        buf = BytesIO()
+        noisy.save(buf, format="PNG")
 
-        img, annotations = get_sample_data(sample)
-        amount = np.random.uniform(0.1, 0.45)
-        noisy_img = add_noise(img, amount=amount)
-        # noisy_img.show()
+        ratio = snr_ratio(img, noisy)
+        snr_all.append(ratio)
 
-        buffer = BytesIO()
-        noisy_img.save(buffer, format="PNG")
-        images_bytes.append(buffer.getvalue())
+        batch["image"].append(buf.getvalue())
+        batch["ground_truth"].append(json.dumps(ann))
+        # batch["snr_ratio"].append(ratio)
 
-        snr_metric.append(snr(img, noisy_img))
+        # Free buffers every 100 imgs
+        del img, noisy, buf
+        if (idx + 1) % 100 == 0:
+            gc.collect()
 
-        ground_truths.append(json.dumps(annotations))
+        # Free the batch when it is full and reset
+        if len(batch["image"]) >= batch_size:
+            writer = _flush_batch(batch, feats, writer)
+            batch = {k: [] for k in feats}
 
-    return {"image": images_bytes, "ground_truth": ground_truths}, snr_metric
+    # Last batch
+    if batch["image"]:
+        writer = _flush_batch(batch, feats, writer)
+
+    return writer, snr_all
 
 
 def add_noise(
@@ -225,16 +250,15 @@ def add_noise(
     return Image.fromarray(arr)
 
 
-def snr(original: Image.Image, noisy: Image.Image) -> float:
-    """
-    Compute SNR between original and noisy image.
-    """
-
+def snr_ratio(original: Image.Image, noisy: Image.Image) -> float:
+    """Compute SNR."""
     orig = np.asarray(original).astype(np.float32)
-    noisy_arr = np.asarray(noisy).astype(np.float32)
-    noise = orig - noisy_arr
+    noise = orig - np.asarray(noisy).astype(np.float32)
 
-    signal_power = np.sum(orig**2)
-    noise_power = np.sum(noise**2) + 1e-8
+    return np.sum(orig**2) / (np.sum(noise**2) + 1e-8)
 
-    return signal_power / noise_power
+
+def _flush_batch(batch, feats, writer):
+    """Transform the dictionary batch→Dataset and concatenate with the writer."""
+    ds_batch = Dataset.from_dict(batch, features=feats)
+    return ds_batch if writer is None else concatenate_datasets([writer, ds_batch])
