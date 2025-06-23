@@ -101,7 +101,8 @@ if __name__ == "__main__":
         snr_mean_db = 10 * np.log10(snr_mean_ratio)
         snr_std_db = np.std(10 * np.log10(snr))
 
-        degradation = f"{degradation}-snr-{np.average(snr)}"
+        degradation = f"{degradation}-snr-{snr_mean_db}"
+        print(f"Noise level: \n mean: {snr_mean_db} \n std {snr_std_db}")
         degradation_subset_name = f"{language}-digital-{degradation}-degradation-{data_format}"
         push_dataset_to_hf(dataset, degradation_subset_name)
 
