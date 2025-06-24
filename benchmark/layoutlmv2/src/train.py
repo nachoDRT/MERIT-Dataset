@@ -253,53 +253,45 @@ def load_session_dataset():
 
     if load_from_hub:
 
-        if dataset_path == "de-Rodrigo/merit":
-            datasets = load_merit_dataset()
+        split = {
+            "train": "train[:1%]",
+            "validation": "validation[:1%]",
+            "test": "test[:1%]",
+        }
+
+        if dataset_path == "de-Rodrigo/merit" and testing_dataset_subset == None:
+            datasets = load_merit_dataset(training_dataset_subset, split)
+        
+        elif dataset_path == "de-Rodrigo/merit" and testing_dataset_subset != None:
+            
+            split_train_val = {
+                "train": "train[:1%]",
+                "validation": "validation[:1%]",
+            }
+
+            split_test = {
+                "test": "test[:1%]",
+            }
+
+            datasets_train_val = load_merit_dataset(training_dataset_subset, split_train_val)
+            datasets_test = load_merit_dataset(testing_dataset_subset, split_test)
+
+            return datasets_train_val, datasets_test
 
     else:
         # Load dataset using a '.py' file
         datasets = load_dataset(LOAD_DATASET_FROM_PY, trust_remote_code=True)
 
-    return datasets
+    return datasets, None
 
 
-def load_merit_dataset():
-    if testing_dataset_subset:
-
-        print(f"Loading test dataset: {dataset_path}/{testing_dataset_subset}")
-        test_dataset = load_dataset(
-            path=dataset_path,
-            name=testing_dataset_subset,
-            num_proc=16,
-            split={
-                "test": "test[:1%]",
-            },
-        )
-
-        print(f"Loading training/validation dataset: {dataset_path}/{training_dataset_subset}")
-        datasets = load_dataset(
-            path=dataset_path,
-            name=training_dataset_subset,
-            num_proc=16,
-            split={
-                "train": "train[:1%]",
-                "validation": "validation[:1%]",
-            },
-        )
-
-        datasets = ConcatDataset(datasets, test_dataset)
-
-    else:
-        datasets = load_dataset(
-            path=dataset_path,
-            name=training_dataset_subset,
-            num_proc=16,
-            split={
-                "train": "train[:1%]",
-                "validation": "validation[:1%]",
-                "test": "test[:1%]",
-            },
-        )
+def load_merit_dataset(dataset_subset, split):
+    datasets = load_dataset(
+        path=dataset_path,
+        name=dataset_subset,
+        num_proc=16,
+        split=split
+    )
 
     datasets = datasets.map(
         add_layoutlm_fields,
@@ -313,34 +305,44 @@ def load_merit_dataset():
     return datasets
 
 
-def get_dataset_partitions():
+def get_dataset_partitions(datasets_train_val, datasets_test):
     """Preprocess datasets partitions"""
     # Train
-    train_dataset = datasets["train"].map(
+    train_dataset = datasets_train_val["train"].map(
         preprocess_data,
         batched=True,
-        remove_columns=datasets["train"].column_names,
+        remove_columns=datasets_train_val["train"].column_names,
         features=features,
     )
     train_dataset.set_format(type="torch")
 
     # Validation
-    validation_dataset = datasets["validation"].map(
+    validation_dataset = datasets_train_val["validation"].map(
         preprocess_data,
         batched=True,
-        remove_columns=datasets["validation"].column_names,
+        remove_columns=datasets_train_val["validation"].column_names,
         features=features,
     )
     validation_dataset.set_format(type="torch")
 
-    # Test
-    test_dataset = datasets["test"].map(
-        preprocess_data,
-        batched=True,
-        remove_columns=datasets["test"].column_names,
-        features=features,
-    )
-    test_dataset.set_format(type="torch")
+    if datasets_test:
+        test_dataset = datasets_test["test"].map(
+            preprocess_data,
+            batched=True,
+            remove_columns=datasets_test["test"].column_names,
+            features=features,
+        )
+        test_dataset.set_format(type="torch")
+    
+    else:
+        # Test
+        test_dataset = datasets_train_val["test"].map(
+            preprocess_data,
+            batched=True,
+            remove_columns=datasets_train_val["test"].column_names,
+            features=features,
+        )
+        test_dataset.set_format(type="torch")
 
     return train_dataset, validation_dataset, test_dataset
 
@@ -381,9 +383,13 @@ if __name__ == "__main__":
     testing_dataset_subset = args.testing_dataset_subset
 
     wandb_config = init_apis()
-    datasets = load_session_dataset()
 
-    labels = datasets["train"].features["ner_tags"].feature.names
+    if testing_dataset_subset:
+        datasets_train_val, dataset_test = load_session_dataset()
+    else:
+        datasets_train_val, dataset_test = load_session_dataset()
+    
+    labels = datasets_train_val["train"].features["ner_tags"].feature.names
     id2label = {v: k for v, k in enumerate(labels)}
     label2id = {k: v for v, k in enumerate(labels)}
 
@@ -401,7 +407,7 @@ if __name__ == "__main__":
         }
     )
 
-    train_dataset, validation_dataset, test_dataset = get_dataset_partitions()
+    train_dataset, validation_dataset, test_dataset = get_dataset_partitions(datasets_train_val, dataset_test)
 
     # Dataloaders
     train_dataloader = DataLoader(train_dataset, batch_size=4, shuffle=True, pin_memory=False)
