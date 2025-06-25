@@ -531,6 +531,7 @@ def train_idefics2(idefics2, configuration):
             devices="auto", # Use available GPUs
             max_epochs=configuration.get("max_epochs"),
             check_val_every_n_epoch=configuration.get("check_val_every_n_epoch"),
+            val_check_interval=configuration.get("val_check_interval"),
             gradient_clip_val=configuration.get("gradient_clip_val"),
             accumulate_grad_batches=configuration.get("accumulate_grad_batches"),
             precision=configuration.get("precision"),
