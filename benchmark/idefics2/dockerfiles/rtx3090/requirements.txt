@@ -1,0 +1,12 @@
+debugpy
+transformers
+datasets
+sentencepiece
+pytorch-lightning==2.4.0
+lightning
+wandb
+nltk
+peft
+bitsandbytes
+donut-python
+peft

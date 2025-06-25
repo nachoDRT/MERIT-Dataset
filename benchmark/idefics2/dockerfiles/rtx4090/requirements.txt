@@ -1,0 +1,10 @@
+debugpy
+transformers
+datasets
+sentencepiece
+pytorch-lightning
+lightning
+wandb
+nltk
+peft
+bitsandbytes
