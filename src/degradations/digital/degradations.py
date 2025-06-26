@@ -7,6 +7,7 @@ import numpy as np
 import gc
 from datasets import Dataset, Value, Features, concatenate_datasets, Image as HFImage
 from os.path import dirname, join, abspath
+from PIL import Image as PILImage
 
 
 def generate_paragraph_samples(merit_subset_iterator, lang: str, data_format: str = "seq"):
@@ -262,3 +263,34 @@ def _flush_batch(batch, feats, writer):
     """Transform the dictionary batch→Dataset and concatenate with the writer."""
     ds_batch = Dataset.from_dict(batch, features=feats)
     return ds_batch if writer is None else concatenate_datasets([writer, ds_batch])
+
+def generate_watermark_samples(merit_subset_iterator):
+    images_bytes = []
+    ground_truths = []
+    decoder = HFImage()
+
+    watermarks = load_watermarks()
+
+    for i, sample in tqdm(enumerate(merit_subset_iterator)):
+
+        img_name = sample["image"]["path"]
+        school = img_name.split("_")[1]
+
+        watermark_img = watermarks[school]
+
+        decoded_img = decoder.decode_example(sample["image"])
+
+        np_img = np.array(decoded_img)
+        decoded_cv_img = cv2.cvtColor(np_img, cv2.COLOR_RGB2BGR)
+
+        output_img = add_transparent_image(decoded_cv_img, watermark_img, 0.2)
+
+        _, annotations = get_sample_data(sample)
+
+        buffer = BytesIO()
+        output_img.save(buffer, format="PNG")
+        images_bytes.append(buffer.getvalue())
+
+        ground_truths.append(json.dumps(annotations))
+
+    return {"image": images_bytes, "ground_truth": ground_truths}

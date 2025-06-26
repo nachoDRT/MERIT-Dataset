@@ -29,7 +29,7 @@ def push_splits_to_hf(data: DatasetDict, configuration: Dict, subset: str, repo_
 
     for split, dataset in data.items():
         dataset_name = f"{username}/{repo_name}"
-        dataset.push_to_hub(dataset_name, config_name=subset, split=split)
+        dataset.push_to_hub(dataset_name, config_name=subset, split=split, max_shard_size="200MB")
 
 
 def get_hf_config() -> Dict:
