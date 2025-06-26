@@ -20,6 +20,9 @@ from lightning.pytorch.callbacks.early_stopping import EarlyStopping
 from lightning.pytorch.loggers import WandbLogger
 from sklearn.metrics import precision_score, recall_score, f1_score
 from torchmetrics.classification import MulticlassF1Score
+from PIL import Image
+import io
+import numpy as np
 
 HF_CARD_FILES = [
     "/app/src/card/README.md",
@@ -54,28 +57,57 @@ class CustomDataset(Dataset):
         self.split = split
         self.sort_json_key = sort_json_key
 
-        self.dataset = load_dataset(dataset_name_or_path, name=subset, split=self.split, num_proc=8)
+        if dataset_name_or_path == "de-Rodrigo/merit":
+            self.dataset = load_dataset(dataset_name_or_path, name=subset, split=self.split, num_proc=8)
+        else:
+            self.dataset = load_dataset(dataset_name_or_path, split=self.split, num_proc=8)
         self.dataset_length = len(self.dataset)
 
         self.gt_token_sequences = []
-        for sample in self.dataset:
-            ground_truth = json.loads(sample["ground_truth"])
-            if "gt_parses" in ground_truth:  # when multiple ground truths are available, e.g., docvqa
-                assert isinstance(ground_truth["gt_parses"], list)
-                gt_jsons = ground_truth["gt_parses"]
-            else:
-                assert "gt_parse" in ground_truth and isinstance(ground_truth["gt_parse"], dict)
-                gt_jsons = [ground_truth["gt_parse"]]
 
-            self.gt_token_sequences.append(
-                [
-                    self.json2token(
-                        gt_json,
-                        sort_json_key=self.sort_json_key,
-                    )
-                    for gt_json in gt_jsons  # load json from list of json
-                ]
-            )
+        if dataset_name_or_path == "de-Rodrigo/merit":
+            for sample in self.dataset:
+                ground_truth = json.loads(sample["ground_truth"])
+                if "gt_parses" in ground_truth:  # when multiple ground truths are available, e.g., docvqa
+                    assert isinstance(ground_truth["gt_parses"], list)
+                    gt_jsons = ground_truth["gt_parses"]
+                else:
+                    assert "gt_parse" in ground_truth and isinstance(ground_truth["gt_parse"], dict)
+                    gt_jsons = [ground_truth["gt_parse"]]
+
+                self.gt_token_sequences.append(
+                    [
+                        self.json2token(
+                            gt_json,
+                            sort_json_key=self.sort_json_key,
+                        )
+                        for gt_json in gt_jsons  # load json from list of json
+                    ]
+                )
+        else:
+            for sample in self.dataset:
+                ocr_words = sample["ocr_words"]
+                words_list = [{"word": word} for word in ocr_words]
+                page = {"page_0": words_list}
+                ground_truth = {"gt_parse": page}
+
+                if "gt_parses" in ground_truth:  # when multiple ground truths are available, e.g., docvqa
+                    assert isinstance(ground_truth["gt_parses"], list)
+                    gt_jsons = ground_truth["gt_parses"]
+                else:
+                    assert "gt_parse" in ground_truth and isinstance(ground_truth["gt_parse"], dict)
+                    gt_jsons = [ground_truth["gt_parse"]]
+
+                self.gt_token_sequences.append(
+                    [
+                        self.json2token(
+                            gt_json,
+                            sort_json_key=self.sort_json_key,
+                        )
+                        for gt_json in gt_jsons  # load json from list of json
+                    ]
+                )
+
 
     def json2token(self, obj: Any, sort_json_key: bool = True):
         """
@@ -350,36 +382,120 @@ class PushToHubCallback(Callback):
             )
 
 
+# def train_collate_fn(examples):
+#   images = [example[0] for example in examples]
+#   texts = [PROMPT for _ in range(len(images))]
+#   labels = [example[1] for example in examples]
+
+#   inputs = processor(text=texts, images=images, suffix=labels, return_tensors="pt", padding=True,
+#                      truncation="only_second", max_length=MAX_LENGTH,
+#                      tokenize_newline_separately=False)
+
+#   input_ids = inputs["input_ids"]
+#   token_type_ids = inputs["token_type_ids"]
+#   attention_mask = inputs["attention_mask"]
+#   pixel_values = inputs["pixel_values"]
+#   labels = inputs["labels"]
+
+#   return input_ids, token_type_ids, attention_mask, pixel_values, labels
+
+
+# def eval_collate_fn(examples):
+#   images = [example[0] for example in examples]
+#   texts = [PROMPT for _ in range(len(images))]
+#   answers = [example[1] for example in examples]
+
+#   inputs = processor(text=texts, images=images, return_tensors="pt", padding=True, tokenize_newline_separately=False)
+
+#   input_ids = inputs["input_ids"]
+#   attention_mask = inputs["attention_mask"]
+#   pixel_values = inputs["pixel_values"]
+
+#   return input_ids, attention_mask, pixel_values, answers
+
+
 def train_collate_fn(examples):
-  images = [example[0] for example in examples]
-  texts = [PROMPT for _ in range(len(images))]
-  labels = [example[1] for example in examples]
+    images = [example[0] for example in examples]
+    texts = [PROMPT for _ in range(len(images))]
+    labels = [example[1] for example in examples]
 
-  inputs = processor(text=texts, images=images, suffix=labels, return_tensors="pt", padding=True,
-                     truncation="only_second", max_length=MAX_LENGTH,
-                     tokenize_newline_separately=False)
+    # Normalize all images to PIL RGB
+    imgs_processed = []
+    for img in images:
+        # If bytes (e.g. raw JPEG data)
+        if isinstance(img, (bytes, bytearray)):
+            img = Image.open(io.BytesIO(img))
+        # If file path
+        elif isinstance(img, str):
+            img = Image.open(img)
+        # If numpy array
+        elif isinstance(img, np.ndarray):
+            if img.ndim == 2:
+                img = Image.fromarray(img).convert("RGB")
+            elif img.ndim == 3:
+                img = Image.fromarray(img)
+        # Ensure in RGB mode
+        if img.mode != "RGB":
+            img = img.convert("RGB")
+        imgs_processed.append(img)
 
-  input_ids = inputs["input_ids"]
-  token_type_ids = inputs["token_type_ids"]
-  attention_mask = inputs["attention_mask"]
-  pixel_values = inputs["pixel_values"]
-  labels = inputs["labels"]
+    # Build inputs
+    inputs = processor(
+        text=texts,
+        images=imgs_processed,
+        suffix=labels,
+        return_tensors="pt",
+        padding=True,
+        truncation="only_second",
+        max_length=MAX_LENGTH,
+        tokenize_newline_separately=False
+    )
 
-  return input_ids, token_type_ids, attention_mask, pixel_values, labels
+    return (
+        inputs["input_ids"],
+        inputs["token_type_ids"],
+        inputs["attention_mask"],
+        inputs["pixel_values"],
+        inputs["labels"],
+    )
 
 
 def eval_collate_fn(examples):
-  images = [example[0] for example in examples]
-  texts = [PROMPT for _ in range(len(images))]
-  answers = [example[1] for example in examples]
+    images = [example[0] for example in examples]
+    texts = [PROMPT for _ in range(len(images))]
+    answers = [example[1] for example in examples]
 
-  inputs = processor(text=texts, images=images, return_tensors="pt", padding=True, tokenize_newline_separately=False)
+    # Normalize all images to PIL RGB
+    imgs_processed = []
+    for img in images:
+        if isinstance(img, (bytes, bytearray)):
+            img = Image.open(io.BytesIO(img))
+        elif isinstance(img, str):
+            img = Image.open(img)
+        elif isinstance(img, np.ndarray):
+            if img.ndim == 2:
+                img = Image.fromarray(img).convert("RGB")
+            elif img.ndim == 3:
+                img = Image.fromarray(img)
+        if img.mode != "RGB":
+            img = img.convert("RGB")
+        imgs_processed.append(img)
 
-  input_ids = inputs["input_ids"]
-  attention_mask = inputs["attention_mask"]
-  pixel_values = inputs["pixel_values"]
+    # Build inputs
+    inputs = processor(
+        text=texts,
+        images=imgs_processed,
+        return_tensors="pt",
+        padding=True,
+        tokenize_newline_separately=False
+    )
 
-  return input_ids, attention_mask, pixel_values, answers
+    return (
+        inputs["input_ids"],
+        inputs["attention_mask"],
+        inputs["pixel_values"],
+        answers,
+    )
 
 
 
@@ -430,7 +546,7 @@ if __name__ == "__main__":
     processor = AutoProcessor.from_pretrained(REPO_ID)
 
     config = {
-        "max_epochs": 10,
+        "max_epochs": 15,
         "val_check_interval": 0.2,
         "check_val_every_n_epoch": 1,
         "gradient_clip_val": 1.0,
