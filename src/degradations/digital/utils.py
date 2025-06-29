@@ -11,6 +11,9 @@ from datasets import load_dataset
 from PIL import Image as PÌLIMage
 import warnings
 from os.path import abspath, dirname, join
+from datasets.features import Image
+import cv2
+import numpy as np
 
 
 PARAGRAPH_DETECTION_THRES = 50
@@ -322,3 +325,87 @@ def read_dataset_features_json():
     config_path = join(dirname(dirname(abspath(__file__))), "config", "dataset_features.json")
     dataset_features = read_json(config_path)
     return dataset_features
+
+def load_watermarks():
+
+    watermarks = {}
+
+    schools = [
+        "aletamar",
+        "britanico",
+        "deus",
+        "liceo",
+        "lusitano",
+        "monterraso",
+        "patria",
+    ]
+
+    watermarks_paths_root = join(dirname(abspath(__file__)), "assets")
+
+    for school in schools:
+        watermark_file_name = f"watermark_{school}.png"
+        watermark_path = join(watermarks_paths_root, watermark_file_name)
+        watermark_pil_img = PÌLIMage.open(watermark_path)
+        np_img = np.array(watermark_pil_img)
+        watermark_cv_img = cv2.cvtColor(np_img, cv2.COLOR_RGB2BGRA)
+        watermarks[school] = watermark_cv_img
+
+    return watermarks
+
+
+def add_transparent_image(background, foreground, alpha_factor=1.0, x_offset=None, y_offset=None):
+    """
+    Function sourced from StackOverflow contributor Ben.
+
+    This function was found on StackOverflow and is the work of Ben, a contributor
+    to the community. We are thankful for Ben's assistance by providing this useful
+    method.
+
+    Original Source:
+    https://stackoverflow.com/questions/40895785/
+    using-opencv-to-overlay-transparent-image-onto-another-image
+    """
+
+    bg_h, bg_w, bg_channels = background.shape
+    fg_h, fg_w, fg_channels = foreground.shape
+
+    assert bg_channels == 3, f"background image should have exactly 3 channels (RGB). found:{bg_channels}"
+    assert fg_channels == 4, f"foreground image should have exactly 4 channels (RGBA). found:{fg_channels}"
+
+    # center by default
+    if x_offset is None:
+        x_offset = (bg_w - fg_w) // 2
+    if y_offset is None:
+        y_offset = (bg_h - fg_h) // 2
+
+    w = min(fg_w, bg_w, fg_w + x_offset, bg_w - x_offset)
+    h = min(fg_h, bg_h, fg_h + y_offset, bg_h - y_offset)
+
+    if w < 1 or h < 1:
+        return
+
+    # clip foreground and background images to the overlapping regions
+    bg_x = max(0, x_offset)
+    bg_y = max(0, y_offset)
+    fg_x = max(0, x_offset * -1)
+    fg_y = max(0, y_offset * -1)
+    foreground = foreground[fg_y : fg_y + h, fg_x : fg_x + w]
+    background_subsection = background[bg_y : bg_y + h, bg_x : bg_x + w]
+
+    # separate alpha and color channels from the foreground image
+    foreground_colors = foreground[:, :, :3]
+    alpha_channel = foreground[:, :, 3] / 255 * alpha_factor  # 0-255 => 0.0-1.0
+
+    # construct an alpha_mask that matches the image shape
+    alpha_mask = np.dstack((alpha_channel, alpha_channel, alpha_channel))
+
+    # combine the background with the overlay image weighted by alpha
+    composite = background_subsection * (1 - alpha_mask) + foreground_colors * alpha_mask
+
+    # overwrite the section of the background image that has been updated
+    background[bg_y : bg_y + h, bg_x : bg_x + w] = composite
+
+    background = cv2.cvtColor(background, cv2.COLOR_BGR2RGB)
+    background = PÌLIMage.fromarray(background)
+
+    return background

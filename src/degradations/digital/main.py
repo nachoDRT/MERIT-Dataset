@@ -122,5 +122,17 @@ if __name__ == "__main__":
 
         print(f"SNR(dataset) = {mean_db:.2f} dB ± {std_db:.2f} dB")
 
+    elif args.degradation.lower() in ("water-mark"):
+        merit_subset_name = f"{language}-digital-seq"
+        degradation_subset_name = f"{language}-digital-{degradation}-degradation-{data_format}"
+
+        for split in splits:
+            print(f"Generating {split} {degradation} samples")
+            merit_subset_iterator, _ = get_merit_dataset_iterator(merit_subset_name, split, False)
+            split_subset = generate_watermark_samples(merit_subset_iterator)
+            dataset.append((split, split_subset))
+        dataset = format_data(dict(dataset))
+        push_dataset_to_hf(dataset, degradation_subset_name)
+
     else:
         print(f"Degradation called {degradation} has not been implemented yet.")
