@@ -2,19 +2,18 @@ import argparse
 from huggingface_hub import login, HfApi
 from datasets import load_dataset
 import os
-from torch.utils.data import Dataset
+from torch.utils.data import Dataset, DataLoader, SubsetRandomSampler
 from typing import Any, List, Dict
 import random
 import json
 from transformers import AutoProcessor, PaliGemmaForConditionalGeneration, BitsAndBytesConfig
-from torch.utils.data import DataLoader
 import lightning as L
 import torch
 import re
 import wandb
 from nltk import edit_distance
 import numpy as np
-from peft import get_peft_model, LoraConfig, prepare_model_for_kbit_training
+from peft import get_peft_model, LoraConfig, prepare_model_for_kbit_training, PeftModel
 from lightning.pytorch.callbacks import Callback
 from lightning.pytorch.callbacks.early_stopping import EarlyStopping
 from lightning.pytorch.loggers import WandbLogger
@@ -23,6 +22,7 @@ from torchmetrics.classification import MulticlassF1Score
 from PIL import Image
 import io
 import numpy as np
+import copy
 
 HF_CARD_FILES = [
     "/app/src/card/README.md",
@@ -287,9 +287,24 @@ class PaliGemmaModelPLModule(L.LightningModule):
     def train_dataloader(self):
         return DataLoader(train_dataset, collate_fn=train_collate_fn, batch_size=self.batch_size, shuffle=True, num_workers=4)
 
-    def val_dataloader(self):
-        return DataLoader(val_dataset, collate_fn=eval_collate_fn, batch_size=self.batch_size, shuffle=False, num_workers=4)
+    # def val_dataloader(self):
+    #     return DataLoader(val_dataset, collate_fn=eval_collate_fn, batch_size=self.batch_size, shuffle=False, num_workers=4)
 
+    def val_dataloader(self):
+        # Muestreamos solo un 10% de val_dataset
+        percentage = 0.1
+        num_samples = int(len(val_dataset) * percentage)
+        # índices aleatorios sin reemplazo
+        indices = torch.randperm(len(val_dataset))[:num_samples].tolist()
+        sampler = SubsetRandomSampler(indices)
+
+        return DataLoader(
+            val_dataset,
+            sampler=sampler,
+            collate_fn=eval_collate_fn,
+            batch_size=self.batch_size,
+            num_workers=4,
+        )
 
 
 class PushToHubCallback(Callback):
@@ -315,47 +330,58 @@ class PushToHubCallback(Callback):
         if mode not in {"min", "max"}:
             raise ValueError("mode must be 'min' or 'max'")
         self.mode = mode
-        # Initialize best_score according to mode
         self.best_score = float('inf') if mode == "min" else -float('inf')
 
     def on_validation_epoch_end(self, trainer, pl_module):
-        """
-        Called at the end of each validation epoch. If the monitored metric improves,
-        save and push the model.
-        """
         logs = trainer.callback_metrics
         current_score = logs.get(self.monitor)
         if current_score is None:
             return
 
-        has_improved = (
-            current_score < self.best_score if self.mode == "min" else current_score > self.best_score
+        improved = (
+            current_score < self.best_score if self.mode == "min"
+            else current_score > self.best_score
         )
-        if has_improved:
+        if improved:
             print(f"Detected improvement in {self.monitor}: {self.best_score} -> {current_score}")
             self.best_score = current_score
             self._push_model(trainer, pl_module, epoch=trainer.current_epoch)
 
     def on_train_end(self, trainer, pl_module):
-        """
-        Called once training is complete. Only push the card files (README, configs, etc.)
-        to the Hub.
-        """
         print("Uploading final card files to the Hub...")
         repo_id = f"de-Rodrigo/{self.model_output_name}"
         self._upload_card_files(repo_id)
 
     def _push_model(self, trainer, pl_module, epoch: int):
-        """
-        Save the model and processor locally and push them to the Hub.
-        """
+        # 1) Construye la ruta donde guardar
         save_path = os.path.join(
             self.save_dir,
             f"{self.model_output_name}_{self.dataset_subset}_epoch{epoch}",
         )
-        pl_module.model.save_pretrained(save_path)
+
+        # 2) Duplica el modelo en CPU para no saturar la GPU con la copia
+        temp_model = copy.deepcopy(pl_module.model).to("cpu")
+
+        # 3) Fusiona LoRA sobre la copia sin tocar pl_module.model
+        if isinstance(temp_model, PeftModel):
+            model_to_save = temp_model.merge_and_unload()
+        else:
+            model_to_save = temp_model
+
+        # 4) Guarda el modelo fusionado completo + processor/tokenizer
+        model_to_save.save_pretrained(
+            save_path,
+            safe_serialization=True,
+            max_shard_size="1GB",
+        )
         pl_module.processor.save_pretrained(save_path)
 
+        # 5) Guarda el adapter LoRA para que luego PeftModel lo cargue desde este subfolder
+        #    Esto creará adapter_config.json + pytorch_model.bin (solo los pesos LoRA)
+        if isinstance(pl_module.model, PeftModel):
+            pl_module.model.save_pretrained(save_path)
+
+        # 6) Sube todo al Hub bajo el subfolder correspondiente
         repo_id = f"de-Rodrigo/{self.model_output_name}"
         self.api.upload_folder(
             folder_path=save_path,
@@ -364,13 +390,13 @@ class PushToHubCallback(Callback):
             repo_type="model",
             commit_message=f"Best model up to epoch {epoch} ({self.monitor}={self.best_score})",
         )
-        # Upload additional files as well
         self._upload_card_files(repo_id)
 
+        # 7) Libera la copia y vacía caché de CUDA
+        del temp_model, model_to_save
+        torch.cuda.empty_cache
+
     def _upload_card_files(self, repo_id: str):
-        """
-        Upload additional card files (README, configs, etc.) to the repository.
-        """
         for file_path in HF_CARD_FILES:
             print(f"Uploading {file_path} to {repo_id}")
             self.api.upload_file(
@@ -380,38 +406,6 @@ class PushToHubCallback(Callback):
                 repo_type="model",
                 commit_message="Uploading card files",
             )
-
-
-# def train_collate_fn(examples):
-#   images = [example[0] for example in examples]
-#   texts = [PROMPT for _ in range(len(images))]
-#   labels = [example[1] for example in examples]
-
-#   inputs = processor(text=texts, images=images, suffix=labels, return_tensors="pt", padding=True,
-#                      truncation="only_second", max_length=MAX_LENGTH,
-#                      tokenize_newline_separately=False)
-
-#   input_ids = inputs["input_ids"]
-#   token_type_ids = inputs["token_type_ids"]
-#   attention_mask = inputs["attention_mask"]
-#   pixel_values = inputs["pixel_values"]
-#   labels = inputs["labels"]
-
-#   return input_ids, token_type_ids, attention_mask, pixel_values, labels
-
-
-# def eval_collate_fn(examples):
-#   images = [example[0] for example in examples]
-#   texts = [PROMPT for _ in range(len(images))]
-#   answers = [example[1] for example in examples]
-
-#   inputs = processor(text=texts, images=images, return_tensors="pt", padding=True, tokenize_newline_separately=False)
-
-#   input_ids = inputs["input_ids"]
-#   attention_mask = inputs["attention_mask"]
-#   pixel_values = inputs["pixel_values"]
-
-#   return input_ids, attention_mask, pixel_values, answers
 
 
 def train_collate_fn(examples):
@@ -531,6 +525,7 @@ if __name__ == "__main__":
         r=8,
         target_modules=["q_proj", "o_proj", "k_proj", "v_proj", "gate_proj", "up_proj", "down_proj"],
         task_type="CAUSAL_LM",
+        inference_mode=False
     )
     
     model = get_peft_model(model, lora_config)
@@ -541,12 +536,14 @@ if __name__ == "__main__":
 
     train_dataset = CustomDataset(dataset_name, dataset_subsets, split="train")
     val_dataset = CustomDataset(dataset_name, dataset_subsets, split="validation")
+
+
     # test_dataset = CustomDataset(dataset_name, test_dataset_version, split="test")
 
     processor = AutoProcessor.from_pretrained(REPO_ID)
 
     config = {
-        "max_epochs": 15,
+        "max_epochs": 5,
         "val_check_interval": 0.2,
         "check_val_every_n_epoch": 1,
         "gradient_clip_val": 1.0,
@@ -573,7 +570,8 @@ if __name__ == "__main__":
         accumulate_grad_batches=config.get("accumulate_grad_batches"),
         check_val_every_n_epoch=config.get("check_val_every_n_epoch"),
         gradient_clip_val=config.get("gradient_clip_val"),
-        precision="16-mixed",
+        # precision="16-mixed",
+        precision="bf16-mixed",
         limit_val_batches=20,
         num_sanity_val_steps=0,
         logger=wandb_logger,

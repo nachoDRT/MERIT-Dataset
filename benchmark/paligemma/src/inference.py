@@ -12,13 +12,16 @@ import json
 import torch
 import wandb
 from lightning.pytorch.loggers import WandbLogger
+from peft import PeftModel, prepare_model_for_kbit_training
+from PIL import Image
 
 
 WANDB_PROJECT = "MERIT-Dataset-Img2Sequence"
 FINETUNED_MODEL_ID = "nielsr/paligemma-cord-demo"
-REPO_ID = "google/paligemma-3b-pt-224"
+# REPO_ID = "google/paligemma-3b-pt-224"
 MAX_LENGTH = 512
 PROMPT = "extract JSON."
+LIMIT = 218
 
 
 def log_info(msg: str):
@@ -49,18 +52,39 @@ def init_wandb():
     return run, wandb_logger
 
 
-def get_paligemma(subfolder: str):
+def get_paligemma(paligemma_model_version: str, subfolder: str):
     log_info("Loading Model and Processor")
 
+    # Configuración de cuantización 4-bit
     bnb_config = BitsAndBytesConfig(
         load_in_4bit=True,
         bnb_4bit_quant_type="nf4",
         bnb_4bit_compute_dtype=torch.bfloat16
     )
 
-    model = PaliGemmaForConditionalGeneration.from_pretrained(paligemma_model_version, quantization_config=bnb_config, device_map="auto")
+    # 1) Carga del modelo base cuantizado
+    base_model = PaliGemmaForConditionalGeneration.from_pretrained(
+        "google/paligemma-3b-pt-224",
+        quantization_config=bnb_config,
+        device_map="auto",
+    )
+    base_model = prepare_model_for_kbit_training(base_model)
+
+    # 2) Inyección de los pesos LoRA entrenados
+    model = PeftModel.from_pretrained(
+        base_model,
+        paligemma_model_version,
+        subfolder=subfolder,
+        device_map="auto",
+        quantization_config=bnb_config,
+    )
     model.eval()
-    processor = AutoProcessor.from_pretrained(REPO_ID)
+
+    # Carga del processor (tokenizer + feature extractor)
+    processor = AutoProcessor.from_pretrained(
+        paligemma_model_version,
+        subfolder=subfolder,
+    )
 
     return model, processor
 
@@ -134,6 +158,15 @@ def token2json(tokens, is_inner_value=False, added_vocab=None):
 def get_sample_data(sample):
 
     img = sample["image"]
+
+    # If the image is not a PIL Image, try converting it (e.g., from a NumPy array)
+    if not isinstance(img, Image.Image):
+        img = Image.fromarray(img)
+
+    # Convert the image to RGB if it's not already (this ensures 3 color channels)
+    if img.mode != "RGB":
+        img = img.convert("RGB")
+
     gt = sample["ground_truth"]
     gt = gt.replace("'", '"')
     gt = json.loads(gt)
@@ -186,17 +219,19 @@ if __name__ == "__main__":
     parser.add_argument("--dataset_name", type=str)
     parser.add_argument("--subset_name", type=str)
     parser.add_argument("--paligemma_model_version", type=str)
+    parser.add_argument("--subfolder", type=str)
     args = parser.parse_args()
 
     dataset_name = args.dataset_name
     subset_name = args.subset_name
     paligemma_model_version = args.paligemma_model_version
+    subfolder = args.subfolder
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     init_hf_hub()
     run, wandb_logger = init_wandb()
 
-    model, processor = get_paligemma(paligemma_model_version)
+    model, processor = get_paligemma(paligemma_model_version, subfolder)
     dataset_iter = get_dataset_iterator(dataset_name, subset_name)
 
     # Process dataset
@@ -204,6 +239,7 @@ if __name__ == "__main__":
 
     f1 = np.mean(accs)
     print(f"Mean accuracy {subset_name}: {f1}")
+    print(accs)
 
     wandb.log({"test_f1": f1})
     run.finish()
