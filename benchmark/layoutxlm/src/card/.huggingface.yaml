@@ -1,0 +1,8 @@
+---
+tags:
+- vision
+- document-understanding
+- donut
+metrics:
+- accuracy
+- f1
