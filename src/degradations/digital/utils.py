@@ -484,6 +484,7 @@ def read_dataset_features_json():
     return dataset_features
 
 def load_watermarks():
+def load_watermarks(language: str):
 
     watermarks = {}
 
