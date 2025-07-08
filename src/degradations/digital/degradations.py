@@ -18,21 +18,21 @@ def generate_paragraph_samples(merit_subset_iterator, lang: str, data_format: st
     if data_format == "seq":
         d_features = read_dataset_features_json()
 
-    for i, sample in enumerate(merit_subset_iterator):
+        for i, sample in enumerate(merit_subset_iterator):
 
-        _, annotations = get_sample_data(sample)
-        text = clean_paragraph_annotation(annotations)
-        img = generate_img(text)
+            _, annotations = get_sample_data(sample)
+            text = clean_paragraph_annotation(annotations)
+            img = generate_img(text)
 
-        buffer = BytesIO()
-        img[0].save(buffer, format="PNG")
-        images_bytes.append(buffer.getvalue())
+            buffer = BytesIO()
+            img[0].save(buffer, format="PNG")
+            images_bytes.append(buffer.getvalue())
 
-        if data_format == "seq":
-            annotations = format_annotations_cordv2_style(annotations, d_features[f"years-{lang}"])
-        ground_truths.append(json.dumps(annotations))
+            if data_format == "seq":
+                annotations = format_annotations_cordv2_style(annotations, d_features[f"years-{lang}"])
+            ground_truths.append(json.dumps(annotations))
 
-    return {"image": images_bytes, "ground_truth": ground_truths}
+        return {"image": images_bytes, "ground_truth": ground_truths}
 
 
 # TODO
@@ -43,27 +43,47 @@ def generate_line_samples(merit_subset_iterator, lang: str, data_format: str = "
 
     if data_format == "seq":
         d_features = read_dataset_features_json()
-    if lang == "es":
-        years = ["3_de_la_eso", "4_de_la_eso", "1_de_bachillerato", "2_de_bachillerato"]
-    elif lang == "en":
-        years = ["year_9", "year_10", "year_11", "year_12"]
+        if lang == "es":
+            years = ["3_de_la_eso", "4_de_la_eso", "1_de_bachillerato", "2_de_bachillerato"]
+        elif lang == "en":
+            years = ["year_9", "year_10", "year_11", "year_12"]
 
-    for i, sample in tqdm(enumerate(merit_subset_iterator)):
+        for i, sample in tqdm(enumerate(merit_subset_iterator)):
 
-        _, annotations = get_sample_data(sample)
-        text = clean_line_annotation(annotations, years)
-        img = generate_line_img(text)
-        # img[0].show()
+            _, annotations = get_sample_data(sample)
+            text = clean_line_annotation(annotations, years)
+            img = generate_line_img(text)
+            # img[0].show()
 
-        buffer = BytesIO()
-        img[0].save(buffer, format="PNG")
-        images_bytes.append(buffer.getvalue())
+            buffer = BytesIO()
+            img[0].save(buffer, format="PNG")
+            images_bytes.append(buffer.getvalue())
 
-        if data_format == "seq":
-            annotations = format_annotations_cordv2_style(annotations, d_features[f"years-{lang}"])
-        ground_truths.append(json.dumps(annotations))
+            if data_format == "seq":
+                annotations = format_annotations_cordv2_style(annotations, d_features[f"years-{lang}"])
+            ground_truths.append(json.dumps(annotations))
 
-    return {"image": images_bytes, "ground_truth": ground_truths}
+        return {"image": images_bytes, "ground_truth": ground_truths}
+
+    elif data_format == "token-class":
+
+        for i, sample in enumerate(merit_subset_iterator):
+
+            _, annotations = get_sample_data(sample)
+            # text = clean_line_annotation(annotations, years)
+            text, form_annotation = clean_line_annotation_token_class(annotations)
+            img, transformed_annotation = generate_line_img_token_class(text, form_annotation)
+
+            # img[0].show()
+            # print(transformed_annotation)
+
+            buffer = BytesIO()
+            img[0].save(buffer, format="PNG")
+            images_bytes.append(buffer.getvalue())
+
+            ground_truths.append(json.dumps(transformed_annotation))
+
+        return {"image": images_bytes, "ground_truth": ground_truths}
 
 
 def generate_rotation_samples(merit_subset_iterator, data_format: str = "seq"):
@@ -209,6 +229,57 @@ def generate_noisy_samples_stream(iterator, *, batch_size=512, seed=42):
     return writer, snr_all
 
 
+def generate_watermark_samples_stream(iterator, language: str, *, batch_size: int = 512, seed: int = 42):
+    random.seed(seed)
+    np.random.seed(seed)
+
+    feats = Features(
+        {
+            "image": HFImage(),
+            "ground_truth": Value("string"),
+        }
+    )
+
+    batch = {k: [] for k in feats}
+    writer = None
+
+    decoder = HFImage()
+    watermarks = load_watermarks(language)
+
+    for idx, sample in tqdm(enumerate(iterator), desc="adding watermark"):
+        img_name: str = sample["image"]["path"]
+        school = img_name.split("_")[1]
+
+        watermark_img = watermarks[school]
+
+        decoded_img = decoder.decode_example(sample["image"])
+        np_img = np.array(decoded_img)
+        decoded_cv_img = cv2.cvtColor(np_img, cv2.COLOR_RGB2BGR)
+
+        output_img = add_transparent_image(decoded_cv_img, watermark_img, 0.2)
+
+        _, annotations = get_sample_data(sample)
+
+        buf = BytesIO()
+        output_img.save(buf, format="PNG")
+
+        batch["image"].append(buf.getvalue())
+        batch["ground_truth"].append(json.dumps(annotations))
+
+        if (idx + 1) % 100 == 0:
+            del decoded_img, np_img, decoded_cv_img, output_img, buf
+            gc.collect()
+
+        if len(batch["image"]) >= batch_size:
+            writer = _flush_batch(batch, feats, writer)
+            batch = {k: [] for k in feats}
+
+    if batch["image"]:
+        writer = _flush_batch(batch, feats, writer)
+
+    return writer
+
+
 def add_noise(
     img: Image.Image,
     mode: str = "salt_pepper",
@@ -264,33 +335,14 @@ def _flush_batch(batch, feats, writer):
     ds_batch = Dataset.from_dict(batch, features=feats)
     return ds_batch if writer is None else concatenate_datasets([writer, ds_batch])
 
-def generate_watermark_samples(merit_subset_iterator):
-    images_bytes = []
-    ground_truths = []
-    decoder = HFImage()
 
-    watermarks = load_watermarks()
+def generate_id_picture_stream(iterator, *, batch_size=512, seed=42):
 
-    for i, sample in tqdm(enumerate(merit_subset_iterator)):
+    doc2IdIimg_csv_path = join(dirname(dirname(abspath(__file__))), "config", "doc_2_id_img.csv")
+    print(doc2IdIimg_csv_path)
 
-        img_name = sample["image"]["path"]
-        school = img_name.split("_")[1]
+    if os.path.isfile(doc2IdIimg_csv_path):
+        print("Done")
 
-        watermark_img = watermarks[school]
-
-        decoded_img = decoder.decode_example(sample["image"])
-
-        np_img = np.array(decoded_img)
-        decoded_cv_img = cv2.cvtColor(np_img, cv2.COLOR_RGB2BGR)
-
-        output_img = add_transparent_image(decoded_cv_img, watermark_img, 0.2)
-
-        _, annotations = get_sample_data(sample)
-
-        buffer = BytesIO()
-        output_img.save(buffer, format="PNG")
-        images_bytes.append(buffer.getvalue())
-
-        ground_truths.append(json.dumps(annotations))
-
-    return {"image": images_bytes, "ground_truth": ground_truths}
+    else:
+        compute_doc2IdImg_csv(doc2IdIimg_csv_path)

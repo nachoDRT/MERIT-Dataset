@@ -30,7 +30,7 @@ if __name__ == "__main__":
         for split in splits:
             print(f"Generating {split} {degradation} samples")
             merit_subset_iterator, _ = get_merit_dataset_iterator(merit_subset_name, split)
-            split_subset = generate_paragraph_samples(merit_subset_iterator, language)
+            split_subset = generate_paragraph_samples(merit_subset_iterator, language, data_format)
             dataset.append((split, split_subset))
         dataset = format_data(dict(dataset))
         push_dataset_to_hf(dataset, degradation_subset_name)
@@ -42,7 +42,7 @@ if __name__ == "__main__":
         for split in splits:
             print(f"Generating {split} {degradation} samples")
             merit_subset_iterator, _ = get_merit_dataset_iterator(merit_subset_name, split)
-            split_subset = generate_line_samples(merit_subset_iterator, language)
+            split_subset = generate_line_samples(merit_subset_iterator, language, data_format)
             dataset.append((split, split_subset))
         dataset = format_data(dict(dataset))
         push_dataset_to_hf(dataset, degradation_subset_name, repo_name="merit")
@@ -129,10 +129,14 @@ if __name__ == "__main__":
         for split in splits:
             print(f"Generating {split} {degradation} samples")
             merit_subset_iterator, _ = get_merit_dataset_iterator(merit_subset_name, split, False)
-            split_subset = generate_watermark_samples(merit_subset_iterator)
-            dataset.append((split, split_subset))
-        dataset = format_data(dict(dataset))
-        push_dataset_to_hf(dataset, degradation_subset_name)
+
+            split_subset = generate_watermark_samples_stream(merit_subset_iterator, language, batch_size=124, seed=42)
+            push_dataset_to_hf({split: split_subset}, degradation_subset_name)
+
+            del split_subset
+            gc.collect()
+
+
 
     else:
         print(f"Degradation called {degradation} has not been implemented yet.")
