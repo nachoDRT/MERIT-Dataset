@@ -11,9 +11,12 @@ from datasets import load_dataset
 from PIL import Image as PÌLIMage
 import warnings
 from os.path import abspath, dirname, join
+import pandas as pd
 from datasets.features import Image
 import cv2
 import numpy as np
+from reportlab.pdfbase.pdfmetrics import stringWidth
+import copy
 
 
 PARAGRAPH_DETECTION_THRES = 50
@@ -21,10 +24,17 @@ MAX_CHARACTERS = 65
 
 
 def get_merit_dataset_iterator(subset_name: str, split: str, decode=None):
+def get_merit_dataset_iterator(subset_name: str, split: str, decode=True):
 
     print("Loading Dataset")
 
     dataset = load_dataset("de-Rodrigo/merit", subset_name, split=split, streaming=True)
+
+    dataset = dataset.cast_column("image", Image(decode=decode))
+    dataset_iterator = iter(dataset)
+
+    return dataset_iterator, dataset
+
 
     if decode:
         dataset = dataset.cast_column("image", PÌLIMage(decode=False))
@@ -105,6 +115,35 @@ def clean_line_annotation(annotation: Dict, years: List):
     text = get_string_from_paragraphs(paragraphs, record)
 
     return text
+
+
+def clean_line_annotation_token_class(annotation: Dict):
+
+    text = ""
+    # lines = []
+    list_of_dicts = []
+
+    for element in annotation["form"]:
+
+        text += f" {element['text']}\n"
+        # lines.append(element["text"])
+
+        line_dict = element
+        line_dict["box"] = None
+
+        words = []
+        for subelement in line_dict["words"]:
+            subelement["box"] = None
+            words.append(subelement)
+
+        line_dict["words"] = words
+
+        list_of_dicts.append(line_dict)
+
+    form_with_no_boxes = {}
+    form_with_no_boxes["form"] = list_of_dicts
+
+    return text, form_with_no_boxes
 
 
 def detect_new_paragraph(element: Dict, last_element: Dict) -> bool:
@@ -194,6 +233,111 @@ def generate_pdf(text: str) -> BytesIO:
     return output_buffer
 
 
+def generate_pdf_with_bboxes(text: str):
+    buffer = BytesIO()
+    c = canvas.Canvas(buffer, pagesize=letter)
+    c.setFont("Helvetica", 12)
+
+    x_start, y_start = 100, 750
+    line_height = 14  # Ajusta según tamaño de fuente
+    bounding_boxes = []
+
+    lines_list = []
+
+    y = y_start
+
+    for line in text.splitlines():
+        wrapped_lines = textwrap.wrap(line, width=MAX_CHARACTERS)
+        for wrapped_line in wrapped_lines:
+            line_dict = {}
+            words = wrapped_line.split()
+            x = x_start
+            line_bboxes = []
+            for word in words:
+                word_width = stringWidth(word, "Helvetica", 12)
+                bbox = {"word": word, "bbox": (int(x), int(y - 2), int(x + word_width), int(y + line_height - 2))}
+                line_bboxes.append(bbox)
+                bounding_boxes.append(bbox)
+                c.drawString(x, y, word)
+                x += word_width + stringWidth(" ", "Helvetica", 12)  # Añadir espacio
+            y -= line_height
+            line_dict["box"] = []
+            lines_list.append(line_dict)
+
+    c.save()
+    buffer.seek(0)
+
+    label_dict = {}
+    label_dict["form"] = lines_list
+
+    return buffer, bounding_boxes
+
+
+def generate_line_pdf_token_class(text: str, form_annotation: Dict) -> BytesIO:
+
+    buffer = BytesIO()
+    c = canvas.Canvas(buffer, pagesize=letter)
+    c.setFont("Helvetica", 8)
+
+    x_start, y_start = 100, 750
+    line_height = 10  # Ajusta según tamaño de fuente
+    # bounding_boxes = []
+
+    lines_list = []
+
+    y = y_start
+
+    transformed_annotation = copy.deepcopy(form_annotation)
+
+    for i, (annotation_line, line) in enumerate(zip(form_annotation["form"], text.splitlines())):
+        # for i, line in enumerate(text.splitlines()):
+        wrapped_lines = textwrap.wrap(line, width=MAX_CHARACTERS)
+
+        for wrapped_line in wrapped_lines:
+            # print(annotation_line["text"], wrapped_line)
+
+            words = wrapped_line.split()
+            x = x_start
+            line_bboxes = []
+            for j, word in enumerate(annotation_line["words"]):
+                word = word["text"]
+                word_width = stringWidth(word, "Helvetica", 8)
+                bbox = {"word": word, "bbox": (int(x), int(y - 2), int(x + word_width), int(y + line_height - 2))}
+                line_bboxes.append(bbox)
+                # bounding_boxes.append(bbox)
+                c.drawString(x, y, word)
+                # x += word_width + stringWidth(" ", "Helvetica", 8)  # Add space
+                # print(len(transformed_annotation["form"]), i)
+                # print(len(transformed_annotation["form"][i]["words"]), j)
+                # print(transformed_annotation["form"][i])
+                transformed_annotation["form"][i]["words"][j]["box"] = [
+                    int(x),
+                    int(y - 2),
+                    int(x + word_width),
+                    int(y + line_height - 2),
+                ]
+            y -= line_height
+            # line_dict["box"] = []
+            # lines_list.append(line_dict)
+
+        # print(line_bboxes)
+        # print(line_bboxes)
+        transformed_annotation["form"][i]["box"] = [
+            line_bboxes[0]["bbox"][0],
+            line_bboxes[0]["bbox"][1],
+            line_bboxes[-1]["bbox"][2],
+            line_bboxes[-1]["bbox"][3],
+        ]
+
+    c.save()
+    buffer.seek(0)
+
+    label_dict = {}
+    label_dict["form"] = lines_list
+
+    return buffer, transformed_annotation
+
+
 def generate_line_pdf(text: str) -> BytesIO:
 
     # Create a temporary buffer for the PDF
@@ -233,11 +377,24 @@ def generate_img(text: str):
     return img
 
 
+def generate_img_with_bboxes(text: str):
+    pdf_bytes, bboxes = generate_pdf_with_bboxes(text)
+    img = convert_pdf_to_img(pdf_bytes)
+    return img, bboxes
+
+
 def generate_line_img(text: str):
     pdf_bytes = generate_line_pdf(text)
     img = convert_pdf_to_img(pdf_bytes)
 
     return img
+
+
+def generate_line_img_token_class(text: str, form_annotation: Dict):
+    pdf_bytes, form_annotation = generate_line_pdf_token_class(text, form_annotation)
+    img = convert_pdf_to_img(pdf_bytes)
+
+    return img, form_annotation
 
 
 def save_sample(path: str, img: List):
@@ -327,18 +484,30 @@ def read_dataset_features_json():
     return dataset_features
 
 def load_watermarks():
+def load_watermarks(language: str):
 
     watermarks = {}
 
-    schools = [
-        "aletamar",
-        "britanico",
-        "deus",
-        "liceo",
-        "lusitano",
-        "monterraso",
-        "patria",
-    ]
+    if language == "es":
+        schools = [
+            "aletamar",
+            "britanico",
+            "deus",
+            "liceo",
+            "lusitano",
+            "monterraso",
+            "patria",
+        ]
+    elif language == "en":
+        schools = [
+            "freefields",
+            "greenfields",
+            "james",
+            "paloalto",
+            "pinnacle",
+            "salesianum",
+            "whitney",
+        ]
 
     watermarks_paths_root = join(dirname(abspath(__file__)), "assets")
 
