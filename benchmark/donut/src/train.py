@@ -227,6 +227,12 @@ class DonutDataset(Dataset):
                 split=self.split,
                 num_proc=8
             )
+        elif dataset_name_or_path == "naver-clova-ix/cord-v2":
+            self.dataset = load_dataset(
+                dataset_name_or_path,
+                split=self.split,
+                num_proc=8
+            )
         else:
             self.dataset = load_dataset(
                 dataset_name_or_path,
@@ -283,7 +289,7 @@ class DonutDataset(Dataset):
         self.gt_token_sequences = []
         self.added_tokens = []
 
-        if dataset_name_or_path == "de-Rodrigo/merit":
+        if dataset_name_or_path == "de-Rodrigo/merit" or dataset_name_or_path == "naver-clova-ix/cord-v2":
             for sample in self.dataset:
                 try:
                     ground_truth = json.loads(sample["ground_truth"])

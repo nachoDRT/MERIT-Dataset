@@ -51,9 +51,14 @@ def resize_image(image, new_width):
 def get_dataset_iterator(dataset_name: str, subset_name: str):
     log_info("Loading Dataset")
 
-    dataset = load_dataset(
-        dataset_name, subset_name, split="test", streaming=True
-    )
+    if dataset_name == "de-Rodrigo/merit":
+        dataset = load_dataset(
+            dataset_name, subset_name, split="test", streaming=True
+        )
+    else:
+        dataset = load_dataset(
+            dataset_name, split="test", streaming=True
+        )
     dataset_iterator = iter(dataset)
 
     return dataset_iterator
@@ -72,10 +77,23 @@ def get_sample_data(sample):
     if img.mode != "RGB":
         img = img.convert("RGB")
 
-    gt = sample["ground_truth"]
-    gt = gt.replace("'", '"')
-    gt = json.loads(gt)
-    # gt = gt["gt_parse"]
+    if dataset_name == "de-Rodrigo/merit" or dataset_name == "naver-clova-ix/cord-v2":
+        gt = sample["ground_truth"]
+
+        if dataset_name == "de-Rodrigo/merit":
+            gt = gt.replace("'", '"')
+        # if gt.startswith("'") and gt.endswith("'"):
+        #     gt = '"' + gt[1:-1].replace('"', '\\"') + '"'
+        
+        gt = json.loads(gt)
+        if dataset_name == "naver-clova-ix/cord-v2":
+            gt = gt["gt_parse"]
+    
+    else:
+        ocr_words = sample["ocr_words"]
+        words_list = [{"word": word} for word in ocr_words]
+        page = {"page_0": words_list}
+        gt = {"gt_parse": page}
 
     if SALIENCY:
         img = resize_image(img, 512)
