@@ -92,9 +92,14 @@ def get_paligemma(paligemma_model_version: str, subfolder: str):
 def get_dataset_iterator(dataset_name: str, subset_name: str):
     log_info("Loading Dataset")
 
-    dataset = load_dataset(
-        dataset_name, subset_name, split="test", streaming=True
-    )
+    if dataset_name == "de-Rodrigo/merit":
+        dataset = load_dataset(
+            dataset_name, subset_name, split="test", streaming=True
+        )
+    else:
+        dataset = load_dataset(
+            dataset_name, split="test", streaming=True
+        )
     dataset_iterator = iter(dataset)
 
     return dataset_iterator
@@ -167,9 +172,23 @@ def get_sample_data(sample):
     if img.mode != "RGB":
         img = img.convert("RGB")
 
-    gt = sample["ground_truth"]
-    gt = gt.replace("'", '"')
-    gt = json.loads(gt)
+    if dataset_name == "de-Rodrigo/merit" or dataset_name == "naver-clova-ix/cord-v2":
+        gt = sample["ground_truth"]
+        if dataset_name == "de-Rodrigo/merit":
+            gt = gt.replace("'", '"')
+        gt = json.loads(gt)
+
+        if dataset_name == "naver-clova-ix/cord-v2":
+            gt = gt["gt_parse"]
+        
+    else:
+        ocr_words = sample["ocr_words"]
+        words_list = [{"word": word} for word in ocr_words]
+        page = {"page_0": words_list}
+        gt = {"gt_parse": page}
+
+    print(gt)
+
 
     return img, gt
 
@@ -201,6 +220,7 @@ def process_dataset(dataset_iterator):
             num_prompt_tokens = num_image_tokens + num_text_tokens + 2
             generated_text = processor.batch_decode(generated_ids[:, num_prompt_tokens:], skip_special_tokens=True, clean_up_tokenization_spaces=False)[0]
             generated_json = token2json(generated_text)
+            print("PREDICTION", generated_json)
 
             score = evaluator.cal_acc(generated_json, gt)
 
