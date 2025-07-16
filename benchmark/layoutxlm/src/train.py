@@ -280,8 +280,6 @@ def load_merit_dataset(dataset_subset, split):
         remove_columns=["ground_truth"],
     )
 
-    # class_label = ClassLabel(names=LABEL_LIST)
-    # datasets = datasets.cast_column("ner_tags", Sequence(class_label))
 
     return datasets
 
@@ -295,7 +293,24 @@ def load_image(path, size=224):
     return img_resized, (w, h)
 
 
+def simplify_bbox(bbox):
+
+    if len(bbox) == 4:
+        xs = bbox[0::2]  # [x0, x1]
+        ys = bbox[1::2]  # [y0, y1]
+    elif len(bbox) == 8:
+        xs = bbox[0::2]  # [x0, x1, x2, x3]
+        ys = bbox[1::2]  # [y0, y1, y2, y3]
+    else:
+        raise ValueError("List must be 4 or 8 values")
+
+    return [min(xs), min(ys), max(xs), max(ys)]
+
+
 def normalize_bbox(b, size):
+
+    b = simplify_bbox(b)
+    
     return [
         int(1000 * b[0] / size[0]),
         int(1000 * b[1] / size[1]),
@@ -303,9 +318,10 @@ def normalize_bbox(b, size):
         int(1000 * b[3] / size[1]),
     ]
 
-# helpers que ya tenías
+
 def load_and_resize(img, size=224):
-    """Devuelve imagen 224×224 en CHW uint8  +  original."""
+
+    img = img.convert("RGB")
     original = img.copy()
     img = img.resize((size, size))
     # RGB → BGR y HWC → CHW
@@ -325,60 +341,46 @@ def merge_bbox(bbox_list):
     return [min(x0), min(y0), max(x1), max(y1)]
 
 def add_layoutlm_fields(example):
-    """
-    Convierte un registro (image + ground_truth) del dataset MERIT a
-    las entradas que espera LayoutLMv2/LayoutXLM, **incluyendo
-    entities y relations**.
-    Requiere que existan en el ámbito:
-        - tokenizer (LayoutXLMTokenizer)
-        - LABEL2ID  (dict: etiqueta BIO -> int)
-        - normalize_bbox, load_and_resize
-    """
 
-    MAX_LEN = 512  # longitud máxima de LayoutLMv2/XL
+    MAX_LEN = 512 
 
-    # ------------------------------------------------------------
-    # 1) Imagen
+
     img224, original = load_and_resize(example["image"])
     width, height = original.size
 
-    # ------------------------------------------------------------
-    # 2) Ground-truth
+
     doc  = json.loads(example["ground_truth"])
-    lines = doc["form"]             # MERIT guarda los renglones aquí
+    lines = doc["form"]
 
     input_ids, bboxes, labels = [], [], []
 
-    entities = []                   # lista final de entidades
-    entity_id_to_index = {}         # id de línea -> índice en entities
-    id2label = {}                   # id de línea -> label (para relaciones)
+    entities = []
+    entity_id_to_index = {}
+    id2label = {}
 
-    # ------------------------------------------------------------
-    # 3) Recorrer líneas y rellenar tokens / cajas / etiquetas
     for line in lines:
-        if not line["words"]:       # línea vacía
+        if not line["words"]:
             continue
 
         word_texts = [w["text"] for w in line["words"]]
         word_boxes = [normalize_bbox(w["box"], (width, height))
                       for w in line["words"]]
 
-        # tokenizar palabra-a-palabra (ya pre-segmentado)
         enc = tokenizer_data(
             word_texts,
             is_split_into_words=True,
             add_special_tokens=False,
             return_attention_mask=False,
         )
-        word_ids = enc.word_ids()   # mapa token -> índice de palabra
+        word_ids = enc.word_ids()  
 
-        start_pos = len(input_ids)  # primer token de esta línea
+        start_pos = len(input_ids) 
 
-        # añadir tokens y cajas
+
         input_ids.extend(enc.input_ids)
         bboxes.extend([word_boxes[wid] for wid in word_ids])
 
-        # etiquetas BIO a nivel palabra
+
         if line["label"] == "other":
             word_labels = ["O"] * len(word_texts)
         else:
@@ -386,11 +388,9 @@ def add_layoutlm_fields(example):
             word_labels = [f"I-{lbl}"] * len(word_texts)
             word_labels[0] = f"B-{lbl}"
 
-        # expandir a nivel token
         token_labels = [LABEL2ID[word_labels[wid]] for wid in word_ids]
         labels.extend(token_labels)
 
-        # entidad si no es 'O'
         if word_labels[0] != "O":
             ent_idx = len(entities)
             entity_id_to_index[line["id"]] = ent_idx
@@ -404,12 +404,11 @@ def add_layoutlm_fields(example):
 
         id2label[line["id"]] = line["label"]
 
-    # ------------------------------------------------------------
-    # 4) Relaciones (question-answer)
+
     kv_rel = []
     for line in lines:
         for pair in line.get("linking", []):
-            a, b = sorted(pair)  # orden estable para comparar etiquetas
+            a, b = sorted(pair)
             if a in entity_id_to_index and b in entity_id_to_index:
                 lbls = [id2label[a], id2label[b]]
                 if lbls == ["question", "answer"]:
@@ -441,15 +440,14 @@ def add_layoutlm_fields(example):
     ]
     relations.sort(key=lambda x: x["head"])
 
-    # ------------------------------------------------------------
-    # 5) Truncar a 512 tokens y reajustar entities/relations
+
     if len(input_ids) > MAX_LEN:
         keep = MAX_LEN
         input_ids = input_ids[:keep]
         bboxes    = bboxes[:keep]
         labels    = labels[:keep]
 
-        # entidades dentro del rango
+
         new_entities, old2new = [], {}
         for idx, ent in enumerate(entities):
             if ent["start"] < keep and ent["end"] <= keep:
@@ -457,7 +455,7 @@ def add_layoutlm_fields(example):
                 new_entities.append(ent)
         entities = new_entities
 
-        # relaciones cuyos extremos siguen vivos
+
         relations = [
             {
                 "head":  old2new[rel["head"]],
@@ -469,14 +467,13 @@ def add_layoutlm_fields(example):
             if rel["head"] in old2new and rel["tail"] in old2new
         ]
 
-    # ------------------------------------------------------------
-    # 6) Devolver ejemplo transformado
+
     return {
         "input_ids":       input_ids,
         "bbox":            bboxes,
         "labels":          labels,
-        "image":           img224,      # (3,224,224) uint8
-        "original_image":  original,    # PIL
+        "image":           img224, 
+        "original_image":  original,
         "entities":        entities,
         "relations":       relations,
     }
@@ -612,7 +609,7 @@ if __name__ == "__main__":
         result = metric.compute(predictions=[true_preds], references=[true_labels])
         true_f1s.append(result["overall_f1"])
 
-    # Convertir a lista y mostrarla:
+
     f1_list = list(true_f1s)
     print(f1_list)
 

@@ -1,5 +1,7 @@
 chmod +x src/format_dataset.py
-chmod +x src/train.py
+chmod +x src/train.py   
+
+
 
 # python src/format_dataset.py \
 #     --test_data_folder True \
@@ -10,5 +12,5 @@ chmod +x src/train.py
 python src/train.py \
     --load_from_hub \
     --dataset_path de-Rodrigo/merit \
-    --training_dataset_subset es-digital-token-class \
+    --training_dataset_subset es-render-token-class \
     --testing_dataset_subset es-render-token-class

@@ -23,7 +23,7 @@ pipeline_tag: token-classification
 
 
 ## Model Architecture
-**This model is based on the Donut architecture and fine-tuned on the Merit dataset for form understanding tasks.**
+**This model is based on the LayoutXLM architecture and fine-tuned on the Merit dataset for form understanding tasks.**
 
 - Backbone: [LayoutXLM](https://huggingface.co/microsoft/layoutxlm-base)
 - Training Data: [Merit](https://huggingface.co/datasets/de-Rodrigo/merit)
