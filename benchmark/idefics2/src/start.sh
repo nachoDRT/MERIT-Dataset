@@ -1,11 +1,12 @@
 chmod +x src/train.py
 chmod +x src/inference.py
+chmod +x src/biases_test.py
 
-python src/train.py \
-    --debug False \
-    --dataset de-Rodrigo/merit \
-    --subset en-render-seq \
-    # --save_initial
+# python src/train.py \
+#     --debug False \
+#     --dataset de-Rodrigo/merit \
+#     --subset en-render-seq \
+#     # --save_initial
 
 # python src/train.py \
 #     --debug False \
@@ -17,3 +18,5 @@ python src/train.py \
 #     --dataset de-Rodrigo/merit-secret \
 #     --subset all \
 #     --model es-digital-rotation-zoom-degradation-seq
+
+python src/biases_test.py
