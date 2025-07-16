@@ -1,7 +1,8 @@
-transformers==4.20.1
+transformers==4.22.0
 pyyaml==5.1
-pillow==8.2.0
+pillow==9.4.0
 wandb
 seqeval
-datasets
+datasets==2.19.0
 sentencepiece
+pyarrow==15.0.2

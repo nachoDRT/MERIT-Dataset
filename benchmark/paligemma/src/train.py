@@ -65,7 +65,7 @@ class CustomDataset(Dataset):
 
         self.gt_token_sequences = []
 
-        if dataset_name_or_path == "de-Rodrigo/merit":
+        if dataset_name_or_path == "de-Rodrigo/merit" or dataset_name_or_path == "naver-clova-ix/cord-v2":
             for sample in self.dataset:
                 ground_truth = json.loads(sample["ground_truth"])
                 if "gt_parses" in ground_truth:  # when multiple ground truths are available, e.g., docvqa
@@ -543,7 +543,7 @@ if __name__ == "__main__":
     processor = AutoProcessor.from_pretrained(REPO_ID)
 
     config = {
-        "max_epochs": 5,
+        "max_epochs": 50,
         "val_check_interval": 0.2,
         "check_val_every_n_epoch": 1,
         "gradient_clip_val": 1.0,
