@@ -14,7 +14,7 @@ docker run -it --gpus '"device=0"' --ipc=host donut
 ```
 
 ```bash
-docker run -p 5678:5678 -it --gpus '"device=0"' --ipc=host donut
+docker run -p 5678:5678 -it --gpus '"device=0"' -v "$HOME/.cache/huggingface":/root/.cache/huggingface --ipc=host donut
 ```
 
 ### Inspect default dataset using a volume
