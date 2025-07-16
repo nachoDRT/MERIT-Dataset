@@ -16,6 +16,9 @@ import argparse
 from huggingface_hub import login
 import wandb
 from PIL import Image
+from transformers import TrainerCallback
+import os
+from huggingface_hub import login, HfApi
 
 
 os.environ["WANDB_SILENT"] = "true"
@@ -25,15 +28,95 @@ WANDB_LOGGING_PATH = "/app/config/wandb_logging.json"
 HUGGINGFACE_LOGGING_PATH = "/app/config/huggingface_logging.json"
 DATASET_FOLDER = "/app/data/train-val/english/"
 
-MAX_TRAIN_STEPS = 10000
+MAX_TRAIN_STEPS = 6000
 EVAL_FRECUENCY = 250
 LOGGING_STEPS = 1
 
 
 GT_IS_PATH = False
+HF_CARD_FILES = ["/app/src/card/README.md", "/app/src/card/.huggingface.yaml", "/app/src/card/assets/dragon_huggingface.png"]
 
+
+
+class PushToHubCallback(TrainerCallback):
+    def __init__(
+        self,
+        repo_id: str,
+        processor,
+        monitor: str = "eval_loss",
+        mode: str = "min",
+        commit_message: str = "Improved model",
+        use_auth_token: str = True,
+    ):
+        self.repo_id = repo_id
+        self.processor = processor
+        self.monitor = monitor
+        self.mode = mode
+        self.best_score = float("inf") if mode == "min" else -float("inf")
+        self.commit_message = commit_message
+        self.use_auth_token = use_auth_token
+        login(token=os.getenv("HUGGINGFACE_HUB_TOKEN"))
+        self.api = HfApi()
+
+        if mode not in {"min", "max"}:
+            raise ValueError("mode must be 'min' o 'max'")
+
+    def on_evaluate(self, args, state, control, metrics=None, **kwargs):
+        current = metrics.get(self.monitor)
+        if current is None:
+            return
+
+        improved = (current < self.best_score) if self.mode == "min" else (current > self.best_score)
+        if not improved:
+            return
+
+        print(f"[PushToHubCallback] {self.monitor} mejoró: {self.best_score:.4f} → {current:.4f}")
+        self.best_score = current
+
+        kwargs["model"].push_to_hub(
+            repo_id=self.repo_id,
+            commit_message=f"{self.commit_message}: step {state.global_step} ({self.monitor}={current:.4f})",
+            use_auth_token=self.use_auth_token
+        )
+
+        self.processor.push_to_hub(
+            repo_id=self.repo_id,
+            commit_message=f"{self.commit_message} (processor): step {state.global_step}",
+            use_auth_token=self.use_auth_token
+        )
+
+        for file_path in HF_CARD_FILES:
+            if os.path.isfile(file_path):
+                self.api.upload_file(
+                    path_or_fileobj=file_path,
+                    path_in_repo=os.path.basename(file_path),
+                    repo_id=self.repo_id,
+                    repo_type="model",
+                    commit_message=f"Añadiendo {os.path.basename(file_path)}"
+                )
+            else:
+                print(f"[PushToHubCallback] Warning: {file_path} does not exist.")
+
+        kwargs["model"].train()
+
+
+def simplify_bbox(bbox):
+
+    if len(bbox) == 4:
+        xs = bbox[0::2]  # [x0, x1]
+        ys = bbox[1::2]  # [y0, y1]
+    elif len(bbox) == 8:
+        xs = bbox[0::2]  # [x0, x1, x2, x3]
+        ys = bbox[1::2]  # [y0, y1, y2, y3]
+    else:
+        raise ValueError("List must be 4 or 8 values")
+
+    return [min(xs), min(ys), max(xs), max(ys)]
 
 def normalize_bbox(box, size):
+
+    box = simplify_bbox(box)
+    
     w, h = size
     return [
         int(1000 * box[0] / w),
@@ -65,63 +148,64 @@ def build_label_list():
 LABEL_LIST = build_label_list()
 LABEL2ID = {t: i for i, t in enumerate(LABEL_LIST)}
 
-
 def add_layoutlm_fields(example):
-
-    # Parse ground-truth
+    # ---------- 1. Parse ground-truth ----------
     if GT_IS_PATH:
         with open(example["ground_truth"], "r", encoding="utf8") as f:
             data = json.load(f)
     else:
         data = json.loads(example["ground_truth"])
 
-    # Image
-    if isinstance(example["image"], dict):
-        print(example["image"].keys())
-        size = example["image"]["width"], example["image"]["height"]
+    # ---------- 2. Imagen ----------
+    if isinstance(example["image"], dict):        # caso “imagen serializada” (p.ej. en HF Hub)
+        size = (example["image"]["width"], example["image"]["height"])
         image_path = example["image"]["path"]
-    else:
-
-        img = example["image"]
+        img = None                                # no tenemos el objeto PIL
+    else:                                         # caso PIL.Image
+        img = example["image"].convert("RGB")
         size = img.size
         image_path = getattr(img, "filename", None)
 
-    # Annotations
+    # ---------- 3. Anotaciones ----------
     words, bboxes, ner_tags = [], [], []
+
     for item in data["form"]:
         words_example, label = item["words"], item["label"]
         words_example = [w for w in words_example if w["text"].strip() != ""]
-        if len(words_example) == 0:
+        if not words_example:
             continue
+
         if label == "other":
             for w in words_example:
                 words.append(w["text"])
                 ner_tags.append("O")
                 bboxes.append(normalize_bbox(w["box"], size))
         else:
+            # Etiqueta B- para la primera palabra
             words.append(words_example[0]["text"])
             ner_tags.append("B-" + label.upper())
             bboxes.append(normalize_bbox(words_example[0]["box"], size))
+            # Etiquetas I- para las siguientes
             for w in words_example[1:]:
                 words.append(w["text"])
                 ner_tags.append("I-" + label.upper())
                 bboxes.append(normalize_bbox(w["box"], size))
 
-        if load_from_hub:
-            return {
-                "words": words,
-                "bboxes": bboxes,
-                "ner_tags": ner_tags,
-                "image": img,
-            }
+    # ---------- 4. Ensamblar y devolver ----------
+    features = {
+        "words": words,
+        "bboxes": bboxes,
+        "ner_tags": ner_tags,
+    }
 
-        else:
-            return {
-                "words": words,
-                "bboxes": bboxes,
-                "ner_tags": ner_tags,
-                "image_path": image_path,
-            }
+    if load_from_hub:
+        # Cuando se entrena directamente desde HF Hub suele necesitar el objeto PIL
+        features["image"] = img if img is not None else example["image"]
+    else:
+        features["image_path"] = image_path
+
+    return features
+
 
 
 def get_dataset_name() -> str:
@@ -154,6 +238,7 @@ class FunsdTrainer(Trainer):
         train_dataset,
         validation_dataset,
         compute_metrics,
+        callbacks=None,
     ):
         super(FunsdTrainer, self).__init__(
             model=model,
@@ -161,6 +246,7 @@ class FunsdTrainer(Trainer):
             compute_metrics=compute_metrics,
             train_dataset=train_dataset,
             eval_dataset=validation_dataset,
+            # callbacks=callbacks,
         )
 
     def get_train_dataloader(self):
@@ -188,6 +274,7 @@ def preprocess_data(examples):
         word_labels=word_labels,
         padding="max_length",
         truncation=True,
+        max_length=512,
     )
     return encoded_inputs
 
@@ -254,9 +341,9 @@ def load_session_dataset():
     if load_from_hub:
 
         split = {
-            "train": "train[:1%]",
-            "validation": "validation[:1%]",
-            "test": "test[:1%]",
+            "train": "train[:100%]",
+            "validation": "validation[:5%]",
+            "test": "test[:5%]",
         }
 
         if dataset_path == "de-Rodrigo/merit" and testing_dataset_subset == None:
@@ -265,12 +352,12 @@ def load_session_dataset():
         elif dataset_path == "de-Rodrigo/merit" and testing_dataset_subset != None:
             
             split_train_val = {
-                "train": "train[:1%]",
-                "validation": "validation[:1%]",
+                "train": "train[:100%]",
+                "validation": "validation[:5%]",
             }
 
             split_test = {
-                "test": "test[:1%]",
+                "test": "test[:5%]",
             }
 
             datasets_train_val = load_merit_dataset(training_dataset_subset, split_train_val)
@@ -353,7 +440,7 @@ def get_args():
         output_dir="".join(["app/", wandb_config["project"]]),
         max_steps=MAX_TRAIN_STEPS,
         # warmup_ratio=0.1,
-        learning_rate=5e-5,
+        learning_rate=1.5e-5,
         fp16=True,
         push_to_hub=False,
         # push_to_hub_model_id="CICLAB-Comillas/layoutlmv2-LSD",
@@ -361,6 +448,7 @@ def get_args():
         logging_steps=LOGGING_STEPS,
         evaluation_strategy="steps",
         eval_steps=EVAL_FRECUENCY,
+        save_steps=EVAL_FRECUENCY,
         report_to="wandb",
         load_best_model_at_end=True,
         save_total_limit=1,
@@ -388,6 +476,12 @@ if __name__ == "__main__":
         datasets_train_val, dataset_test = load_session_dataset()
     else:
         datasets_train_val, dataset_test = load_session_dataset()
+
+    # ex = datasets_train_val["train"][0]
+    # print(ex)
+
+    # ex = dataset_test["test"][0]
+    # print(ex)
     
     labels = datasets_train_val["train"].features["ner_tags"].feature.names
     id2label = {v: k for v, k in enumerate(labels)}
@@ -428,6 +522,14 @@ if __name__ == "__main__":
 
     args = get_args()
 
+    push_cb = PushToHubCallback(
+        repo_id="de-Rodrigo/layoutlmv2-merit",
+        processor=processor,
+        monitor="eval_loss",
+        mode="min",
+        # save_dir="checkpoints"
+    )
+
     # Initialize our Trainer
     trainer = FunsdTrainer(
         model=model,
@@ -435,6 +537,7 @@ if __name__ == "__main__":
         train_dataset=train_dataset,
         validation_dataset=validation_dataset,
         compute_metrics=compute_metrics,
+        # callbacks=[push_cb],
     )
 
     # Train
@@ -442,6 +545,24 @@ if __name__ == "__main__":
 
     # Test
     test_results = trainer.predict(test_dataset)
+
+    preds, labels = test_results.predictions, test_results.label_ids
+    metric = load_metric("seqeval")
+
+    true_f1s = []
+    for pred_logits, label_ids in zip(preds, labels):
+        pred_ids = np.argmax(pred_logits, axis=-1)
+        true_labels, true_preds = [], []
+        for p, l in zip(pred_ids, label_ids):
+            if l != -100:
+                true_labels.append(id2label[l])
+                true_preds.append(id2label[p])
+        result = metric.compute(predictions=[true_preds], references=[true_labels])
+        true_f1s.append(result["overall_f1"])
+
+    # Convertir a lista y mostrarla:
+    f1_list = list(true_f1s)
+    print(f1_list)
 
     wandb.log(
         {
