@@ -499,8 +499,8 @@ def eval_collate_fn(examples, processor, model):
 
 
 def init_pl_module(processor, model):
-    configuration = {"max_epochs": 10,
-        "val_check_interval": 0.05,
+    configuration = {"max_epochs": 15,
+        "val_check_interval": 0.2,
         "check_val_every_n_epoch": 1,
         "gradient_clip_val": 1.0,
         "accumulate_grad_batches": 8,

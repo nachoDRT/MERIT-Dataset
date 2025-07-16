@@ -4,7 +4,7 @@ chmod +x src/inference.py
 python src/train.py \
     --debug False \
     --dataset de-Rodrigo/merit \
-    --subset es-digital-seq \
+    --subset en-render-seq \
     # --save_initial
 
 # python src/train.py \
