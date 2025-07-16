@@ -10,3 +10,4 @@ peft
 bitsandbytes
 donut-python
 peft
+accelerate

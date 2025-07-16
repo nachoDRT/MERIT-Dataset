@@ -1,6 +1,6 @@
 import requests
 from PIL import Image
-from transformers import Idefics2Processor, Idefics2ForConditionalGeneration
+from transformers import Idefics2Processor, Idefics2ForConditionalGeneration, BitsAndBytesConfig
 import torch
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -21,8 +21,25 @@ messages = [{
     ],
 }]
 
-processor = Idefics2Processor.from_pretrained("HuggingFaceM4/idefics2-8b")
-model = Idefics2ForConditionalGeneration.from_pretrained("HuggingFaceM4/idefics2-8b")
+processor = Idefics2Processor.from_pretrained(
+    "HuggingFaceM4/idefics2-8b",
+    do_image_splitting=False,
+)
+
+quant_cfg = BitsAndBytesConfig(
+    load_in_4bit=True,
+    bnb_4bit_quant_type="nf4",
+    bnb_4bit_use_double_quant=True,
+    bnb_4bit_compute_dtype=torch.float16
+)
+
+model = Idefics2ForConditionalGeneration.from_pretrained(
+    "HuggingFaceM4/idefics2-8b",
+    device_map="auto",
+    torch_dtype=torch.float16,
+    quantization_config=quant_cfg,
+)
+
 model.to(device)
 
 # at inference time, one needs to pass `add_generation_prompt=True` in order to make sure the model completes the prompt
